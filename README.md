@@ -7,7 +7,7 @@ The build workflow for R2D2-2019 is based on the BMPTK (bare metal programming t
  ### Windows:
 
  1. Install git by visiting the git [download](https://git-scm.com/download/win) page.  Install using all the default settings and make sure the checkbox which adds git to your path is checked. **note:** If you already installed git on your machine you can skip this step.
- 2. Pull the build repo by typing `git clone "add link here"` you can clone repo to whatever drive or folder you want. Remember the path you cloned the repo to.
+ 2. Pull the build repo by typing `git clone  https://github.com/R2D2-2019/R2D2-build` you can clone repo to whatever drive or folder you want. Remember the path you cloned the repo to.
  3. Open windows explorer and browse to the path you cloned the repo to, browse to the folder `R2D2-build/programs/install`
  4. Double-click on the "mingw-w64-install.exe" after the installation wizard has opened click next until you can select the installation path at this point change the path to the following `<path-to-your-repo>/R2D2-build/programs`. Install by clicking next. After installation a folder `mingw32` should have appeared int the `R2D2-build/programs` directory.
  5.  Double-click on the "gcc-arm-none-eabi-8-2018-q4-major-win32-sha1.exe" after the installation wizard has opened click next until you can select the installation path at this point change the path to the following `<path-to-your-repo>/R2D2-build/programs`. Install by clicking next. After installation a folder `8 2018-q4-major` should have appeared in the `R2D2-build/programs` directory.
