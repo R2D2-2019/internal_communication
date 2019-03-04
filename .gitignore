@@ -1,2 +1,7 @@
-/programs/mingw32
-/programs/8 2018-q4-major
+*.o
+*.elf
+*.bin
+*.c
+*.map
+*.ld
+/.idea
