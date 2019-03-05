@@ -2,6 +2,9 @@
 
 #include "sam.h"
 
+#include "ringbuffer.hpp"
+#include "queue.hpp"
+
 namespace r2d2::can_bus {
     struct pioa {
         constexpr static uint32_t instance_id = ID_PIOA;
@@ -158,7 +161,7 @@ namespace r2d2::can_bus {
     enum mailbox_status {
         TRANSFER_OK = 0,
         NOT_READY = 0x01,
-        RS_OVER = 0x02,
+        RX_OVER = 0x02,
         RX_NEED_RD_AGAIN = 0x03
     };
 
@@ -175,7 +178,282 @@ namespace r2d2::can_bus {
         BPS_5K = 5000,
     };
 
+    enum mailbox {
+        MAILBOX_0,
+        MAILBOX_1,
+        MAILBOX_2,
+        MAILBOX_3,
+        MAILBOX_4,
+        MAILBOX_5,
+        MAILBOX_6,
+        MAILBOX_7
+    };
+
     namespace detail {
+        struct _can_frame_s {
+            uint32_t id; // EID/SID
+            uint32_t fid; // Family id
+            uint8_t rtr; // Remote transmission request
+            uint8_t priority;
+            uint8_t extended;
+            uint16_t time;
+            uint8_t length;
+
+            // Data
+            union {
+                struct {
+                    uint32_t low;
+                    uint32_t high;
+                };
+
+                uint8_t bytes[8];    
+            } data;
+        };
+
+        template<typename Bus>
+        struct _mailbox_tx_queues {
+            using queue_type = queue_c<_can_frame_s, 32>;
+
+            static queue_type queues[4];
+        };
+
+        template<typename Bus>
+        struct _mailbox_rx_stores {
+            using ringbuffer_type = ringbuffer_c<_can_frame_s, 32>;
+
+            static ringbuffer_type buffers[4];
+        };
+
+        /**
+         * Set the mode of the given mailbox.
+         * 
+         * @tparam Bus 
+         * @param index 
+         * @param mode 
+         */
+        template<typename Bus>
+        void _set_mailbox_mode(const uint8_t index, uint8_t mode) {
+            if (mode > 5) {
+                mode = 0; // Set disabled on invalid mode
+            }
+
+            port<Bus>->CAN_MB[index].CAN_MMR = 
+                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_MOT_Msk) | (mode << CAN_MMR_MOT_Pos);
+        }
+
+        /**
+         * Set mask for rx on the given mailbox.
+         *  
+         * @tparam Bus 
+         * @param index 
+         * @param mask 
+         * @param extended 
+         */
+        template<typename Bus>
+        void _set_mailbox_accept_mask(const uint8_t index, const uint32_t mask, bool extended) {
+            if (extended) {
+                port<Bus>->CAN_MB[index].CAN_MAM = mask | CAN_MAM_MIDE;
+                port<Bus>->CAN_MB[index].CAN_MID |= CAN_MAM_MIDE;
+            } else {
+                port<Bus>->CAN_MB[index].CAN_MAM = mask | CAN_MAM_MIDvA(mask);
+                port<Bus>->CAN_MB[index].CAN_MID &= ~CAN_MAM_MIDE;
+            }
+        }
+
+        /**
+         * Set the id portion of a given mailbox.
+         * 
+         * @tparam Bus 
+         * @param index 
+         * @param id 
+         * @param extended 
+         */
+        template<typename Bus>
+        void _set_mailbox_id(const uint8_t index, uint32_t id, bool extended) {
+            if (extended) {
+                port<Bus>->CAN_MB[index].CAN_MID = id | CAN_MID_MIDE;
+            } else {
+                port<Bus>->CAN_MB[index].CAN_MID = CAN_MID_MIDvA(id);
+            }
+        }
+
+        /**
+         * Set the transmission priority of the given
+         * mailbox.
+         * 
+         * @tparam Bus 
+         * @param index 
+         * @param priority 
+         */
+        template<typename Bus>
+        void _set_mailbox_priority(const uint8_t index, const uint8_t priority) {
+            port<Bus>->CAN_MB[index].CAN_MMR = 
+                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_PRIOR_Msk) | (priority << CAN_MMR_PRIOR_Pos);
+        }
+
+        /**
+         * Set the rtr for the given mailbox.
+         * 
+         * @tparam Bus 
+         * @param index 
+         * @param rtr 
+         */
+        template<typename Bus>
+        void _set_mailbox_rtr(const uint8_t index, const uint8_t rtr) {
+            if (rtr) {
+                port<Bus>->CAN_MB[index].CAN_MSR |= CAN_MSR_MRTR;
+            } else {
+                port<Bus>->CAN_MB[index].CAN_MSR &= ~CAN_MSR_MRTR;
+            }
+        }
+
+        /**
+         * Set the data length for the given mailbox.
+         * 
+         * @tparam Bus 
+         * @param index 
+         * @param data_length 
+         */
+        template<typename Bus>
+        void _set_mailbox_datalen(const uint8_t index, uint8_t data_length) {
+            if (data_length > 8) {
+                data_length = 8;
+            }
+
+            port<Bus>->CAN_MB[index].CAN_MCR
+                = (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) | CAN_MCR_MDLC(data_length);
+        }
+
+        template<typename Bus>
+        uint32_t _read_mailbox(const uint8_t index, _can_frame_s &frame) {
+            uint32_t retval = 0;
+            uint32_t status = port<Bus>->CAN_MB[index].CAN_MSR;
+
+            /* 
+             * Check whether there is overwriting happening in Receive with Overwrite mode, 
+             * or there're messages lost in Receive mode. 
+             */
+            if ((status & CAN_MSR_MRDY) && (status & CAN_MSR_MMI)) {
+                retval = mailbox_status::RX_OVER;
+            }
+
+            uint32_t id = port<Bus>->CAN_MB[index].CAN_MID;
+
+            // Extended id
+            if ((id & CAN_MID_MIDE) == CAN_MID_MIDE) { 
+                frame.id = id & 0x1FFFFFFFu;
+                frame.extended = true;
+            } 
+            // Standard ID
+            else { 
+                frame.id = (id  >> CAN_MID_MIDvA_Pos) & 0x7ffu;
+                frame.extended = false;
+            }
+            
+            frame.fid    = port<Bus>->CAN_MB[index].CAN_MFID;
+            frame.length = (status & CAN_MSR_MDLC_Msk) >> CAN_MSR_MDLC_Pos;
+            frame.time   = (status & CAN_MSR_MTIMESTAMP_Msk);
+            frame.rtr    = (port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRTR) ? 1 : 0 ;
+
+            frame.data.low = port<Bus>->CAN_MB[index].CAN_MDL;
+            frame.data.high = port<Bus>->CAN_MB[index].CAN_MDH;
+
+            /* 
+             * Read the mailbox status again to check whether the software
+             * needs to re-read mailbox data register. 
+             */
+            status = port<Bus>->CAN_MB[index].CAN_MSR;	
+            if (status & CAN_MSR_MMI) {
+                retval |= mailbox_status::RX_NEED_RD_AGAIN;
+            } else {
+                retval |= mailbox_status::TRANSFER_OK;
+            }
+
+            // Enable next receive process.
+            port<Bus>->CAN_MB[index].CAN_MCR |= CAN_MCR_MTCR;
+
+            return retval;
+        }
+
+        /**
+         * Write the frame into the tx registers of
+         * the mailbox.
+         * 
+         * @tparam Bus 
+         * @param frame 
+         * @param index 
+         */
+        template<typename Bus>
+        void _write_tx_registers(const _can_frame_s &frame, const uint8_t index) {
+            _set_mailbox_id<Bus>(index, frame.id, frame.extended);
+            _set_mailbox_datalen<Bus>(index, frame.length);        
+            _set_mailbox_rtr<Bus>(index, frame.rtr);
+            _set_mailbox_priority<Bus>(index, frame.priority);
+
+            // Set mailbox data
+            port<Bus>->CAN_MB[index].CAN_MDL = frame.data.low;
+            port<Bus>->CAN_MB[index].CAN_MDH = frame.data.high;
+
+            port<Bus>->CAN_TCR = (0x1U << index) & 0x000000FF;
+        }
+
+        /**
+         * Handle a isr for a mailbox.
+         * 
+         * @tparam Bus 
+         * @param mb 
+         */
+        template<typename Bus>
+        void _handle_mailbox_isr(const uint8_t index) {
+            _can_frame_s frame;
+
+            // Mailbox ready?
+            if (!(port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRDY)) {
+                return;
+            }
+
+            switch ((port<Bus>->CAN_MB[index].CAN_MMR >> 24) & 7) {
+                case 1: // Fallthrough
+                case 2: // Fallthrough
+                case 4: 
+                    _read_mailbox<Bus>(index, frame);
+                    _mailbox_rx_stores<Bus>::buffers[index].push(frame);
+                    break;
+
+                // Transmit
+                case 3:
+                    auto &queue = _mailbox_tx_queues<Bus>::queues[index - 4];
+                    
+                    if (!queue.empty()) {
+                        const auto frame = queue.copy_and_pop();
+                        _write_tx_registers<Bus>(frame, index);
+                    } else {
+                        port<Bus>->CAN_IDR = (0x01 << index);
+                    }
+
+                    break;
+            }
+        }
+
+        /**
+         * Handle an interrupt from the CAN bus.
+         * 
+         * @tparam Bus 
+         */
+        template<typename Bus>
+        void _handle_generic_isr() {
+            const uint32_t status = port<Bus>->CAN_SR;
+            const uint32_t mask = port<Bus>->CAN_IMR;
+
+            uint8_t trailing_zeros = 0;
+            while((trailing_zeros = __CLZ(__RBIT(status & mask))) < 32) {
+                const auto bit = static_cast<uint8_t>(trailing_zeros);
+
+                // Callback
+                _handle_mailbox_isr<Bus>(bit);
+            }
+        }
+
         /**
          * Disable the given CAN bus and clear
          * the SR register.
@@ -347,73 +625,6 @@ namespace r2d2::can_bus {
         }
 
         /**
-         * Set the mode of the given mailbox.
-         * 
-         * @tparam Bus 
-         * @param index 
-         * @param mode 
-         */
-        template<typename Bus>
-        void _set_mailbox_mode(const uint8_t index, uint8_t mode) {
-            if (mode > 5) {
-                mode = 0; // Set disabled on invalid mode
-            }
-
-            port<Bus>->CAN_MB[index].CAN_MMR = 
-                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_MOT_Msk) | (mode << CAN_MMR_MOT_Pos);
-        }
-
-        /**
-         * Set mask for rx on the given mailbox.
-         *  
-         * @tparam Bus 
-         * @param index 
-         * @param mask 
-         * @param extended 
-         */
-        template<typename Bus>
-        void _set_mailbox_accept_mask(const uint8_t index, const uint32_t mask, bool extended) {
-            if (extended) {
-                port<Bus>->CAN_MB[index].CAN_MAM = mask | CAN_MAM_MIDE;
-                port<Bus>->CAN_MB[index].CAN_MID |= CAN_MAM_MIDE;
-            } else {
-                port<Bus>->CAN_MB[index].CAN_MAM = mask | CAN_MAM_MIDvA(mask);
-                port<Bus>->CAN_MB[index].CAN_MID &= ~CAN_MAM_MIDE;
-            }
-        }
-
-        /**
-         * Set the id portion of a given mailbox.
-         * 
-         * @tparam Bus 
-         * @param index 
-         * @param id 
-         * @param extended 
-         */
-        template<typename Bus>
-        void _set_mailbox_id(const uint8_t index, uint32_t id, bool extended) {
-            if (extended) {
-                port<Bus>->CAN_MB[index].CAN_MID = id | CAN_MID_MIDE;
-            } else {
-                port<Bus>->CAN_MB[index].CAN_MID = CAN_MID_MIDvA(id);
-            }
-        }
-
-        /**
-         * Set the transmission priority of the given
-         * mailbox.
-         * 
-         * @tparam Bus 
-         * @param index 
-         * @param priority 
-         */
-        template<typename Bus>
-        void _set_mailbox_priority(const uint8_t index, const uint8_t priority) {
-            port<Bus>->CAN_MB[index].CAN_MMR = 
-                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_PRIOR_Msk) | (priority << CAN_MMR_PRIOR_Pos);
-        }
-
-        /**
          * Set the tx/rx mailbox balance and modes.
          * If tx_boxes is 4, 4 tx and 4 rx mailboxes will
          * be configured.
@@ -436,6 +647,38 @@ namespace r2d2::can_bus {
                 _set_mailbox_priority<Bus>(i, 10);
                 _set_mailbox_accept_mask<Bus>(i, 0x7FF, false);
             }
+        }
+
+        template<typename Bus>
+        uint8_t _get_free_tx_queue() {
+            uint8_t selected = 255;
+            const auto &queues = _mailbox_tx_queues<Bus>::queues;
+
+            for (uint8_t i = 0; i < 4; i++) {
+                if (queues[i].full()) {
+                    continue;
+                }
+
+                if (selected == 255 || queues[i].size() < queues[selected].size()) {
+                    selected = i;
+                }
+            }
+            
+            return selected;
+        }
+
+        template<typename Bus>
+        bool _send_frame(const _can_frame_s &frame) {
+            auto id = _get_free_tx_queue<Bus>();
+
+            if (id == 255) {
+                return false;
+            }
+
+            _mailbox_tx_queues<Bus>::queues[id].push(frame);
+            port<Bus>->CAN_IER = (0x01 << (id + 4));
+
+            return true;
         }
     }
 
@@ -488,4 +731,18 @@ namespace r2d2::can_bus {
             return tick != can_timeout;
         }
     };
+}
+
+extern "C" {
+    void __CAN0_Handler() {
+        r2d2::can_bus::detail::_handle_generic_isr<
+            r2d2::can_bus::can0
+        >();
+    }
+
+    void __CAN1_Handler() {
+        r2d2::can_bus::detail::_handle_generic_isr<
+            r2d2::can_bus::can1
+        >();
+    }
 }
