@@ -443,7 +443,7 @@ namespace r2d2::can_bus {
         template<typename Bus>
         void _handle_generic_isr() {
             const uint32_t status = port<Bus>->CAN_SR;
-            const uint32_t mask = port<Bus>->CAN_IMR;
+            uint32_t mask = port<Bus>->CAN_IMR;
 
             uint8_t trailing_zeros = 0;
             while((trailing_zeros = __CLZ(__RBIT(status & mask))) < 32) {
@@ -451,6 +451,9 @@ namespace r2d2::can_bus {
 
                 // Callback
                 _handle_mailbox_isr<Bus>(bit);
+
+                // remove current bit from mask
+                mask &= (~(1U << bit));
             }
         }
 
