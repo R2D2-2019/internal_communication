@@ -133,8 +133,8 @@ namespace r2d2::can_bus {
         /**
          * Handle a interrupt meant for this channel.
          */
-        static void handle_interrupt() {
-            if (!(port<Bus>->CAN_MB[ids::rx].CAN_MSR & CAN_MSR_MRDY)) {
+        static void handle_interrupt(const uint8_t index) {
+            if (!(port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRDY)) {
                 return;
             }
 
