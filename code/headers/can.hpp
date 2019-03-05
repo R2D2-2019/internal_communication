@@ -345,6 +345,98 @@ namespace r2d2::can_bus {
                 _init_mailbox<Bus>(i);
             }
         }
+
+        /**
+         * Set the mode of the given mailbox.
+         * 
+         * @tparam Bus 
+         * @param index 
+         * @param mode 
+         */
+        template<typename Bus>
+        void _set_mailbox_mode(const uint8_t index, uint8_t mode) {
+            if (mode > 5) {
+                mode = 0; // Set disabled on invalid mode
+            }
+
+            port<Bus>->CAN_MB[index].CAN_MMR = 
+                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_MOT_Msk) | (mode << CAN_MMR_MOT_Pos);
+        }
+
+        /**
+         * Set mask for rx on the given mailbox.
+         *  
+         * @tparam Bus 
+         * @param index 
+         * @param mask 
+         * @param extended 
+         */
+        template<typename Bus>
+        void _set_mailbox_accept_mask(const uint8_t index, const uint32_t mask, bool extended) {
+            if (extended) {
+                port<Bus>->CAN_MB[index].CAN_MAM = mask | CAN_MAM_MIDE;
+                port<Bus>->CAN_MB[index].CAN_MID |= CAN_MAM_MIDE;
+            } else {
+                port<Bus>->CAN_MB[index].CAN_MAM = mask | CAN_MAM_MIDvA(mask);
+                port<Bus>->CAN_MB[index].CAN_MID &= ~CAN_MAM_MIDE;
+            }
+        }
+
+        /**
+         * Set the id portion of a given mailbox.
+         * 
+         * @tparam Bus 
+         * @param index 
+         * @param id 
+         * @param extended 
+         */
+        template<typename Bus>
+        void _set_mailbox_id(const uint8_t index, uint32_t id, bool extended) {
+            if (extended) {
+                port<Bus>->CAN_MB[index].CAN_MID = id | CAN_MID_MIDE;
+            } else {
+                port<Bus>->CAN_MB[index].CAN_MID = CAN_MID_MIDvA(id);
+            }
+        }
+
+        /**
+         * Set the transmission priority of the given
+         * mailbox.
+         * 
+         * @tparam Bus 
+         * @param index 
+         * @param priority 
+         */
+        template<typename Bus>
+        void _set_mailbox_priority(const uint8_t index, const uint8_t priority) {
+            port<Bus>->CAN_MB[index].CAN_MMR = 
+                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_PRIOR_Msk) | (priority << CAN_MMR_PRIOR_Pos);
+        }
+
+        /**
+         * Set the tx/rx mailbox balance and modes.
+         * If tx_boxes is 4, 4 tx and 4 rx mailboxes will
+         * be configured.
+         * 
+         * @tparam Bus 
+         * @param tx_boxes 
+         */
+        template<typename Bus>
+        void _set_mailbox_tx_count(const uint8_t tx_boxes) {
+            // Initialize RX
+            for (int i = 0; i < tx_boxes; i++) {
+                _set_mailbox_mode<Bus>(i, mailbox_mode::RX);
+                _set_mailbox_id<Bus>(i, 0x0, false);
+                _set_mailbox_accept_mask<Bus>(i, 0x7FF, false);
+            }
+
+            // Initialize TX
+            for (int i = tx_boxes; i < CANMB_NUMBER; i++) {
+                _set_mailbox_mode<Bus>(i, mailbox_mode::TX);
+                _set_mailbox_priority<Bus>(i, 10);
+                _set_mailbox_accept_mask<Bus>(i, 0x7FF, false);
+            }
+        }
     }
 
     /**
@@ -369,9 +461,13 @@ namespace r2d2::can_bus {
             }
 
             // TODO: mailbox stuf?
+            detail::_reset_mailboxes<Bus>();
 
             // Disable all CAN interrupts by default
             port<Bus>->CAN_IDR = 0xffffffff;
+
+            // Enable four mailboxes for tx, four for rx
+            detail::_set_mailbox_tx_count<Bus>(4);
 
             detail::_enable_bus<Bus>();
 
@@ -383,7 +479,11 @@ namespace r2d2::can_bus {
                 ++tick;
             } while (!(flag & CAN_SR_WAKEUP) && (tick < can_timeout));
 
-            // TODO: priority in nvic for interrupts
+            // Priority is low; almost everything can preempt.
+            constexpr auto irqn = static_cast<IRQn_Type>(Bus::irqn);
+
+            NVIC_SetPriority(irqn, 12);
+            NVIC_EnableIRQ(irqn);
 
             return tick != can_timeout;
         }
