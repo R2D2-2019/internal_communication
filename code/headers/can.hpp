@@ -698,6 +698,12 @@ namespace r2d2::can_bus {
             // Init bus clock
             enable_clock<Bus>();
 
+            // Priority is low; almost everything can preempt.
+            constexpr auto irqn = static_cast<IRQn_Type>(Bus::irqn);
+
+            NVIC_SetPriority(irqn, 12);
+            NVIC_EnableIRQ(irqn);
+
             // Change multiplexers on tx/rx pins to CAN
             set_peripheral<typename Bus::tx>();
             set_peripheral<typename Bus::rx>();
@@ -724,12 +730,6 @@ namespace r2d2::can_bus {
                 flag = port<Bus>->CAN_SR;
                 ++tick;
             } while (!(flag & CAN_SR_WAKEUP) && (tick < can_timeout));
-
-            // Priority is low; almost everything can preempt.
-            constexpr auto irqn = static_cast<IRQn_Type>(Bus::irqn);
-
-            NVIC_SetPriority(irqn, 12);
-            NVIC_EnableIRQ(irqn);
 
             return tick != can_timeout;
         }
