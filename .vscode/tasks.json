@@ -1,0 +1,48 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "bmptk-make",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/code"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+
+            "windows": {
+                "command": "../../../programs/bmptk/tools/bmptk-make.exe",
+            },
+
+            "linux": {
+                "command": "make",
+            }
+        },
+        {
+            "label": "bmptk-make rebuild",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/code"
+            },
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ],
+
+            "windows": {
+                "command": "../../../programs/bmptk/tools/bmptk-make.exe clean build",
+            },
+
+            "linux": {
+                "command": "make clean build",
+            }
+        }
+    ]
+}
