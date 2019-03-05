@@ -45,6 +45,20 @@ namespace r2d2::can_bus {
         }
 
         /**
+         * Copy the last item from the buffer
+         * and pop.
+         *
+         * @return
+         */
+        constexpr T copy_and_pop() {
+            T item = buffer[tail];
+
+            tail -= tail - 1 != 0;
+
+            return item;
+        }
+
+        /**
          * Reset (empty) the ringbuffer.
          *
          * @return
