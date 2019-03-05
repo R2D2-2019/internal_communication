@@ -255,7 +255,9 @@ namespace r2d2::can_bus {
             constexpr uint32_t max_tq = 25;
             constexpr uint32_t baudrate_max_div = 128;
 
-            uint32_t prescale = (SystemCoreClock + (Baud * max_tq - 1)) / (SystemCoreClock * max_tq);
+            constexpr uint32_t mck = CHIP_FREQ_CPU_MAX;
+
+            uint32_t prescale = (mck + (Baud * max_tq - 1)) / (mck * max_tq);
 
             /*
              *  Is the baudrate prescale greater than
@@ -268,7 +270,7 @@ namespace r2d2::can_bus {
             /*
              * Is the input MCK too small?
              */
-            if (SystemCoreClock < Baud * min_tq) {
+            if (mck < Baud * min_tq) {
                 return false;
             }
 
@@ -277,11 +279,11 @@ namespace r2d2::can_bus {
 
             // Find approximate Time Quantum
             for (uint8_t i = min_tq; i <= max_tq; ++i) {
-                if (SystemCoreClock / (Baud * i) > baudrate_max_div) {
+                if (mck / (Baud * i) > baudrate_max_div) {
                     continue;
                 }
 
-                const uint32_t cur_mod = SystemCoreClock % (Baud * i);
+                const uint32_t cur_mod = mck % (Baud * i);
 
                 if (cur_mod >= mod) {
                     continue;
@@ -296,7 +298,7 @@ namespace r2d2::can_bus {
             }
 
             // Calculate baudrate prescale
-            prescale = SystemCoreClock / (Baud * tq);
+            prescale = mck / (Baud * tq);
 
             // Get the right CAN bit timing group
             const auto bit_time = _can_bit_time[tq - min_tq];
@@ -313,8 +315,41 @@ namespace r2d2::can_bus {
 
             return true;
         }
+
+        /**
+         * Initialize the mailbox to a default state.
+         * 
+         * @internal
+         * @tparam Bus
+         * @param index
+         */ 
+        template<typename Bus>
+        void _init_mailbox(const uint8_t index) {
+            port<Bus>->CAN_MB[index].CAN_MMR = 0;
+            port<Bus>->CAN_MB[index].CAN_MAM = 0;
+            port<Bus>->CAN_MB[index].CAN_MID = 0;
+            port<Bus>->CAN_MB[index].CAN_MDL = 0;
+            port<Bus>->CAN_MB[index].CAN_MDH = 0;
+            port<Bus>->CAN_MB[index].CAN_MCR = 0;
+        }
+
+        /**
+         * Reset all mail boxes for the given bus.
+         * 
+         * @internal
+         * @tparam Bus
+         */ 
+        template<typename Bus>
+        void _reset_mailboxes() {
+            for (uint8_t i = 0; i < CANMB_NUMBER; i++) {
+                _init_mailbox<Bus>(i);
+            }
+        }
     }
 
+    /**
+    * @tparam Bus 
+    */
     template<typename Bus>
     class controller {
     public:
