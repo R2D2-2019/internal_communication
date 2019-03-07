@@ -38,6 +38,7 @@ namespace r2d2::can_bus {
             buffer[tail++] = val;
 
             if (full()) {
+                tail = head;
                 head = (head + 1) % MaxSize;
             } else {
                 used += 1;
@@ -51,9 +52,27 @@ namespace r2d2::can_bus {
          * @return
          */
         constexpr T copy_and_pop() {
-            T item = buffer[tail];
+            size_t pos = 0;
 
-            tail -= tail - 1 != 0;
+            // get previous position
+            if(tail){
+                pos = tail - 1;
+            } else {
+                pos = MaxSize - 1;
+            }
+
+            T item = buffer[pos];
+
+            if(!used){
+                // at last item
+                return item;
+            }
+
+            // remove last item
+            used--;
+
+            // move tail back 1 or back to maxsize - 1
+            tail = !(tail) ? (MaxSize - 1) : (tail - 1);
 
             return item;
         }
