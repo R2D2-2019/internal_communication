@@ -214,14 +214,14 @@ namespace r2d2::can_bus {
         struct _mailbox_tx_queues {
             using queue_type = queue_c<_can_frame_s, 32>;
 
-            static queue_type queues[4];
+            static inline queue_type queues[4] = {};
         };
 
         template<typename Bus>
         struct _mailbox_rx_stores {
             using ringbuffer_type = ringbuffer_c<_can_frame_s, 32>;
 
-            static ringbuffer_type buffers[4];
+            static inline ringbuffer_type buffers[4] = {};
         };
 
         /**
@@ -683,6 +683,35 @@ namespace r2d2::can_bus {
 
             return true;
         }
+
+        template<typename Bus, bool Extended = false>
+        void _set_mailbox_mask(uint8_t index, uint32_t mask){
+            if constexpr (Extended){
+                port<Bus>->CAN_MB[index].CAN_MAM = (mask & 0x7FFFFFFF) | CAN_MAM_MIDE;
+                port<Bus>->CAN_MB[index].CAN_MID |= CAN_MID_MIDE;
+            } else {
+                port<Bus>->CAN_MB[index].CAN_MAM = CAN_MAM_MIDvA(mask);
+                port<Bus>->CAN_MB[index].CAN_MID &= ~CAN_MID_MIDE;                
+            }
+        }
+
+        template<typename Bus, bool Extended = false>
+        void _set_mailbox_id(uint8_t index, uint32_t id){
+            if constexpr (Extended) {
+                port<Bus>->CAN_MB[index].CAN_MID = id | CAN_MID_MIDE;
+            } else {
+                port<Bus>->CAN_MB[index].CAN_MID = CAN_MID_MIDvA(id);
+            }
+        }
+
+        template<typename Bus, bool Extended = false>
+        void _set_mailbox_filter(uint8_t index, uint32_t id, uint32_t mask){
+            _set_mailbox_mask<Bus, Extended>(index, mask);
+            _set_mailbox_id<Bus, Extended>(index, id);
+            
+            // enable interrupt on mailbox
+            port<Bus>->CAN_IER = 1U << index;
+        }
     }
 
     /**
@@ -727,7 +756,7 @@ namespace r2d2::can_bus {
             uint32_t tick = 0;
 
             do {
-                flag = port<Bus>->CAN_SR;
+                flag = port<Bus>->CAN_SR;         
                 ++tick;
             } while (!(flag & CAN_SR_WAKEUP) && (tick < can_timeout));
 
