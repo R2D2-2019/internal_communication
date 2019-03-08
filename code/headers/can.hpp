@@ -762,6 +762,49 @@ namespace r2d2::can_bus {
 
             return tick != can_timeout;
         }
+
+        /**
+         * @brief adds a frame to an internal send buffer
+         * 
+         * @param frame 
+         * @return if frame is added to buffer correctly
+         */
+        bool send_frame(const detail::_can_frame_s & frame){
+            return detail::_send_frame<Bus>(frame);
+        } 
+
+        /**
+         * @brief returns a can frame
+         * 
+         * @param index 
+         * @return _can_frame_s 
+         */
+        detail::_can_frame_s read_mailbox(uint8_t index){
+            return detail::_mailbox_rx_stores<Bus>::buffers[index].copy_and_pop();
+        }
+
+        /**
+         * @brief returns if a mailbox has data
+         * 
+         * @param index 
+         * @return if mailbox buffer is empty
+         */
+        bool mailbox_rx_available(uint8_t index){
+            return !detail::_mailbox_rx_stores<Bus>::buffers[index].empty();
+        }
+
+        /**
+         * @brief Set the mailbox filter object
+         * 
+         * @tparam false 
+         * @param index 
+         * @param id 
+         * @param mask 
+         */
+        template<bool Extended = false>
+        void set_mailbox_filter(uint8_t index, uint32_t id, uint32_t mask){
+            r2d2::can_bus::detail::_set_mailbox_filter<Bus, Extended>(i, 0, 0);
+        }
     };
 }
 
