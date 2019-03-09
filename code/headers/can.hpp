@@ -803,7 +803,7 @@ namespace r2d2::can_bus {
          */
         template<bool Extended = false>
         void set_mailbox_filter(uint8_t index, uint32_t id, uint32_t mask){
-            r2d2::can_bus::detail::_set_mailbox_filter<Bus, Extended>(i, 0, 0);
+            r2d2::can_bus::detail::_set_mailbox_filter<Bus, Extended>(index, id, mask);
         }
     };
 }
