@@ -1,0 +1,4178 @@
+
+main.elf:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+       0:	00 40 08 20 d5 1b 00 00 35 1c 00 00 35 1c 00 00     .@. ....5...5...
+      10:	35 1c 00 00 35 1c 00 00 35 1c 00 00 00 00 00 00     5...5...5.......
+	...
+      2c:	35 1c 00 00 35 1c 00 00 00 00 00 00 35 1c 00 00     5...5.......5...
+      3c:	35 1c 00 00 35 1c 00 00 35 1c 00 00 35 1c 00 00     5...5...5...5...
+      4c:	35 1c 00 00 35 1c 00 00 35 1c 00 00 35 1c 00 00     5...5...5...5...
+      5c:	35 1c 00 00 35 1c 00 00 35 1c 00 00 00 00 00 00     5...5...5.......
+      6c:	35 1c 00 00 35 1c 00 00 35 1c 00 00 35 1c 00 00     5...5...5...5...
+	...
+      84:	35 1c 00 00 35 1c 00 00 35 1c 00 00 35 1c 00 00     5...5...5...5...
+      94:	35 1c 00 00 35 1c 00 00 35 1c 00 00 35 1c 00 00     5...5...5...5...
+      a4:	00 00 00 00 35 1c 00 00 35 1c 00 00 35 1c 00 00     ....5...5...5...
+      b4:	35 1c 00 00 35 1c 00 00 35 1c 00 00 35 1c 00 00     5...5...5...5...
+      c4:	35 1c 00 00 35 1c 00 00 35 1c 00 00 35 1c 00 00     5...5...5...5...
+      d4:	35 1c 00 00 35 1c 00 00 35 1c 00 00 35 1c 00 00     5...5...5...5...
+      e4:	35 1c 00 00 35 1c 00 00 fd 09 00 00 07 0a 00 00     5...5...........
+
+000000f4 <_ZN5hwlib7wait_msEi>:
+      // top and bottom
+      w.write( start + xy( 0, + radius ), col );
+      w.write( start + xy( 0, - radius ), col );
+
+      // left and right 
+      w.write( start + xy( + radius, 0 ), col );
+      f4:	b500      	push	{lr}
+      f6:	b083      	sub	sp, #12
+      f8:	9001      	str	r0, [sp, #4]
+      fa:	9801      	ldr	r0, [sp, #4]
+      fc:	f000 f804 	bl	108 <_ZN5hwlib12wait_ms_busyEi>
+     100:	bf00      	nop
+      w.write( start + xy( - radius, 0 ), col );
+     102:	b003      	add	sp, #12
+     104:	f85d fb04 	ldr.w	pc, [sp], #4
+
+00000108 <_ZN5hwlib12wait_ms_busyEi>:
+     108:	b500      	push	{lr}
+     10a:	b083      	sub	sp, #12
+     10c:	9001      	str	r0, [sp, #4]
+     10e:	9b01      	ldr	r3, [sp, #4]
+     110:	2b00      	cmp	r3, #0
+     112:	dd07      	ble.n	124 <_ZN5hwlib12wait_ms_busyEi+0x1c>
+     114:	f44f 707a 	mov.w	r0, #1000	; 0x3e8
+     118:	f000 fb4e 	bl	7b8 <_ZN5hwlib12wait_us_busyEi>
+     11c:	9b01      	ldr	r3, [sp, #4]
+     11e:	3b01      	subs	r3, #1
+     120:	9301      	str	r3, [sp, #4]
+     122:	e7f4      	b.n	10e <_ZN5hwlib12wait_ms_busyEi+0x6>
+     124:	bf00      	nop
+     126:	b003      	add	sp, #12
+     128:	f85d fb04 	ldr.w	pc, [sp], #4
+
+0000012c <_ZN5hwlib7ostream6strlenEPKc>:
+   bool align_right;
+   bool show_pos;
+   bool bool_alpha;
+   bool show_base;
+        
+   static size_t strlen( const char *s ){
+     12c:	b084      	sub	sp, #16
+     12e:	9001      	str	r0, [sp, #4]
+      size_t n = 0;
+     130:	2300      	movs	r3, #0
+     132:	9303      	str	r3, [sp, #12]
+      while( *s != '\0' ){
+     134:	9b01      	ldr	r3, [sp, #4]
+     136:	781b      	ldrb	r3, [r3, #0]
+     138:	2b00      	cmp	r3, #0
+     13a:	d006      	beq.n	14a <_ZN5hwlib7ostream6strlenEPKc+0x1e>
+         n++;
+     13c:	9b03      	ldr	r3, [sp, #12]
+     13e:	3301      	adds	r3, #1
+     140:	9303      	str	r3, [sp, #12]
+         s++;
+     142:	9b01      	ldr	r3, [sp, #4]
+     144:	3301      	adds	r3, #1
+     146:	9301      	str	r3, [sp, #4]
+      while( *s != '\0' ){
+     148:	e7f4      	b.n	134 <_ZN5hwlib7ostream6strlenEPKc+0x8>
+      }
+      return n; 
+     14a:	9b03      	ldr	r3, [sp, #12]
+   }     
+     14c:	4618      	mov	r0, r3
+     14e:	b004      	add	sp, #16
+     150:	4770      	bx	lr
+
+00000152 <_ZN5hwlib7ostream6fillerEi>:
+   
+   // must handle negative numbers!
+   void filler( int_fast16_t n ){
+     152:	b500      	push	{lr}
+     154:	b083      	sub	sp, #12
+     156:	9001      	str	r0, [sp, #4]
+     158:	9100      	str	r1, [sp, #0]
+      while( n-- > 0 ){
+     15a:	9b00      	ldr	r3, [sp, #0]
+     15c:	1e5a      	subs	r2, r3, #1
+     15e:	9200      	str	r2, [sp, #0]
+     160:	2b00      	cmp	r3, #0
+     162:	bfcc      	ite	gt
+     164:	2301      	movgt	r3, #1
+     166:	2300      	movle	r3, #0
+     168:	b2db      	uxtb	r3, r3
+     16a:	2b00      	cmp	r3, #0
+     16c:	d006      	beq.n	17c <_ZN5hwlib7ostream6fillerEi+0x2a>
+         *this << fill_char;
+     16e:	9b01      	ldr	r3, [sp, #4]
+     170:	7b1b      	ldrb	r3, [r3, #12]
+     172:	4619      	mov	r1, r3
+     174:	9801      	ldr	r0, [sp, #4]
+     176:	f000 f899 	bl	2ac <_ZN5hwlib7ostreamlsEc>
+      while( n-- > 0 ){
+     17a:	e7ee      	b.n	15a <_ZN5hwlib7ostream6fillerEi+0x8>
+      }
+   }      
+     17c:	bf00      	nop
+     17e:	b003      	add	sp, #12
+     180:	f85d fb04 	ldr.w	pc, [sp], #4
+
+00000184 <_ZN5hwlib7ostream7reverseC1Ev>:
+   struct reverse {
+      static constexpr uint_fast16_t length = 70;
+      char body[ length ];
+      char *content;
+         
+      reverse(){
+     184:	b082      	sub	sp, #8
+     186:	9001      	str	r0, [sp, #4]
+         body[ length - 1 ] = '\0';
+     188:	9b01      	ldr	r3, [sp, #4]
+     18a:	2200      	movs	r2, #0
+     18c:	f883 2045 	strb.w	r2, [r3, #69]	; 0x45
+         content = & body[ length - 1 ];
+     190:	9b01      	ldr	r3, [sp, #4]
+     192:	f103 0245 	add.w	r2, r3, #69	; 0x45
+     196:	9b01      	ldr	r3, [sp, #4]
+     198:	649a      	str	r2, [r3, #72]	; 0x48
+      }
+     19a:	9b01      	ldr	r3, [sp, #4]
+     19c:	4618      	mov	r0, r3
+     19e:	b002      	add	sp, #8
+     1a0:	4770      	bx	lr
+
+000001a2 <_ZN5hwlib7ostream7reverse8add_charEc>:
+         
+      void add_char( char c ){
+     1a2:	b082      	sub	sp, #8
+     1a4:	9001      	str	r0, [sp, #4]
+     1a6:	460b      	mov	r3, r1
+     1a8:	f88d 3003 	strb.w	r3, [sp, #3]
+         content--;
+     1ac:	9b01      	ldr	r3, [sp, #4]
+     1ae:	6c9b      	ldr	r3, [r3, #72]	; 0x48
+     1b0:	1e5a      	subs	r2, r3, #1
+     1b2:	9b01      	ldr	r3, [sp, #4]
+     1b4:	649a      	str	r2, [r3, #72]	; 0x48
+         *content = c;
+     1b6:	9b01      	ldr	r3, [sp, #4]
+     1b8:	6c9b      	ldr	r3, [r3, #72]	; 0x48
+     1ba:	f89d 2003 	ldrb.w	r2, [sp, #3]
+     1be:	701a      	strb	r2, [r3, #0]
+      }
+     1c0:	bf00      	nop
+     1c2:	b002      	add	sp, #8
+     1c4:	4770      	bx	lr
+
+000001c6 <_ZN5hwlib7ostream7reverse9add_digitEcc>:
+         
+      void add_digit( char c, char hex_base ){
+     1c6:	b500      	push	{lr}
+     1c8:	b083      	sub	sp, #12
+     1ca:	9001      	str	r0, [sp, #4]
+     1cc:	460b      	mov	r3, r1
+     1ce:	f88d 3003 	strb.w	r3, [sp, #3]
+     1d2:	4613      	mov	r3, r2
+     1d4:	f88d 3002 	strb.w	r3, [sp, #2]
+         if( c > 9 ){
+     1d8:	f89d 3003 	ldrb.w	r3, [sp, #3]
+     1dc:	2b09      	cmp	r3, #9
+     1de:	d909      	bls.n	1f4 <_ZN5hwlib7ostream7reverse9add_digitEcc+0x2e>
+            c += ( hex_base - 10 );
+     1e0:	f89d 2002 	ldrb.w	r2, [sp, #2]
+     1e4:	f89d 3003 	ldrb.w	r3, [sp, #3]
+     1e8:	4413      	add	r3, r2
+     1ea:	b2db      	uxtb	r3, r3
+     1ec:	3b0a      	subs	r3, #10
+     1ee:	f88d 3003 	strb.w	r3, [sp, #3]
+     1f2:	e004      	b.n	1fe <_ZN5hwlib7ostream7reverse9add_digitEcc+0x38>
+         } else {
+            c += '0';
+     1f4:	f89d 3003 	ldrb.w	r3, [sp, #3]
+     1f8:	3330      	adds	r3, #48	; 0x30
+     1fa:	f88d 3003 	strb.w	r3, [sp, #3]
+         } 
+         add_char( c );
+     1fe:	f89d 3003 	ldrb.w	r3, [sp, #3]
+     202:	4619      	mov	r1, r3
+     204:	9801      	ldr	r0, [sp, #4]
+     206:	f7ff ffcc 	bl	1a2 <_ZN5hwlib7ostream7reverse8add_charEc>
+      }
+     20a:	bf00      	nop
+     20c:	b003      	add	sp, #12
+     20e:	f85d fb04 	ldr.w	pc, [sp], #4
+	...
+
+00000214 <_ZN5hwlib7ostream7reverse10add_prefixERKS0_>:
+         
+      void add_prefix( const ostream & s ){
+     214:	b500      	push	{lr}
+     216:	b083      	sub	sp, #12
+     218:	9001      	str	r0, [sp, #4]
+     21a:	9100      	str	r1, [sp, #0]
+         if( s.show_base ){
+     21c:	9b00      	ldr	r3, [sp, #0]
+     21e:	7c5b      	ldrb	r3, [r3, #17]
+     220:	2b00      	cmp	r3, #0
+     222:	d03f      	beq.n	2a4 <_ZN5hwlib7ostream7reverse10add_prefixERKS0_+0x90>
+            switch( s.numerical_radix ){
+     224:	9b00      	ldr	r3, [sp, #0]
+     226:	689b      	ldr	r3, [r3, #8]
+     228:	3b02      	subs	r3, #2
+     22a:	2b0e      	cmp	r3, #14
+     22c:	d82f      	bhi.n	28e <_ZN5hwlib7ostream7reverse10add_prefixERKS0_+0x7a>
+     22e:	a201      	add	r2, pc, #4	; (adr r2, 234 <_ZN5hwlib7ostream7reverse10add_prefixERKS0_+0x20>)
+     230:	f852 f023 	ldr.w	pc, [r2, r3, lsl #2]
+     234:	00000271 	.word	0x00000271
+     238:	0000028f 	.word	0x0000028f
+     23c:	0000028f 	.word	0x0000028f
+     240:	0000028f 	.word	0x0000028f
+     244:	0000028f 	.word	0x0000028f
+     248:	0000028f 	.word	0x0000028f
+     24c:	0000027b 	.word	0x0000027b
+     250:	0000028f 	.word	0x0000028f
+     254:	000002a3 	.word	0x000002a3
+     258:	0000028f 	.word	0x0000028f
+     25c:	0000028f 	.word	0x0000028f
+     260:	0000028f 	.word	0x0000028f
+     264:	0000028f 	.word	0x0000028f
+     268:	0000028f 	.word	0x0000028f
+     26c:	00000285 	.word	0x00000285
+               case 2  : add_char( 'b' ); break;
+     270:	2162      	movs	r1, #98	; 0x62
+     272:	9801      	ldr	r0, [sp, #4]
+     274:	f7ff ff95 	bl	1a2 <_ZN5hwlib7ostream7reverse8add_charEc>
+     278:	e00e      	b.n	298 <_ZN5hwlib7ostream7reverse10add_prefixERKS0_+0x84>
+               case 8  : add_char( 'o' ); break;
+     27a:	216f      	movs	r1, #111	; 0x6f
+     27c:	9801      	ldr	r0, [sp, #4]
+     27e:	f7ff ff90 	bl	1a2 <_ZN5hwlib7ostream7reverse8add_charEc>
+     282:	e009      	b.n	298 <_ZN5hwlib7ostream7reverse10add_prefixERKS0_+0x84>
+               case 10 : return;
+               case 16 : add_char( 'x' ); break;
+     284:	2178      	movs	r1, #120	; 0x78
+     286:	9801      	ldr	r0, [sp, #4]
+     288:	f7ff ff8b 	bl	1a2 <_ZN5hwlib7ostream7reverse8add_charEc>
+     28c:	e004      	b.n	298 <_ZN5hwlib7ostream7reverse10add_prefixERKS0_+0x84>
+               default : add_char( '?' ); break; 
+     28e:	213f      	movs	r1, #63	; 0x3f
+     290:	9801      	ldr	r0, [sp, #4]
+     292:	f7ff ff86 	bl	1a2 <_ZN5hwlib7ostream7reverse8add_charEc>
+     296:	bf00      	nop
+            }
+            add_char( '0' );
+     298:	2130      	movs	r1, #48	; 0x30
+     29a:	9801      	ldr	r0, [sp, #4]
+     29c:	f7ff ff81 	bl	1a2 <_ZN5hwlib7ostream7reverse8add_charEc>
+     2a0:	e000      	b.n	2a4 <_ZN5hwlib7ostream7reverse10add_prefixERKS0_+0x90>
+               case 10 : return;
+     2a2:	bf00      	nop
+         }
+      }          
+     2a4:	b003      	add	sp, #12
+     2a6:	f85d fb04 	ldr.w	pc, [sp], #4
+         ddFx += 2;
+         fx += ddFx;   
+                    
+         w.write( start + xy( + x, + y ), col );
+         w.write( start + xy( - x, + y ), col );
+         w.write( start + xy( + x, - y ), col );
+     2aa:	bf00      	nop
+
+000002ac <_ZN5hwlib7ostreamlsEc>:
+   /// This function is called by the other functions to output
+   /// each character.
+   virtual void putc( char c ) = 0;    
+       
+   /// char output operator 
+   ostream & operator<< ( char c ){ 
+     2ac:	b500      	push	{lr}
+     2ae:	b083      	sub	sp, #12
+     2b0:	9001      	str	r0, [sp, #4]
+     2b2:	460b      	mov	r3, r1
+     2b4:	f88d 3003 	strb.w	r3, [sp, #3]
+      putc( c ); 
+     2b8:	9b01      	ldr	r3, [sp, #4]
+     2ba:	681b      	ldr	r3, [r3, #0]
+     2bc:	681b      	ldr	r3, [r3, #0]
+     2be:	f89d 2003 	ldrb.w	r2, [sp, #3]
+     2c2:	4611      	mov	r1, r2
+     2c4:	9801      	ldr	r0, [sp, #4]
+     2c6:	4798      	blx	r3
+      return *this; 
+     2c8:	9b01      	ldr	r3, [sp, #4]
+   }
+     2ca:	4618      	mov	r0, r3
+     2cc:	b003      	add	sp, #12
+     2ce:	f85d fb04 	ldr.w	pc, [sp], #4
+
+000002d2 <_ZNK5hwlib7ostream5widthEv>:
+   // manipulators
+   //
+   // =======================================================================
+  
+   /// return the current field width
+   uint_fast16_t width( void ) const { return field_width; }
+     2d2:	b082      	sub	sp, #8
+     2d4:	9001      	str	r0, [sp, #4]
+     2d6:	9b01      	ldr	r3, [sp, #4]
+     2d8:	685b      	ldr	r3, [r3, #4]
+     2da:	4618      	mov	r0, r3
+     2dc:	b002      	add	sp, #8
+     2de:	4770      	bx	lr
+
+000002e0 <_ZN5hwlib7ostream5widthEj>:
+      
+   /// set the field width, return the old field width
+   uint_fast16_t width( uint_fast16_t x ) { 
+     2e0:	b084      	sub	sp, #16
+     2e2:	9001      	str	r0, [sp, #4]
+     2e4:	9100      	str	r1, [sp, #0]
+      auto temp = field_width; 
+     2e6:	9b01      	ldr	r3, [sp, #4]
+     2e8:	685b      	ldr	r3, [r3, #4]
+     2ea:	9303      	str	r3, [sp, #12]
+      field_width = x; 
+     2ec:	9b01      	ldr	r3, [sp, #4]
+     2ee:	9a00      	ldr	r2, [sp, #0]
+     2f0:	605a      	str	r2, [r3, #4]
+      return temp;
+     2f2:	9b03      	ldr	r3, [sp, #12]
+   }
+     2f4:	4618      	mov	r0, r3
+     2f6:	b004      	add	sp, #16
+     2f8:	4770      	bx	lr
+
+000002fa <_ZNK5hwlib7ostream4baseEv>:
+      return stream;
+   }
+   /// \endcond 
+      
+   /// return the numerical radix       
+   uint_fast16_t base( void ) const { return numerical_radix; }
+     2fa:	b082      	sub	sp, #8
+     2fc:	9001      	str	r0, [sp, #4]
+     2fe:	9b01      	ldr	r3, [sp, #4]
+     300:	689b      	ldr	r3, [r3, #8]
+     302:	4618      	mov	r0, r3
+     304:	b002      	add	sp, #8
+     306:	4770      	bx	lr
+
+00000308 <_ZN5hwliblsERNS_7ostreamERKNS_8_setbaseE>:
+      numerical_radix = x; 
+      return temp;
+   }
+      
+   /// \cond INTERNAL      
+   friend ostream & operator<< ( ostream & stream, const _setbase & x ){
+     308:	b082      	sub	sp, #8
+     30a:	9001      	str	r0, [sp, #4]
+     30c:	9100      	str	r1, [sp, #0]
+      stream.numerical_radix = x.x;
+     30e:	9b00      	ldr	r3, [sp, #0]
+     310:	681a      	ldr	r2, [r3, #0]
+     312:	9b01      	ldr	r3, [sp, #4]
+     314:	609a      	str	r2, [r3, #8]
+      return stream;
+     316:	9b01      	ldr	r3, [sp, #4]
+   }
+     318:	4618      	mov	r0, r3
+     31a:	b002      	add	sp, #8
+     31c:	4770      	bx	lr
+
+0000031e <_ZNK5hwlib7ostream7showposEv>:
+   /// \endcond 
+      
+   /// return the current showpos setting        
+   bool showpos( void ) const { return show_pos; }
+     31e:	b082      	sub	sp, #8
+     320:	9001      	str	r0, [sp, #4]
+     322:	9b01      	ldr	r3, [sp, #4]
+     324:	7bdb      	ldrb	r3, [r3, #15]
+     326:	4618      	mov	r0, r3
+     328:	b002      	add	sp, #8
+     32a:	4770      	bx	lr
+
+0000032c <_ZN5hwliblsERNS_7ostreamEPKc>:
+      }
+      return stream;   
+   }      
+  
+   /// output operator for const char pointer (literal string)
+   friend ostream & operator<< ( ostream & stream, const char *s ){
+     32c:	b510      	push	{r4, lr}
+     32e:	b084      	sub	sp, #16
+     330:	9001      	str	r0, [sp, #4]
+     332:	9100      	str	r1, [sp, #0]
+      if( stream.align_right ){
+     334:	9b01      	ldr	r3, [sp, #4]
+     336:	7b9b      	ldrb	r3, [r3, #14]
+     338:	2b00      	cmp	r3, #0
+     33a:	d00c      	beq.n	356 <_ZN5hwliblsERNS_7ostreamEPKc+0x2a>
+         stream.filler( static_cast< int_fast16_t >( 
+		    stream.width()) - strlen( s )); 
+     33c:	9801      	ldr	r0, [sp, #4]
+     33e:	f7ff ffc8 	bl	2d2 <_ZNK5hwlib7ostream5widthEv>
+     342:	4604      	mov	r4, r0
+     344:	9800      	ldr	r0, [sp, #0]
+     346:	f7ff fef1 	bl	12c <_ZN5hwlib7ostream6strlenEPKc>
+     34a:	4603      	mov	r3, r0
+     34c:	1ae3      	subs	r3, r4, r3
+         stream.filler( static_cast< int_fast16_t >( 
+     34e:	4619      	mov	r1, r3
+     350:	9801      	ldr	r0, [sp, #4]
+     352:	f7ff fefe 	bl	152 <_ZN5hwlib7ostream6fillerEi>
+      }       
+      for( const char *p = s; *p != '\0'; p++ ){
+     356:	9b00      	ldr	r3, [sp, #0]
+     358:	9303      	str	r3, [sp, #12]
+     35a:	9b03      	ldr	r3, [sp, #12]
+     35c:	781b      	ldrb	r3, [r3, #0]
+     35e:	2b00      	cmp	r3, #0
+     360:	d009      	beq.n	376 <_ZN5hwliblsERNS_7ostreamEPKc+0x4a>
+         stream << *p;
+     362:	9b03      	ldr	r3, [sp, #12]
+     364:	781b      	ldrb	r3, [r3, #0]
+     366:	4619      	mov	r1, r3
+     368:	9801      	ldr	r0, [sp, #4]
+     36a:	f7ff ff9f 	bl	2ac <_ZN5hwlib7ostreamlsEc>
+      for( const char *p = s; *p != '\0'; p++ ){
+     36e:	9b03      	ldr	r3, [sp, #12]
+     370:	3301      	adds	r3, #1
+     372:	9303      	str	r3, [sp, #12]
+     374:	e7f1      	b.n	35a <_ZN5hwliblsERNS_7ostreamEPKc+0x2e>
+      }
+      if( ! stream.align_right ){
+     376:	9b01      	ldr	r3, [sp, #4]
+     378:	7b9b      	ldrb	r3, [r3, #14]
+     37a:	f083 0301 	eor.w	r3, r3, #1
+     37e:	b2db      	uxtb	r3, r3
+     380:	2b00      	cmp	r3, #0
+     382:	d00c      	beq.n	39e <_ZN5hwliblsERNS_7ostreamEPKc+0x72>
+        stream.filler( static_cast< int_fast16_t >( 
+		   stream.width()) - strlen( s )); 
+     384:	9801      	ldr	r0, [sp, #4]
+     386:	f7ff ffa4 	bl	2d2 <_ZNK5hwlib7ostream5widthEv>
+     38a:	4604      	mov	r4, r0
+     38c:	9800      	ldr	r0, [sp, #0]
+     38e:	f7ff fecd 	bl	12c <_ZN5hwlib7ostream6strlenEPKc>
+     392:	4603      	mov	r3, r0
+     394:	1ae3      	subs	r3, r4, r3
+        stream.filler( static_cast< int_fast16_t >( 
+     396:	4619      	mov	r1, r3
+     398:	9801      	ldr	r0, [sp, #4]
+     39a:	f7ff feda 	bl	152 <_ZN5hwlib7ostream6fillerEi>
+      }  
+      stream.width( 0 );
+     39e:	2100      	movs	r1, #0
+     3a0:	9801      	ldr	r0, [sp, #4]
+     3a2:	f7ff ff9d 	bl	2e0 <_ZN5hwlib7ostream5widthEj>
+      return stream;
+     3a6:	9b01      	ldr	r3, [sp, #4]
+   }    
+     3a8:	4618      	mov	r0, r3
+     3aa:	b004      	add	sp, #16
+     3ac:	bd10      	pop	{r4, pc}
+
+000003ae <_ZN5hwliblsERNS_7ostreamEi>:
+   // print integers
+   //
+   // =======================================================================
+      
+   /// output operator for integer      
+   friend ostream & operator<< ( ostream & stream, int x ){
+     3ae:	b510      	push	{r4, lr}
+     3b0:	b096      	sub	sp, #88	; 0x58
+     3b2:	9001      	str	r0, [sp, #4]
+     3b4:	9100      	str	r1, [sp, #0]
+      reverse s;
+     3b6:	ab02      	add	r3, sp, #8
+     3b8:	4618      	mov	r0, r3
+     3ba:	f7ff fee3 	bl	184 <_ZN5hwlib7ostream7reverseC1Ev>
+         
+      bool minus = ( x < 0 );
+     3be:	9b00      	ldr	r3, [sp, #0]
+     3c0:	0fdb      	lsrs	r3, r3, #31
+     3c2:	f88d 3057 	strb.w	r3, [sp, #87]	; 0x57
+      if( x < 0 ){ x = -x; }
+     3c6:	9b00      	ldr	r3, [sp, #0]
+     3c8:	2b00      	cmp	r3, #0
+     3ca:	da02      	bge.n	3d2 <_ZN5hwliblsERNS_7ostreamEi+0x24>
+     3cc:	9b00      	ldr	r3, [sp, #0]
+     3ce:	425b      	negs	r3, r3
+     3d0:	9300      	str	r3, [sp, #0]
+         
+      if( x == 0 ){
+     3d2:	9b00      	ldr	r3, [sp, #0]
+     3d4:	2b00      	cmp	r3, #0
+     3d6:	d106      	bne.n	3e6 <_ZN5hwliblsERNS_7ostreamEi+0x38>
+         s.add_digit( 0, stream.hex_base );
+     3d8:	9b01      	ldr	r3, [sp, #4]
+     3da:	7b5a      	ldrb	r2, [r3, #13]
+     3dc:	ab02      	add	r3, sp, #8
+     3de:	2100      	movs	r1, #0
+     3e0:	4618      	mov	r0, r3
+     3e2:	f7ff fef0 	bl	1c6 <_ZN5hwlib7ostream7reverse9add_digitEcc>
+      }
+      while( x > 0 ){
+     3e6:	9b00      	ldr	r3, [sp, #0]
+     3e8:	2b00      	cmp	r3, #0
+     3ea:	dd19      	ble.n	420 <_ZN5hwliblsERNS_7ostreamEi+0x72>
+         s.add_digit( x % stream.base(), stream.hex_base );
+     3ec:	9c00      	ldr	r4, [sp, #0]
+     3ee:	9801      	ldr	r0, [sp, #4]
+     3f0:	f7ff ff83 	bl	2fa <_ZNK5hwlib7ostream4baseEv>
+     3f4:	4603      	mov	r3, r0
+     3f6:	fbb4 f2f3 	udiv	r2, r4, r3
+     3fa:	fb03 f302 	mul.w	r3, r3, r2
+     3fe:	1ae3      	subs	r3, r4, r3
+     400:	b2d9      	uxtb	r1, r3
+     402:	9b01      	ldr	r3, [sp, #4]
+     404:	7b5a      	ldrb	r2, [r3, #13]
+     406:	ab02      	add	r3, sp, #8
+     408:	4618      	mov	r0, r3
+     40a:	f7ff fedc 	bl	1c6 <_ZN5hwlib7ostream7reverse9add_digitEcc>
+         x = x / stream.base();
+     40e:	9c00      	ldr	r4, [sp, #0]
+     410:	9801      	ldr	r0, [sp, #4]
+     412:	f7ff ff72 	bl	2fa <_ZNK5hwlib7ostream4baseEv>
+     416:	4603      	mov	r3, r0
+     418:	fbb4 f3f3 	udiv	r3, r4, r3
+     41c:	9300      	str	r3, [sp, #0]
+      while( x > 0 ){
+     41e:	e7e2      	b.n	3e6 <_ZN5hwliblsERNS_7ostreamEi+0x38>
+      }
+      s.add_prefix( stream );
+     420:	ab02      	add	r3, sp, #8
+     422:	9901      	ldr	r1, [sp, #4]
+     424:	4618      	mov	r0, r3
+     426:	f7ff fef5 	bl	214 <_ZN5hwlib7ostream7reverse10add_prefixERKS0_>
+         
+      if( minus ){
+     42a:	f89d 3057 	ldrb.w	r3, [sp, #87]	; 0x57
+     42e:	2b00      	cmp	r3, #0
+     430:	d005      	beq.n	43e <_ZN5hwliblsERNS_7ostreamEi+0x90>
+         s.add_char( '-' );
+     432:	ab02      	add	r3, sp, #8
+     434:	212d      	movs	r1, #45	; 0x2d
+     436:	4618      	mov	r0, r3
+     438:	f7ff feb3 	bl	1a2 <_ZN5hwlib7ostream7reverse8add_charEc>
+     43c:	e00a      	b.n	454 <_ZN5hwliblsERNS_7ostreamEi+0xa6>
+      } else if( stream.showpos() ){
+     43e:	9801      	ldr	r0, [sp, #4]
+     440:	f7ff ff6d 	bl	31e <_ZNK5hwlib7ostream7showposEv>
+     444:	4603      	mov	r3, r0
+     446:	2b00      	cmp	r3, #0
+     448:	d004      	beq.n	454 <_ZN5hwliblsERNS_7ostreamEi+0xa6>
+         s.add_char( '+' );
+     44a:	ab02      	add	r3, sp, #8
+     44c:	212b      	movs	r1, #43	; 0x2b
+     44e:	4618      	mov	r0, r3
+     450:	f7ff fea7 	bl	1a2 <_ZN5hwlib7ostream7reverse8add_charEc>
+      }        
+         
+      stream << s.content;
+     454:	9b14      	ldr	r3, [sp, #80]	; 0x50
+     456:	4619      	mov	r1, r3
+     458:	9801      	ldr	r0, [sp, #4]
+     45a:	f7ff ff67 	bl	32c <_ZN5hwliblsERNS_7ostreamEPKc>
+      return stream;   
+     45e:	9b01      	ldr	r3, [sp, #4]
+   }
+     460:	4618      	mov	r0, r3
+     462:	b016      	add	sp, #88	; 0x58
+     464:	bd10      	pop	{r4, pc}
+
+00000466 <_ZN5hwliblsERNS_7ostreamEh>:
+      //stream.putc( c );
+      //return stream;
+   }
+   
+   /// output operator for unsigned char (prints as integer)   
+   friend ostream & operator<< ( ostream & stream, unsigned char c ){
+     466:	b500      	push	{lr}
+     468:	b083      	sub	sp, #12
+     46a:	9001      	str	r0, [sp, #4]
+     46c:	460b      	mov	r3, r1
+     46e:	f88d 3003 	strb.w	r3, [sp, #3]
+      return stream << static_cast< int >( c ); 
+     472:	f89d 3003 	ldrb.w	r3, [sp, #3]
+     476:	4619      	mov	r1, r3
+     478:	9801      	ldr	r0, [sp, #4]
+     47a:	f7ff ff98 	bl	3ae <_ZN5hwliblsERNS_7ostreamEi>
+     47e:	4603      	mov	r3, r0
+      //stream.putc( c );
+      //return stream;
+   }
+     480:	4618      	mov	r0, r3
+     482:	b003      	add	sp, #12
+     484:	f85d fb04 	ldr.w	pc, [sp], #4
+
+00000488 <_ZN5hwlib20cout_using_uart_putc4putcEc>:
+               start + xy(  x,  y ), 
+               col ).draw( w );
+            line( 
+               start + xy( -x, -y ), 
+               start + xy(  x, -y ), 
+               col ).draw( w );
+     488:	b500      	push	{lr}
+            line( 
+     48a:	b083      	sub	sp, #12
+     48c:	9001      	str	r0, [sp, #4]
+     48e:	460b      	mov	r3, r1
+     490:	f88d 3003 	strb.w	r3, [sp, #3]
+     494:	f89d 3003 	ldrb.w	r3, [sp, #3]
+     498:	4618      	mov	r0, r3
+     49a:	f000 f95d 	bl	758 <_ZN5hwlib9uart_putcEc>
+     49e:	bf00      	nop
+     4a0:	b003      	add	sp, #12
+     4a2:	f85d fb04 	ldr.w	pc, [sp], #4
+
+000004a6 <_ZN5hwlib20cout_using_uart_putc5flushEv>:
+     4a6:	b082      	sub	sp, #8
+     4a8:	9001      	str	r0, [sp, #4]
+     4aa:	bf00      	nop
+     4ac:	b002      	add	sp, #8
+     4ae:	4770      	bx	lr
+
+000004b0 <_ZN6sam3xa10SystemInitEv>:
+ * Initialize the System and update the SystemFrequency variable.
+ */
+static void SystemInit( void )
+{
+  /* Set FWS according to SYS_BOARD_MCKR configuration */
+  EFC0->EEFC_FMR = EEFC_FMR_FWS(4);
+     4b0:	4b3b      	ldr	r3, [pc, #236]	; (5a0 <_ZN6sam3xa10SystemInitEv+0xf0>)
+     4b2:	f44f 6280 	mov.w	r2, #1024	; 0x400
+     4b6:	601a      	str	r2, [r3, #0]
+  EFC1->EEFC_FMR = EEFC_FMR_FWS(4);
+     4b8:	4b3a      	ldr	r3, [pc, #232]	; (5a4 <_ZN6sam3xa10SystemInitEv+0xf4>)
+     4ba:	f44f 6280 	mov.w	r2, #1024	; 0x400
+     4be:	601a      	str	r2, [r3, #0]
+
+  /* Initialize main oscillator */
+  if ( !(PMC->CKGR_MOR & CKGR_MOR_MOSCSEL) )
+     4c0:	4b39      	ldr	r3, [pc, #228]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     4c2:	6a1b      	ldr	r3, [r3, #32]
+     4c4:	f003 7380 	and.w	r3, r3, #16777216	; 0x1000000
+     4c8:	2b00      	cmp	r3, #0
+     4ca:	bf0c      	ite	eq
+     4cc:	2301      	moveq	r3, #1
+     4ce:	2300      	movne	r3, #0
+     4d0:	b2db      	uxtb	r3, r3
+     4d2:	2b00      	cmp	r3, #0
+     4d4:	d00e      	beq.n	4f4 <_ZN6sam3xa10SystemInitEv+0x44>
+  {
+    PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | SYS_BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
+     4d6:	4b34      	ldr	r3, [pc, #208]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     4d8:	4a34      	ldr	r2, [pc, #208]	; (5ac <_ZN6sam3xa10SystemInitEv+0xfc>)
+     4da:	621a      	str	r2, [r3, #32]
+    while ( !(PMC->PMC_SR & PMC_SR_MOSCXTS) )
+     4dc:	4b32      	ldr	r3, [pc, #200]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     4de:	6e9b      	ldr	r3, [r3, #104]	; 0x68
+     4e0:	f003 0301 	and.w	r3, r3, #1
+     4e4:	2b00      	cmp	r3, #0
+     4e6:	bf0c      	ite	eq
+     4e8:	2301      	moveq	r3, #1
+     4ea:	2300      	movne	r3, #0
+     4ec:	b2db      	uxtb	r3, r3
+     4ee:	2b00      	cmp	r3, #0
+     4f0:	d000      	beq.n	4f4 <_ZN6sam3xa10SystemInitEv+0x44>
+     4f2:	e7f3      	b.n	4dc <_ZN6sam3xa10SystemInitEv+0x2c>
+    {
+    }
+  }
+
+  /* Switch to 3-20MHz Xtal oscillator */
+  PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | SYS_BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN | CKGR_MOR_MOSCSEL;
+     4f4:	4b2c      	ldr	r3, [pc, #176]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     4f6:	4a2e      	ldr	r2, [pc, #184]	; (5b0 <_ZN6sam3xa10SystemInitEv+0x100>)
+     4f8:	621a      	str	r2, [r3, #32]
+
+  while ( !(PMC->PMC_SR & PMC_SR_MOSCSELS) )
+     4fa:	4b2b      	ldr	r3, [pc, #172]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     4fc:	6e9b      	ldr	r3, [r3, #104]	; 0x68
+     4fe:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
+     502:	2b00      	cmp	r3, #0
+     504:	bf0c      	ite	eq
+     506:	2301      	moveq	r3, #1
+     508:	2300      	movne	r3, #0
+     50a:	b2db      	uxtb	r3, r3
+     50c:	2b00      	cmp	r3, #0
+     50e:	d000      	beq.n	512 <_ZN6sam3xa10SystemInitEv+0x62>
+     510:	e7f3      	b.n	4fa <_ZN6sam3xa10SystemInitEv+0x4a>
+  {
+  }
+ 	PMC->PMC_MCKR = (PMC->PMC_MCKR & ~(uint32_t)PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
+     512:	4b25      	ldr	r3, [pc, #148]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     514:	6b1b      	ldr	r3, [r3, #48]	; 0x30
+     516:	f023 0303 	bic.w	r3, r3, #3
+     51a:	4a23      	ldr	r2, [pc, #140]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     51c:	f043 0301 	orr.w	r3, r3, #1
+     520:	6313      	str	r3, [r2, #48]	; 0x30
+  while (!(PMC->PMC_SR & PMC_SR_MCKRDY))
+     522:	4b21      	ldr	r3, [pc, #132]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     524:	6e9b      	ldr	r3, [r3, #104]	; 0x68
+     526:	f003 0308 	and.w	r3, r3, #8
+     52a:	2b00      	cmp	r3, #0
+     52c:	bf0c      	ite	eq
+     52e:	2301      	moveq	r3, #1
+     530:	2300      	movne	r3, #0
+     532:	b2db      	uxtb	r3, r3
+     534:	2b00      	cmp	r3, #0
+     536:	d000      	beq.n	53a <_ZN6sam3xa10SystemInitEv+0x8a>
+     538:	e7f3      	b.n	522 <_ZN6sam3xa10SystemInitEv+0x72>
+  {
+  }
+
+  /* Initialize PLLA */
+  PMC->CKGR_PLLAR = SYS_BOARD_PLLAR;
+     53a:	4b1b      	ldr	r3, [pc, #108]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     53c:	4a1d      	ldr	r2, [pc, #116]	; (5b4 <_ZN6sam3xa10SystemInitEv+0x104>)
+     53e:	629a      	str	r2, [r3, #40]	; 0x28
+  while ( !(PMC->PMC_SR & PMC_SR_LOCKA) )
+     540:	4b19      	ldr	r3, [pc, #100]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     542:	6e9b      	ldr	r3, [r3, #104]	; 0x68
+     544:	f003 0302 	and.w	r3, r3, #2
+     548:	2b00      	cmp	r3, #0
+     54a:	bf0c      	ite	eq
+     54c:	2301      	moveq	r3, #1
+     54e:	2300      	movne	r3, #0
+     550:	b2db      	uxtb	r3, r3
+     552:	2b00      	cmp	r3, #0
+     554:	d000      	beq.n	558 <_ZN6sam3xa10SystemInitEv+0xa8>
+     556:	e7f3      	b.n	540 <_ZN6sam3xa10SystemInitEv+0x90>
+  {
+  }
+
+  /* Switch to main clock */
+  PMC->PMC_MCKR = (SYS_BOARD_MCKR & ~PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
+     558:	4b13      	ldr	r3, [pc, #76]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     55a:	2211      	movs	r2, #17
+     55c:	631a      	str	r2, [r3, #48]	; 0x30
+  while ( !(PMC->PMC_SR & PMC_SR_MCKRDY) )
+     55e:	4b12      	ldr	r3, [pc, #72]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     560:	6e9b      	ldr	r3, [r3, #104]	; 0x68
+     562:	f003 0308 	and.w	r3, r3, #8
+     566:	2b00      	cmp	r3, #0
+     568:	bf0c      	ite	eq
+     56a:	2301      	moveq	r3, #1
+     56c:	2300      	movne	r3, #0
+     56e:	b2db      	uxtb	r3, r3
+     570:	2b00      	cmp	r3, #0
+     572:	d000      	beq.n	576 <_ZN6sam3xa10SystemInitEv+0xc6>
+     574:	e7f3      	b.n	55e <_ZN6sam3xa10SystemInitEv+0xae>
+  {
+  }
+
+  /* Switch to PLLA */
+  PMC->PMC_MCKR = SYS_BOARD_MCKR;
+     576:	4b0c      	ldr	r3, [pc, #48]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     578:	2212      	movs	r2, #18
+     57a:	631a      	str	r2, [r3, #48]	; 0x30
+  while ( !(PMC->PMC_SR & PMC_SR_MCKRDY) )
+     57c:	4b0a      	ldr	r3, [pc, #40]	; (5a8 <_ZN6sam3xa10SystemInitEv+0xf8>)
+     57e:	6e9b      	ldr	r3, [r3, #104]	; 0x68
+     580:	f003 0308 	and.w	r3, r3, #8
+     584:	2b00      	cmp	r3, #0
+     586:	bf0c      	ite	eq
+     588:	2301      	moveq	r3, #1
+     58a:	2300      	movne	r3, #0
+     58c:	b2db      	uxtb	r3, r3
+     58e:	2b00      	cmp	r3, #0
+     590:	d000      	beq.n	594 <_ZN6sam3xa10SystemInitEv+0xe4>
+     592:	e7f3      	b.n	57c <_ZN6sam3xa10SystemInitEv+0xcc>
+  {
+  }
+
+  SystemCoreClock = CHIP_FREQ_CPU_MAX;
+     594:	4b08      	ldr	r3, [pc, #32]	; (5b8 <_ZN6sam3xa10SystemInitEv+0x108>)
+     596:	4a09      	ldr	r2, [pc, #36]	; (5bc <_ZN6sam3xa10SystemInitEv+0x10c>)
+     598:	601a      	str	r2, [r3, #0]
+}
+     59a:	bf00      	nop
+     59c:	4770      	bx	lr
+     59e:	bf00      	nop
+     5a0:	400e0a00 	.word	0x400e0a00
+     5a4:	400e0c00 	.word	0x400e0c00
+     5a8:	400e0600 	.word	0x400e0600
+     5ac:	00370809 	.word	0x00370809
+     5b0:	01370809 	.word	0x01370809
+     5b4:	200d3f01 	.word	0x200d3f01
+     5b8:	200870a8 	.word	0x200870a8
+     5bc:	0501bd00 	.word	0x0501bd00
+
+000005c0 <_ZN3due12ticks_per_usEv>:
+      return ADC->ADC_CDR[ channel ] & 0x0000'0FFF;
+   }
+};
+
+/// the number of ticks per us
+uint_fast64_t HWLIB_WEAK ticks_per_us(){
+     5c0:	b410      	push	{r4}
+   return 84;
+     5c2:	f04f 0354 	mov.w	r3, #84	; 0x54
+     5c6:	f04f 0400 	mov.w	r4, #0
+}
+     5ca:	4618      	mov	r0, r3
+     5cc:	4621      	mov	r1, r4
+     5ce:	bc10      	pop	{r4}
+     5d0:	4770      	bx	lr
+	...
+
+000005d4 <_ZN3due9now_ticksEv>:
+
+/// returns the number of ticks since some fixed starting point
+uint_fast64_t HWLIB_WEAK now_ticks(){
+     5d4:	e92d 4810 	stmdb	sp!, {r4, fp, lr}
+     5d8:	b083      	sub	sp, #12
+   static bool init_done = false;
+   if( ! init_done ){
+     5da:	4b26      	ldr	r3, [pc, #152]	; (674 <_ZN3due9now_ticksEv+0xa0>)
+     5dc:	781b      	ldrb	r3, [r3, #0]
+     5de:	f083 0301 	eor.w	r3, r3, #1
+     5e2:	b2db      	uxtb	r3, r3
+     5e4:	2b00      	cmp	r3, #0
+     5e6:	d01d      	beq.n	624 <_ZN3due9now_ticksEv+0x50>
+	   
+      // kill the watchdog
+      WDT->WDT_MR = WDT_MR_WDDIS;
+     5e8:	4b23      	ldr	r3, [pc, #140]	; (678 <_ZN3due9now_ticksEv+0xa4>)
+     5ea:	f44f 4200 	mov.w	r2, #32768	; 0x8000
+     5ee:	605a      	str	r2, [r3, #4]
+      
+      // switch to the 84 MHz crystal/PLL clock
+      sam3xa::SystemInit();
+     5f0:	f7ff ff5e 	bl	4b0 <_ZN6sam3xa10SystemInitEv>
+      
+      EFC0->EEFC_FMR = EEFC_FMR_FWS(4);
+     5f4:	4b21      	ldr	r3, [pc, #132]	; (67c <_ZN3due9now_ticksEv+0xa8>)
+     5f6:	f44f 6280 	mov.w	r2, #1024	; 0x400
+     5fa:	601a      	str	r2, [r3, #0]
+      EFC1->EEFC_FMR = EEFC_FMR_FWS(4);      
+     5fc:	4b20      	ldr	r3, [pc, #128]	; (680 <_ZN3due9now_ticksEv+0xac>)
+     5fe:	f44f 6280 	mov.w	r2, #1024	; 0x400
+     602:	601a      	str	r2, [r3, #0]
+      
+      SysTick->CTRL  = 0;         // stop the timer
+     604:	4b1f      	ldr	r3, [pc, #124]	; (684 <_ZN3due9now_ticksEv+0xb0>)
+     606:	2200      	movs	r2, #0
+     608:	601a      	str	r2, [r3, #0]
+      SysTick->LOAD  = 0xFFFFFF;  // use its as a 24-bit timer
+     60a:	4b1e      	ldr	r3, [pc, #120]	; (684 <_ZN3due9now_ticksEv+0xb0>)
+     60c:	f06f 427f 	mvn.w	r2, #4278190080	; 0xff000000
+     610:	605a      	str	r2, [r3, #4]
+      SysTick->VAL   = 0;         // clear the timer
+     612:	4b1c      	ldr	r3, [pc, #112]	; (684 <_ZN3due9now_ticksEv+0xb0>)
+     614:	2200      	movs	r2, #0
+     616:	609a      	str	r2, [r3, #8]
+      SysTick->CTRL  = 5;         // start the timer, 1:1
+     618:	4b1a      	ldr	r3, [pc, #104]	; (684 <_ZN3due9now_ticksEv+0xb0>)
+     61a:	2205      	movs	r2, #5
+     61c:	601a      	str	r2, [r3, #0]
+
+      init_done = true;      
+     61e:	4b15      	ldr	r3, [pc, #84]	; (674 <_ZN3due9now_ticksEv+0xa0>)
+     620:	2201      	movs	r2, #1
+     622:	701a      	strb	r2, [r3, #0]
+   
+   static unsigned int last_low = 0;
+   static unsigned long long int high = 0;
+
+   // the timer ticks down, but we want an up counter
+   unsigned int low = 0xFFFFFF - ( SysTick->VAL & 0xFFFFFF );
+     624:	4b17      	ldr	r3, [pc, #92]	; (684 <_ZN3due9now_ticksEv+0xb0>)
+     626:	689b      	ldr	r3, [r3, #8]
+     628:	43db      	mvns	r3, r3
+     62a:	f023 437f 	bic.w	r3, r3, #4278190080	; 0xff000000
+     62e:	9301      	str	r3, [sp, #4]
+   if( low < last_low ){
+     630:	4b15      	ldr	r3, [pc, #84]	; (688 <_ZN3due9now_ticksEv+0xb4>)
+     632:	681b      	ldr	r3, [r3, #0]
+     634:	9a01      	ldr	r2, [sp, #4]
+     636:	429a      	cmp	r2, r3
+     638:	d209      	bcs.n	64e <_ZN3due9now_ticksEv+0x7a>
+   
+      // the timer rolled over, so increment the high part
+      high += 0x1ULL << 24;
+     63a:	4b14      	ldr	r3, [pc, #80]	; (68c <_ZN3due9now_ticksEv+0xb8>)
+     63c:	e9d3 1200 	ldrd	r1, r2, [r3]
+     640:	f111 7380 	adds.w	r3, r1, #16777216	; 0x1000000
+     644:	f142 0400 	adc.w	r4, r2, #0
+     648:	4a10      	ldr	r2, [pc, #64]	; (68c <_ZN3due9now_ticksEv+0xb8>)
+     64a:	e9c2 3400 	strd	r3, r4, [r2]
+   }
+   last_low = low;
+     64e:	4a0e      	ldr	r2, [pc, #56]	; (688 <_ZN3due9now_ticksEv+0xb4>)
+     650:	9b01      	ldr	r3, [sp, #4]
+     652:	6013      	str	r3, [r2, #0]
+
+   // return the aggregated ticks value
+   // the counter runs at 84 MHz 
+   return ( low | high ); 
+     654:	9b01      	ldr	r3, [sp, #4]
+     656:	4619      	mov	r1, r3
+     658:	f04f 0200 	mov.w	r2, #0
+     65c:	4b0b      	ldr	r3, [pc, #44]	; (68c <_ZN3due9now_ticksEv+0xb8>)
+     65e:	e9d3 bc00 	ldrd	fp, ip, [r3]
+     662:	ea4b 0301 	orr.w	r3, fp, r1
+     666:	ea4c 0402 	orr.w	r4, ip, r2
+
+} 
+     66a:	4618      	mov	r0, r3
+     66c:	4621      	mov	r1, r4
+     66e:	b003      	add	sp, #12
+     670:	e8bd 8810 	ldmia.w	sp!, {r4, fp, pc}
+     674:	20084000 	.word	0x20084000
+     678:	400e1a50 	.word	0x400e1a50
+     67c:	400e0a00 	.word	0x400e0a00
+     680:	400e0c00 	.word	0x400e0c00
+     684:	e000e010 	.word	0xe000e010
+     688:	20084004 	.word	0x20084004
+     68c:	20084008 	.word	0x20084008
+
+00000690 <_ZN3due9uart_initEv>:
+
+Uart * hw_uart = UART;
+
+void uart_init(){
+   static bool init_done = false;
+   if( init_done ){
+     690:	4b1d      	ldr	r3, [pc, #116]	; (708 <_ZN3due9uart_initEv+0x78>)
+     692:	781b      	ldrb	r3, [r3, #0]
+     694:	2b00      	cmp	r3, #0
+     696:	d135      	bne.n	704 <_ZN3due9uart_initEv+0x74>
+      return;
+   }
+   init_done = true;
+     698:	4b1b      	ldr	r3, [pc, #108]	; (708 <_ZN3due9uart_initEv+0x78>)
+     69a:	2201      	movs	r2, #1
+     69c:	701a      	strb	r2, [r3, #0]
+
+    // enable the clock to port A
+    PMC->PMC_PCER0 = 1 << ID_PIOA;
+     69e:	4b1b      	ldr	r3, [pc, #108]	; (70c <_ZN3due9uart_initEv+0x7c>)
+     6a0:	f44f 6200 	mov.w	r2, #2048	; 0x800
+     6a4:	611a      	str	r2, [r3, #16]
+	
+    // disable PIO Control on PA9 and set up for Peripheral A
+	PIOA->PIO_PDR   = PIO_PA8; 
+     6a6:	4b1a      	ldr	r3, [pc, #104]	; (710 <_ZN3due9uart_initEv+0x80>)
+     6a8:	f44f 7280 	mov.w	r2, #256	; 0x100
+     6ac:	605a      	str	r2, [r3, #4]
+	PIOA->PIO_ABSR &= ~PIO_PA8; 
+     6ae:	4b18      	ldr	r3, [pc, #96]	; (710 <_ZN3due9uart_initEv+0x80>)
+     6b0:	6f1b      	ldr	r3, [r3, #112]	; 0x70
+     6b2:	4a17      	ldr	r2, [pc, #92]	; (710 <_ZN3due9uart_initEv+0x80>)
+     6b4:	f423 7380 	bic.w	r3, r3, #256	; 0x100
+     6b8:	6713      	str	r3, [r2, #112]	; 0x70
+	PIOA->PIO_PDR   = PIO_PA9; 
+     6ba:	4b15      	ldr	r3, [pc, #84]	; (710 <_ZN3due9uart_initEv+0x80>)
+     6bc:	f44f 7200 	mov.w	r2, #512	; 0x200
+     6c0:	605a      	str	r2, [r3, #4]
+	PIOA->PIO_ABSR &= ~PIO_PA9; 
+     6c2:	4b13      	ldr	r3, [pc, #76]	; (710 <_ZN3due9uart_initEv+0x80>)
+     6c4:	6f1b      	ldr	r3, [r3, #112]	; 0x70
+     6c6:	4a12      	ldr	r2, [pc, #72]	; (710 <_ZN3due9uart_initEv+0x80>)
+     6c8:	f423 7300 	bic.w	r3, r3, #512	; 0x200
+     6cc:	6713      	str	r3, [r2, #112]	; 0x70
+
+	// enable the clock to the UART
+    PMC->PMC_PCER0 = ( 0x01 << ID_UART );
+     6ce:	4b0f      	ldr	r3, [pc, #60]	; (70c <_ZN3due9uart_initEv+0x7c>)
+     6d0:	f44f 7280 	mov.w	r2, #256	; 0x100
+     6d4:	611a      	str	r2, [r3, #16]
+
+    // Reset and disable receiver and transmitter.
+    hw_uart->UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_RXDIS | UART_CR_TXDIS;
+     6d6:	4b0f      	ldr	r3, [pc, #60]	; (714 <_ZN3due9uart_initEv+0x84>)
+     6d8:	681b      	ldr	r3, [r3, #0]
+     6da:	22ac      	movs	r2, #172	; 0xac
+     6dc:	601a      	str	r2, [r3, #0]
+
+    // Set the baudrate to 115200.
+    //hw_uart->UART_BRGR = 45; // MASTER_CLK_FREQ / (16 * 45) = 116666 (close enough).
+    //uart->UART_BRGR = 546; // For ~9600 baud.
+    hw_uart->UART_BRGR = 5241600 / BMPTK_BAUDRATE; 
+     6de:	4b0d      	ldr	r3, [pc, #52]	; (714 <_ZN3due9uart_initEv+0x84>)
+     6e0:	681b      	ldr	r3, [r3, #0]
+     6e2:	222d      	movs	r2, #45	; 0x2d
+     6e4:	621a      	str	r2, [r3, #32]
+
+    // No parity, normal channel mode.
+    hw_uart->UART_MR = UART_MR_PAR_NO;
+     6e6:	4b0b      	ldr	r3, [pc, #44]	; (714 <_ZN3due9uart_initEv+0x84>)
+     6e8:	681b      	ldr	r3, [r3, #0]
+     6ea:	f44f 6200 	mov.w	r2, #2048	; 0x800
+     6ee:	605a      	str	r2, [r3, #4]
+
+    // Disable all interrupts.	  
+    hw_uart->UART_IDR = 0xFFFFFFFF;   
+     6f0:	4b08      	ldr	r3, [pc, #32]	; (714 <_ZN3due9uart_initEv+0x84>)
+     6f2:	681b      	ldr	r3, [r3, #0]
+     6f4:	f04f 32ff 	mov.w	r2, #4294967295
+     6f8:	60da      	str	r2, [r3, #12]
+
+    // Enable the receiver and the trasmitter.
+    hw_uart->UART_CR = UART_CR_RXEN | UART_CR_TXEN;      
+     6fa:	4b06      	ldr	r3, [pc, #24]	; (714 <_ZN3due9uart_initEv+0x84>)
+     6fc:	681b      	ldr	r3, [r3, #0]
+     6fe:	2250      	movs	r2, #80	; 0x50
+     700:	601a      	str	r2, [r3, #0]
+     702:	4770      	bx	lr
+      return;
+     704:	bf00      	nop
+}
+     706:	4770      	bx	lr
+     708:	20084010 	.word	0x20084010
+     70c:	400e0600 	.word	0x400e0600
+     710:	400e0e00 	.word	0x400e0e00
+     714:	200870ac 	.word	0x200870ac
+
+00000718 <_ZN3due9uart_putcEc>:
+   // uart_init() is not needed because uart_char_available does that
+   while( ! uart_char_available() ){}
+   return hw_uart->UART_RHR; 
+}
+
+void uart_putc( char c ){
+     718:	b500      	push	{lr}
+     71a:	b083      	sub	sp, #12
+     71c:	4603      	mov	r3, r0
+     71e:	f88d 3007 	strb.w	r3, [sp, #7]
+   uart_init();	
+     722:	f7ff ffb5 	bl	690 <_ZN3due9uart_initEv>
+   while( ( hw_uart->UART_SR & 2 ) == 0 ){}
+     726:	4b0b      	ldr	r3, [pc, #44]	; (754 <_ZN3due9uart_putcEc+0x3c>)
+     728:	681b      	ldr	r3, [r3, #0]
+     72a:	695b      	ldr	r3, [r3, #20]
+     72c:	f003 0302 	and.w	r3, r3, #2
+     730:	2b00      	cmp	r3, #0
+     732:	bf0c      	ite	eq
+     734:	2301      	moveq	r3, #1
+     736:	2300      	movne	r3, #0
+     738:	b2db      	uxtb	r3, r3
+     73a:	2b00      	cmp	r3, #0
+     73c:	d000      	beq.n	740 <_ZN3due9uart_putcEc+0x28>
+     73e:	e7f2      	b.n	726 <_ZN3due9uart_putcEc+0xe>
+   hw_uart->UART_THR = c;
+     740:	4b04      	ldr	r3, [pc, #16]	; (754 <_ZN3due9uart_putcEc+0x3c>)
+     742:	681b      	ldr	r3, [r3, #0]
+     744:	f89d 2007 	ldrb.w	r2, [sp, #7]
+     748:	61da      	str	r2, [r3, #28]
+}
+     74a:	bf00      	nop
+     74c:	b003      	add	sp, #12
+     74e:	f85d fb04 	ldr.w	pc, [sp], #4
+     752:	bf00      	nop
+     754:	200870ac 	.word	0x200870ac
+
+00000758 <_ZN5hwlib9uart_putcEc>:
+void wait_ms( int_fast32_t n ); 
+
+#define HWLIB_USE_HW_UART 
+#ifdef HWLIB_USE_HW_UART
+
+void HWLIB_WEAK uart_putc( char c ){
+     758:	b500      	push	{lr}
+     75a:	b083      	sub	sp, #12
+     75c:	4603      	mov	r3, r0
+     75e:	f88d 3007 	strb.w	r3, [sp, #7]
+   due::uart_putc( c );
+     762:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     766:	4618      	mov	r0, r3
+     768:	f7ff ffd6 	bl	718 <_ZN3due9uart_putcEc>
+}
+     76c:	bf00      	nop
+     76e:	b003      	add	sp, #12
+     770:	f85d fb04 	ldr.w	pc, [sp], #4
+
+00000774 <_ZN5hwlib9now_ticksEv>:
+
+#endif
+
+#ifdef _HWLIB_ONCE
+
+uint64_t now_ticks(){
+     774:	b510      	push	{r4, lr}
+   return target::now_ticks();
+     776:	f7ff ff2d 	bl	5d4 <_ZN3due9now_ticksEv>
+     77a:	4603      	mov	r3, r0
+     77c:	460c      	mov	r4, r1
+}   
+     77e:	4618      	mov	r0, r3
+     780:	4621      	mov	r1, r4
+     782:	bd10      	pop	{r4, pc}
+
+00000784 <_ZN5hwlib12ticks_per_usEv>:
+
+uint64_t ticks_per_us(){
+     784:	b510      	push	{r4, lr}
+   return target::ticks_per_us();
+     786:	f7ff ff1b 	bl	5c0 <_ZN3due12ticks_per_usEv>
+     78a:	4603      	mov	r3, r0
+     78c:	460c      	mov	r4, r1
+}   
+     78e:	4618      	mov	r0, r3
+     790:	4621      	mov	r1, r4
+     792:	bd10      	pop	{r4, pc}
+
+00000794 <_ZN5hwlib6now_usEv>:
+
+uint64_t now_us(){
+     794:	b538      	push	{r3, r4, r5, lr}
+   return now_ticks() / ticks_per_us();
+     796:	f7ff ffed 	bl	774 <_ZN5hwlib9now_ticksEv>
+     79a:	4604      	mov	r4, r0
+     79c:	460d      	mov	r5, r1
+     79e:	f7ff fff1 	bl	784 <_ZN5hwlib12ticks_per_usEv>
+     7a2:	4602      	mov	r2, r0
+     7a4:	460b      	mov	r3, r1
+     7a6:	4620      	mov	r0, r4
+     7a8:	4629      	mov	r1, r5
+     7aa:	f001 fa95 	bl	1cd8 <__aeabi_uldivmod>
+     7ae:	4603      	mov	r3, r0
+     7b0:	460c      	mov	r4, r1
+}   
+     7b2:	4618      	mov	r0, r3
+     7b4:	4621      	mov	r1, r4
+     7b6:	bd38      	pop	{r3, r4, r5, pc}
+
+000007b8 <_ZN5hwlib12wait_us_busyEi>:
+
+void HWLIB_WEAK wait_us_busy( int_fast32_t n ){
+     7b8:	e92d 4810 	stmdb	sp!, {r4, fp, lr}
+     7bc:	b085      	sub	sp, #20
+     7be:	9001      	str	r0, [sp, #4]
+   auto end = now_us() + n;
+     7c0:	f7ff ffe8 	bl	794 <_ZN5hwlib6now_usEv>
+     7c4:	460a      	mov	r2, r1
+     7c6:	4601      	mov	r1, r0
+     7c8:	9b01      	ldr	r3, [sp, #4]
+     7ca:	469b      	mov	fp, r3
+     7cc:	ea4f 7ceb 	mov.w	ip, fp, asr #31
+     7d0:	eb1b 0301 	adds.w	r3, fp, r1
+     7d4:	eb4c 0402 	adc.w	r4, ip, r2
+     7d8:	e9cd 3402 	strd	r3, r4, [sp, #8]
+   while( now_us() < end ){}
+     7dc:	f7ff ffda 	bl	794 <_ZN5hwlib6now_usEv>
+     7e0:	460a      	mov	r2, r1
+     7e2:	4601      	mov	r1, r0
+     7e4:	e9dd 3402 	ldrd	r3, r4, [sp, #8]
+     7e8:	42a2      	cmp	r2, r4
+     7ea:	bf08      	it	eq
+     7ec:	4299      	cmpeq	r1, r3
+     7ee:	bf34      	ite	cc
+     7f0:	2301      	movcc	r3, #1
+     7f2:	2300      	movcs	r3, #0
+     7f4:	b2db      	uxtb	r3, r3
+     7f6:	2b00      	cmp	r3, #0
+     7f8:	d000      	beq.n	7fc <_ZN5hwlib12wait_us_busyEi+0x44>
+     7fa:	e7ef      	b.n	7dc <_ZN5hwlib12wait_us_busyEi+0x24>
+}
+     7fc:	bf00      	nop
+     7fe:	b005      	add	sp, #20
+     800:	e8bd 8810 	ldmia.w	sp!, {r4, fp, pc}
+
+00000804 <_ZNK5hwlib7ostream9boolalphaEv>:
+   bool boolalpha( void ) const { return bool_alpha; }
+     804:	b082      	sub	sp, #8
+     806:	9001      	str	r0, [sp, #4]
+     808:	9b01      	ldr	r3, [sp, #4]
+     80a:	7c1b      	ldrb	r3, [r3, #16]
+     80c:	4618      	mov	r0, r3
+     80e:	b002      	add	sp, #8
+     810:	4770      	bx	lr
+	...
+
+00000814 <_ZN5hwliblsERNS_7ostreamEb>:
+   friend ostream & operator<< ( ostream & stream, bool x ){
+     814:	b500      	push	{lr}
+     816:	b083      	sub	sp, #12
+     818:	9001      	str	r0, [sp, #4]
+     81a:	460b      	mov	r3, r1
+     81c:	f88d 3003 	strb.w	r3, [sp, #3]
+      if( stream.boolalpha()){
+     820:	9801      	ldr	r0, [sp, #4]
+     822:	f7ff ffef 	bl	804 <_ZNK5hwlib7ostream9boolalphaEv>
+     826:	4603      	mov	r3, r0
+     828:	2b00      	cmp	r3, #0
+     82a:	d00b      	beq.n	844 <_ZN5hwliblsERNS_7ostreamEb+0x30>
+         stream << ( x ? "true" : "false" );
+     82c:	f89d 3003 	ldrb.w	r3, [sp, #3]
+     830:	2b00      	cmp	r3, #0
+     832:	d001      	beq.n	838 <_ZN5hwliblsERNS_7ostreamEb+0x24>
+     834:	4b0b      	ldr	r3, [pc, #44]	; (864 <_ZN5hwliblsERNS_7ostreamEb+0x50>)
+     836:	e000      	b.n	83a <_ZN5hwliblsERNS_7ostreamEb+0x26>
+     838:	4b0b      	ldr	r3, [pc, #44]	; (868 <_ZN5hwliblsERNS_7ostreamEb+0x54>)
+     83a:	4619      	mov	r1, r3
+     83c:	9801      	ldr	r0, [sp, #4]
+     83e:	f7ff fd75 	bl	32c <_ZN5hwliblsERNS_7ostreamEPKc>
+     842:	e00a      	b.n	85a <_ZN5hwliblsERNS_7ostreamEb+0x46>
+         stream << ( x ? "1" : "0" );
+     844:	f89d 3003 	ldrb.w	r3, [sp, #3]
+     848:	2b00      	cmp	r3, #0
+     84a:	d001      	beq.n	850 <_ZN5hwliblsERNS_7ostreamEb+0x3c>
+     84c:	4b07      	ldr	r3, [pc, #28]	; (86c <_ZN5hwliblsERNS_7ostreamEb+0x58>)
+     84e:	e000      	b.n	852 <_ZN5hwliblsERNS_7ostreamEb+0x3e>
+     850:	4b07      	ldr	r3, [pc, #28]	; (870 <_ZN5hwliblsERNS_7ostreamEb+0x5c>)
+     852:	4619      	mov	r1, r3
+     854:	9801      	ldr	r0, [sp, #4]
+     856:	f7ff fd69 	bl	32c <_ZN5hwliblsERNS_7ostreamEPKc>
+      return stream;   
+     85a:	9b01      	ldr	r3, [sp, #4]
+   }      
+     85c:	4618      	mov	r0, r3
+     85e:	b003      	add	sp, #12
+     860:	f85d fb04 	ldr.w	pc, [sp], #4
+     864:	00001ff0 	.word	0x00001ff0
+     868:	00001ff8 	.word	0x00001ff8
+     86c:	00002000 	.word	0x00002000
+     870:	00002004 	.word	0x00002004
+
+00000874 <_ZN5hwliblsERNS_7ostreamEx>:
+   friend ostream & operator<< ( ostream & stream, long long int x ){
+     874:	b510      	push	{r4, lr}
+     876:	b098      	sub	sp, #96	; 0x60
+     878:	9003      	str	r0, [sp, #12]
+     87a:	e9cd 2300 	strd	r2, r3, [sp]
+      reverse s;
+     87e:	ab04      	add	r3, sp, #16
+     880:	4618      	mov	r0, r3
+     882:	f7ff fc7f 	bl	184 <_ZN5hwlib7ostream7reverseC1Ev>
+      bool minus = ( x < 0 );
+     886:	9b01      	ldr	r3, [sp, #4]
+     888:	0fdb      	lsrs	r3, r3, #31
+     88a:	f88d 305f 	strb.w	r3, [sp, #95]	; 0x5f
+      if( x < 0 ){ x = -x; }
+     88e:	e9dd 3400 	ldrd	r3, r4, [sp]
+     892:	2b00      	cmp	r3, #0
+     894:	f174 0300 	sbcs.w	r3, r4, #0
+     898:	da06      	bge.n	8a8 <_ZN5hwliblsERNS_7ostreamEx+0x34>
+     89a:	e9dd 3400 	ldrd	r3, r4, [sp]
+     89e:	425b      	negs	r3, r3
+     8a0:	eb64 0444 	sbc.w	r4, r4, r4, lsl #1
+     8a4:	e9cd 3400 	strd	r3, r4, [sp]
+      if( x == 0 ){
+     8a8:	e9dd 3400 	ldrd	r3, r4, [sp]
+     8ac:	4323      	orrs	r3, r4
+     8ae:	d106      	bne.n	8be <_ZN5hwliblsERNS_7ostreamEx+0x4a>
+         s.add_digit( 0, stream.hex_base );
+     8b0:	9b03      	ldr	r3, [sp, #12]
+     8b2:	7b5a      	ldrb	r2, [r3, #13]
+     8b4:	ab04      	add	r3, sp, #16
+     8b6:	2100      	movs	r1, #0
+     8b8:	4618      	mov	r0, r3
+     8ba:	f7ff fc84 	bl	1c6 <_ZN5hwlib7ostream7reverse9add_digitEcc>
+      while( x != 0 ){
+     8be:	e9dd 3400 	ldrd	r3, r4, [sp]
+     8c2:	4323      	orrs	r3, r4
+     8c4:	d025      	beq.n	912 <_ZN5hwliblsERNS_7ostreamEx+0x9e>
+         s.add_digit( x % stream.base(), stream.hex_base );
+     8c6:	9803      	ldr	r0, [sp, #12]
+     8c8:	f7ff fd17 	bl	2fa <_ZNK5hwlib7ostream4baseEv>
+     8cc:	4603      	mov	r3, r0
+     8ce:	f04f 0400 	mov.w	r4, #0
+     8d2:	e9dd 0100 	ldrd	r0, r1, [sp]
+     8d6:	461a      	mov	r2, r3
+     8d8:	4623      	mov	r3, r4
+     8da:	f001 f9ad 	bl	1c38 <__aeabi_ldivmod>
+     8de:	461c      	mov	r4, r3
+     8e0:	4613      	mov	r3, r2
+     8e2:	b2d9      	uxtb	r1, r3
+     8e4:	9b03      	ldr	r3, [sp, #12]
+     8e6:	7b5a      	ldrb	r2, [r3, #13]
+     8e8:	ab04      	add	r3, sp, #16
+     8ea:	4618      	mov	r0, r3
+     8ec:	f7ff fc6b 	bl	1c6 <_ZN5hwlib7ostream7reverse9add_digitEcc>
+         x = x / stream.base();
+     8f0:	9803      	ldr	r0, [sp, #12]
+     8f2:	f7ff fd02 	bl	2fa <_ZNK5hwlib7ostream4baseEv>
+     8f6:	4603      	mov	r3, r0
+     8f8:	f04f 0400 	mov.w	r4, #0
+     8fc:	461a      	mov	r2, r3
+     8fe:	4623      	mov	r3, r4
+     900:	e9dd 0100 	ldrd	r0, r1, [sp]
+     904:	f001 f998 	bl	1c38 <__aeabi_ldivmod>
+     908:	4603      	mov	r3, r0
+     90a:	460c      	mov	r4, r1
+     90c:	e9cd 3400 	strd	r3, r4, [sp]
+      while( x != 0 ){
+     910:	e7d5      	b.n	8be <_ZN5hwliblsERNS_7ostreamEx+0x4a>
+      s.add_prefix( stream );
+     912:	ab04      	add	r3, sp, #16
+     914:	9903      	ldr	r1, [sp, #12]
+     916:	4618      	mov	r0, r3
+     918:	f7ff fc7c 	bl	214 <_ZN5hwlib7ostream7reverse10add_prefixERKS0_>
+      if( minus ){
+     91c:	f89d 305f 	ldrb.w	r3, [sp, #95]	; 0x5f
+     920:	2b00      	cmp	r3, #0
+     922:	d005      	beq.n	930 <_ZN5hwliblsERNS_7ostreamEx+0xbc>
+         s.add_char( '-' );
+     924:	ab04      	add	r3, sp, #16
+     926:	212d      	movs	r1, #45	; 0x2d
+     928:	4618      	mov	r0, r3
+     92a:	f7ff fc3a 	bl	1a2 <_ZN5hwlib7ostream7reverse8add_charEc>
+     92e:	e00a      	b.n	946 <_ZN5hwliblsERNS_7ostreamEx+0xd2>
+      } else if( stream.showpos() ){
+     930:	9803      	ldr	r0, [sp, #12]
+     932:	f7ff fcf4 	bl	31e <_ZNK5hwlib7ostream7showposEv>
+     936:	4603      	mov	r3, r0
+     938:	2b00      	cmp	r3, #0
+     93a:	d004      	beq.n	946 <_ZN5hwliblsERNS_7ostreamEx+0xd2>
+         s.add_char( '+' );
+     93c:	ab04      	add	r3, sp, #16
+     93e:	212b      	movs	r1, #43	; 0x2b
+     940:	4618      	mov	r0, r3
+     942:	f7ff fc2e 	bl	1a2 <_ZN5hwlib7ostream7reverse8add_charEc>
+      stream << s.content;
+     946:	9b16      	ldr	r3, [sp, #88]	; 0x58
+     948:	4619      	mov	r1, r3
+     94a:	9803      	ldr	r0, [sp, #12]
+     94c:	f7ff fcee 	bl	32c <_ZN5hwliblsERNS_7ostreamEPKc>
+      return stream;   
+     950:	9b03      	ldr	r3, [sp, #12]
+   }
+     952:	4618      	mov	r0, r3
+     954:	b018      	add	sp, #96	; 0x60
+     956:	bd10      	pop	{r4, pc}
+
+00000958 <_ZN5hwliblsERNS_7ostreamEm>:
+   friend ostream & operator<< ( ostream & stream, unsigned long int x ){
+     958:	b510      	push	{r4, lr}
+     95a:	b082      	sub	sp, #8
+     95c:	9001      	str	r0, [sp, #4]
+     95e:	9100      	str	r1, [sp, #0]
+      return stream << static_cast< long long int >( x ); 
+     960:	9b00      	ldr	r3, [sp, #0]
+     962:	f04f 0400 	mov.w	r4, #0
+     966:	461a      	mov	r2, r3
+     968:	4623      	mov	r3, r4
+     96a:	9801      	ldr	r0, [sp, #4]
+     96c:	f7ff ff82 	bl	874 <_ZN5hwliblsERNS_7ostreamEx>
+     970:	4603      	mov	r3, r0
+   }
+     972:	4618      	mov	r0, r3
+     974:	b002      	add	sp, #8
+     976:	bd10      	pop	{r4, pc}
+
+00000978 <NVIC_EnableIRQ>:
+    The function enables a device-specific interrupt in the NVIC interrupt controller.
+
+    \param [in]      IRQn  External interrupt number. Value cannot be negative.
+ */
+__STATIC_INLINE void NVIC_EnableIRQ(IRQn_Type IRQn)
+{
+     978:	b082      	sub	sp, #8
+     97a:	4603      	mov	r3, r0
+     97c:	f88d 3007 	strb.w	r3, [sp, #7]
+  NVIC->ISER[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F)); /* enable interrupt */
+     980:	f99d 3007 	ldrsb.w	r3, [sp, #7]
+     984:	b2db      	uxtb	r3, r3
+     986:	f003 031f 	and.w	r3, r3, #31
+     98a:	2201      	movs	r2, #1
+     98c:	fa02 f103 	lsl.w	r1, r2, r3
+     990:	4a04      	ldr	r2, [pc, #16]	; (9a4 <NVIC_EnableIRQ+0x2c>)
+     992:	f99d 3007 	ldrsb.w	r3, [sp, #7]
+     996:	095b      	lsrs	r3, r3, #5
+     998:	f842 1023 	str.w	r1, [r2, r3, lsl #2]
+}
+     99c:	bf00      	nop
+     99e:	b002      	add	sp, #8
+     9a0:	4770      	bx	lr
+     9a2:	bf00      	nop
+     9a4:	e000e100 	.word	0xe000e100
+
+000009a8 <NVIC_SetPriority>:
+
+    \param [in]      IRQn  Interrupt number.
+    \param [in]  priority  Priority to set.
+ */
+__STATIC_INLINE void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
+{
+     9a8:	b082      	sub	sp, #8
+     9aa:	4603      	mov	r3, r0
+     9ac:	9100      	str	r1, [sp, #0]
+     9ae:	f88d 3007 	strb.w	r3, [sp, #7]
+  if(IRQn < 0) {
+     9b2:	f99d 3007 	ldrsb.w	r3, [sp, #7]
+     9b6:	2b00      	cmp	r3, #0
+     9b8:	da0d      	bge.n	9d6 <NVIC_SetPriority+0x2e>
+    SCB->SHP[((uint32_t)(IRQn) & 0xF)-4] = ((priority << (8 - __NVIC_PRIO_BITS)) & 0xff); } /* set Priority for Cortex-M  System Interrupts */
+     9ba:	9b00      	ldr	r3, [sp, #0]
+     9bc:	b2da      	uxtb	r2, r3
+     9be:	490d      	ldr	r1, [pc, #52]	; (9f4 <NVIC_SetPriority+0x4c>)
+     9c0:	f99d 3007 	ldrsb.w	r3, [sp, #7]
+     9c4:	b2db      	uxtb	r3, r3
+     9c6:	f003 030f 	and.w	r3, r3, #15
+     9ca:	3b04      	subs	r3, #4
+     9cc:	0112      	lsls	r2, r2, #4
+     9ce:	b2d2      	uxtb	r2, r2
+     9d0:	440b      	add	r3, r1
+     9d2:	761a      	strb	r2, [r3, #24]
+  else {
+    NVIC->IP[(uint32_t)(IRQn)] = ((priority << (8 - __NVIC_PRIO_BITS)) & 0xff);    }        /* set Priority for device specific Interrupts  */
+}
+     9d4:	e00b      	b.n	9ee <NVIC_SetPriority+0x46>
+    NVIC->IP[(uint32_t)(IRQn)] = ((priority << (8 - __NVIC_PRIO_BITS)) & 0xff);    }        /* set Priority for device specific Interrupts  */
+     9d6:	9b00      	ldr	r3, [sp, #0]
+     9d8:	b2db      	uxtb	r3, r3
+     9da:	4a07      	ldr	r2, [pc, #28]	; (9f8 <NVIC_SetPriority+0x50>)
+     9dc:	f99d 1007 	ldrsb.w	r1, [sp, #7]
+     9e0:	4608      	mov	r0, r1
+     9e2:	011b      	lsls	r3, r3, #4
+     9e4:	b2d9      	uxtb	r1, r3
+     9e6:	1813      	adds	r3, r2, r0
+     9e8:	460a      	mov	r2, r1
+     9ea:	f883 2300 	strb.w	r2, [r3, #768]	; 0x300
+}
+     9ee:	bf00      	nop
+     9f0:	b002      	add	sp, #8
+     9f2:	4770      	bx	lr
+     9f4:	e000ed00 	.word	0xe000ed00
+     9f8:	e000e100 	.word	0xe000e100
+
+000009fc <__CAN0_Handler>:
+        }
+    };
+}
+
+extern "C" {
+    void __CAN0_Handler() {
+     9fc:	b508      	push	{r3, lr}
+        r2d2::can_bus::detail::_handle_generic_isr<
+            r2d2::can_bus::can0
+        >();
+     9fe:	f000 f8b1 	bl	b64 <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can0EEEvv>
+    }
+     a02:	bf00      	nop
+     a04:	bd08      	pop	{r3, pc}
+
+00000a06 <__CAN1_Handler>:
+
+    void __CAN1_Handler() {
+     a06:	b508      	push	{r3, lr}
+        r2d2::can_bus::detail::_handle_generic_isr<
+            r2d2::can_bus::can1
+        >();
+     a08:	f000 f8ec 	bl	be4 <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can1EEEvv>
+    }
+     a0c:	bf00      	nop
+     a0e:	bd08      	pop	{r3, pc}
+
+00000a10 <main>:
+#include "hwlib.hpp"
+
+#include <can.hpp>
+
+int main(void) {
+     a10:	b510      	push	{r4, lr}
+     a12:	b088      	sub	sp, #32
+    // kill the watchdog
+    WDT->WDT_MR = WDT_MR_WDDIS;
+     a14:	4b4a      	ldr	r3, [pc, #296]	; (b40 <main+0x130>)
+     a16:	f44f 4200 	mov.w	r2, #32768	; 0x8000
+     a1a:	605a      	str	r2, [r3, #4]
+    hwlib::wait_ms(1000);
+     a1c:	f44f 707a 	mov.w	r0, #1000	; 0x3e8
+     a20:	f7ff fb68 	bl	f4 <_ZN5hwlib7wait_msEi>
+
+    hwlib::cout << "Starting Due\n";
+     a24:	4947      	ldr	r1, [pc, #284]	; (b44 <main+0x134>)
+     a26:	4848      	ldr	r0, [pc, #288]	; (b48 <main+0x138>)
+     a28:	f7ff fc80 	bl	32c <_ZN5hwliblsERNS_7ostreamEPKc>
+
+    using can = r2d2::can_bus::controller<r2d2::can_bus::can0>;
+
+    hwlib::cout << "Correct init: " << can::init<r2d2::can_bus::baudrate::BPS_250K>() << '\n';
+     a2c:	4947      	ldr	r1, [pc, #284]	; (b4c <main+0x13c>)
+     a2e:	4846      	ldr	r0, [pc, #280]	; (b48 <main+0x138>)
+     a30:	f7ff fc7c 	bl	32c <_ZN5hwliblsERNS_7ostreamEPKc>
+     a34:	4604      	mov	r4, r0
+     a36:	f000 f915 	bl	c64 <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv>
+     a3a:	4603      	mov	r3, r0
+     a3c:	4619      	mov	r1, r3
+     a3e:	4620      	mov	r0, r4
+     a40:	f7ff fee8 	bl	814 <_ZN5hwliblsERNS_7ostreamEb>
+     a44:	4603      	mov	r3, r0
+     a46:	210a      	movs	r1, #10
+     a48:	4618      	mov	r0, r3
+     a4a:	f7ff fc2f 	bl	2ac <_ZN5hwlib7ostreamlsEc>
+
+    for(uint8_t i = 0; i < 4; i++){
+     a4e:	2300      	movs	r3, #0
+     a50:	f88d 301f 	strb.w	r3, [sp, #31]
+     a54:	f89d 301f 	ldrb.w	r3, [sp, #31]
+     a58:	2b03      	cmp	r3, #3
+     a5a:	d80c      	bhi.n	a76 <main+0x66>
+        r2d2::can_bus::detail::_set_mailbox_filter<r2d2::can_bus::can0>(i, 0, 0);
+     a5c:	f89d 301f 	ldrb.w	r3, [sp, #31]
+     a60:	2200      	movs	r2, #0
+     a62:	2100      	movs	r1, #0
+     a64:	4618      	mov	r0, r3
+     a66:	f000 f94b 	bl	d00 <_ZN4r2d27can_bus6detail19_set_mailbox_filterINS0_4can0ELb0EEEvhmm>
+    for(uint8_t i = 0; i < 4; i++){
+     a6a:	f89d 301f 	ldrb.w	r3, [sp, #31]
+     a6e:	3301      	adds	r3, #1
+     a70:	f88d 301f 	strb.w	r3, [sp, #31]
+     a74:	e7ee      	b.n	a54 <main+0x44>
+    }
+    
+    for (;;){
+        for(uint8_t i = 0; i < 4; i++){
+     a76:	2300      	movs	r3, #0
+     a78:	f88d 301e 	strb.w	r3, [sp, #30]
+     a7c:	f89d 301e 	ldrb.w	r3, [sp, #30]
+     a80:	2b03      	cmp	r3, #3
+     a82:	d858      	bhi.n	b36 <main+0x126>
+            if(!r2d2::can_bus::detail::_mailbox_rx_stores<r2d2::can_bus::can0>::buffers[i].empty()){
+     a84:	f89d 301e 	ldrb.w	r3, [sp, #30]
+     a88:	f44f 7243 	mov.w	r2, #780	; 0x30c
+     a8c:	fb02 f303 	mul.w	r3, r2, r3
+     a90:	4a2f      	ldr	r2, [pc, #188]	; (b50 <main+0x140>)
+     a92:	4413      	add	r3, r2
+     a94:	4618      	mov	r0, r3
+     a96:	f000 f953 	bl	d40 <_ZNK4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE5emptyEv>
+     a9a:	4603      	mov	r3, r0
+     a9c:	f083 0301 	eor.w	r3, r3, #1
+     aa0:	b2db      	uxtb	r3, r3
+     aa2:	2b00      	cmp	r3, #0
+     aa4:	d041      	beq.n	b2a <main+0x11a>
+                hwlib::cout << "Got data buffer:" << i << "\n";
+     aa6:	492b      	ldr	r1, [pc, #172]	; (b54 <main+0x144>)
+     aa8:	4827      	ldr	r0, [pc, #156]	; (b48 <main+0x138>)
+     aaa:	f7ff fc3f 	bl	32c <_ZN5hwliblsERNS_7ostreamEPKc>
+     aae:	4602      	mov	r2, r0
+     ab0:	f89d 301e 	ldrb.w	r3, [sp, #30]
+     ab4:	4619      	mov	r1, r3
+     ab6:	4610      	mov	r0, r2
+     ab8:	f7ff fcd5 	bl	466 <_ZN5hwliblsERNS_7ostreamEh>
+     abc:	4603      	mov	r3, r0
+     abe:	4926      	ldr	r1, [pc, #152]	; (b58 <main+0x148>)
+     ac0:	4618      	mov	r0, r3
+     ac2:	f7ff fc33 	bl	32c <_ZN5hwliblsERNS_7ostreamEPKc>
+                while(!r2d2::can_bus::detail::_mailbox_rx_stores<r2d2::can_bus::can0>::buffers[i].empty()){
+     ac6:	f89d 301e 	ldrb.w	r3, [sp, #30]
+     aca:	f44f 7243 	mov.w	r2, #780	; 0x30c
+     ace:	fb02 f303 	mul.w	r3, r2, r3
+     ad2:	4a1f      	ldr	r2, [pc, #124]	; (b50 <main+0x140>)
+     ad4:	4413      	add	r3, r2
+     ad6:	4618      	mov	r0, r3
+     ad8:	f000 f932 	bl	d40 <_ZNK4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE5emptyEv>
+     adc:	4603      	mov	r3, r0
+     ade:	f083 0301 	eor.w	r3, r3, #1
+     ae2:	b2db      	uxtb	r3, r3
+     ae4:	2b00      	cmp	r3, #0
+     ae6:	d01c      	beq.n	b22 <main+0x112>
+                    auto data = r2d2::can_bus::detail::_mailbox_rx_stores<r2d2::can_bus::can0>::buffers[i].copy_and_pop();
+     ae8:	f89d 301e 	ldrb.w	r3, [sp, #30]
+     aec:	f44f 7243 	mov.w	r2, #780	; 0x30c
+     af0:	fb02 f303 	mul.w	r3, r2, r3
+     af4:	4a16      	ldr	r2, [pc, #88]	; (b50 <main+0x140>)
+     af6:	441a      	add	r2, r3
+     af8:	ab01      	add	r3, sp, #4
+     afa:	4611      	mov	r1, r2
+     afc:	4618      	mov	r0, r3
+     afe:	f000 f92c 	bl	d5a <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE12copy_and_popEv>
+                    hwlib::cout << hwlib::hex << data.data.low << ", ";
+     b02:	4916      	ldr	r1, [pc, #88]	; (b5c <main+0x14c>)
+     b04:	4810      	ldr	r0, [pc, #64]	; (b48 <main+0x138>)
+     b06:	f7ff fbff 	bl	308 <_ZN5hwliblsERNS_7ostreamERKNS_8_setbaseE>
+     b0a:	4602      	mov	r2, r0
+     b0c:	9b05      	ldr	r3, [sp, #20]
+     b0e:	4619      	mov	r1, r3
+     b10:	4610      	mov	r0, r2
+     b12:	f7ff ff21 	bl	958 <_ZN5hwliblsERNS_7ostreamEm>
+     b16:	4603      	mov	r3, r0
+     b18:	4911      	ldr	r1, [pc, #68]	; (b60 <main+0x150>)
+     b1a:	4618      	mov	r0, r3
+     b1c:	f7ff fc06 	bl	32c <_ZN5hwliblsERNS_7ostreamEPKc>
+                while(!r2d2::can_bus::detail::_mailbox_rx_stores<r2d2::can_bus::can0>::buffers[i].empty()){
+     b20:	e7d1      	b.n	ac6 <main+0xb6>
+                }
+                hwlib::cout << "\n";
+     b22:	490d      	ldr	r1, [pc, #52]	; (b58 <main+0x148>)
+     b24:	4808      	ldr	r0, [pc, #32]	; (b48 <main+0x138>)
+     b26:	f7ff fc01 	bl	32c <_ZN5hwliblsERNS_7ostreamEPKc>
+        for(uint8_t i = 0; i < 4; i++){
+     b2a:	f89d 301e 	ldrb.w	r3, [sp, #30]
+     b2e:	3301      	adds	r3, #1
+     b30:	f88d 301e 	strb.w	r3, [sp, #30]
+     b34:	e7a2      	b.n	a7c <main+0x6c>
+            }
+        }
+        hwlib::wait_ms(10000);
+     b36:	f242 7010 	movw	r0, #10000	; 0x2710
+     b3a:	f7ff fadb 	bl	f4 <_ZN5hwlib7wait_msEi>
+    }
+     b3e:	e79a      	b.n	a76 <main+0x66>
+     b40:	400e1a50 	.word	0x400e1a50
+     b44:	00002048 	.word	0x00002048
+     b48:	20087094 	.word	0x20087094
+     b4c:	00002058 	.word	0x00002058
+     b50:	20084014 	.word	0x20084014
+     b54:	00002068 	.word	0x00002068
+     b58:	0000207c 	.word	0x0000207c
+     b5c:	00001fec 	.word	0x00001fec
+     b60:	00002080 	.word	0x00002080
+
+00000b64 <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can0EEEvv>:
+        void _handle_generic_isr() {
+     b64:	b500      	push	{lr}
+     b66:	b089      	sub	sp, #36	; 0x24
+            const uint32_t status = port<Bus>->CAN_SR;
+     b68:	4b1d      	ldr	r3, [pc, #116]	; (be0 <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can0EEEvv+0x7c>)
+     b6a:	691b      	ldr	r3, [r3, #16]
+     b6c:	9306      	str	r3, [sp, #24]
+            uint32_t mask = port<Bus>->CAN_IMR;
+     b6e:	4b1c      	ldr	r3, [pc, #112]	; (be0 <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can0EEEvv+0x7c>)
+     b70:	68db      	ldr	r3, [r3, #12]
+     b72:	9307      	str	r3, [sp, #28]
+            uint8_t trailing_zeros = 0;
+     b74:	2300      	movs	r3, #0
+     b76:	f88d 3017 	strb.w	r3, [sp, #23]
+            while((trailing_zeros = __CLZ(__RBIT(status & mask))) < 32) {
+     b7a:	9a06      	ldr	r2, [sp, #24]
+     b7c:	9b07      	ldr	r3, [sp, #28]
+     b7e:	4013      	ands	r3, r2
+     b80:	9303      	str	r3, [sp, #12]
+ */
+__attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __RBIT(uint32_t value)
+{
+  uint32_t result;
+
+   __ASM volatile ("rbit %0, %1" : "=r" (result) : "r" (value) );
+     b82:	9b03      	ldr	r3, [sp, #12]
+     b84:	fa93 f3a3 	rbit	r3, r3
+     b88:	9302      	str	r3, [sp, #8]
+   return(result);
+     b8a:	9b02      	ldr	r3, [sp, #8]
+     b8c:	9304      	str	r3, [sp, #16]
+ */
+__attribute__( ( always_inline ) ) __STATIC_INLINE uint8_t __CLZ(uint32_t value)
+{
+   uint32_t result;
+
+  __ASM volatile ("clz %0, %1" : "=r" (result) : "r" (value) );
+     b8e:	9b04      	ldr	r3, [sp, #16]
+     b90:	fab3 f383 	clz	r3, r3
+     b94:	9301      	str	r3, [sp, #4]
+  return(result);
+     b96:	9b01      	ldr	r3, [sp, #4]
+     b98:	b2db      	uxtb	r3, r3
+     b9a:	f88d 3017 	strb.w	r3, [sp, #23]
+     b9e:	f89d 3017 	ldrb.w	r3, [sp, #23]
+     ba2:	2b1f      	cmp	r3, #31
+     ba4:	bf94      	ite	ls
+     ba6:	2301      	movls	r3, #1
+     ba8:	2300      	movhi	r3, #0
+     baa:	b2db      	uxtb	r3, r3
+     bac:	2b00      	cmp	r3, #0
+     bae:	d012      	beq.n	bd6 <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can0EEEvv+0x72>
+                const auto bit = static_cast<uint8_t>(trailing_zeros);
+     bb0:	f89d 3017 	ldrb.w	r3, [sp, #23]
+     bb4:	f88d 3016 	strb.w	r3, [sp, #22]
+                _handle_mailbox_isr<Bus>(bit);
+     bb8:	f89d 3016 	ldrb.w	r3, [sp, #22]
+     bbc:	4618      	mov	r0, r3
+     bbe:	f000 f911 	bl	de4 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh>
+                mask &= (~(1U << bit));
+     bc2:	f89d 3016 	ldrb.w	r3, [sp, #22]
+     bc6:	2201      	movs	r2, #1
+     bc8:	fa02 f303 	lsl.w	r3, r2, r3
+     bcc:	43db      	mvns	r3, r3
+     bce:	9a07      	ldr	r2, [sp, #28]
+     bd0:	4013      	ands	r3, r2
+     bd2:	9307      	str	r3, [sp, #28]
+            while((trailing_zeros = __CLZ(__RBIT(status & mask))) < 32) {
+     bd4:	e7d1      	b.n	b7a <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can0EEEvv+0x16>
+        }
+     bd6:	bf00      	nop
+     bd8:	b009      	add	sp, #36	; 0x24
+     bda:	f85d fb04 	ldr.w	pc, [sp], #4
+     bde:	bf00      	nop
+     be0:	400b4000 	.word	0x400b4000
+
+00000be4 <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can1EEEvv>:
+        void _handle_generic_isr() {
+     be4:	b500      	push	{lr}
+     be6:	b089      	sub	sp, #36	; 0x24
+            const uint32_t status = port<Bus>->CAN_SR;
+     be8:	4b1d      	ldr	r3, [pc, #116]	; (c60 <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can1EEEvv+0x7c>)
+     bea:	691b      	ldr	r3, [r3, #16]
+     bec:	9306      	str	r3, [sp, #24]
+            uint32_t mask = port<Bus>->CAN_IMR;
+     bee:	4b1c      	ldr	r3, [pc, #112]	; (c60 <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can1EEEvv+0x7c>)
+     bf0:	68db      	ldr	r3, [r3, #12]
+     bf2:	9307      	str	r3, [sp, #28]
+            uint8_t trailing_zeros = 0;
+     bf4:	2300      	movs	r3, #0
+     bf6:	f88d 3017 	strb.w	r3, [sp, #23]
+            while((trailing_zeros = __CLZ(__RBIT(status & mask))) < 32) {
+     bfa:	9a06      	ldr	r2, [sp, #24]
+     bfc:	9b07      	ldr	r3, [sp, #28]
+     bfe:	4013      	ands	r3, r2
+     c00:	9303      	str	r3, [sp, #12]
+   __ASM volatile ("rbit %0, %1" : "=r" (result) : "r" (value) );
+     c02:	9b03      	ldr	r3, [sp, #12]
+     c04:	fa93 f3a3 	rbit	r3, r3
+     c08:	9302      	str	r3, [sp, #8]
+   return(result);
+     c0a:	9b02      	ldr	r3, [sp, #8]
+     c0c:	9304      	str	r3, [sp, #16]
+  __ASM volatile ("clz %0, %1" : "=r" (result) : "r" (value) );
+     c0e:	9b04      	ldr	r3, [sp, #16]
+     c10:	fab3 f383 	clz	r3, r3
+     c14:	9301      	str	r3, [sp, #4]
+  return(result);
+     c16:	9b01      	ldr	r3, [sp, #4]
+     c18:	b2db      	uxtb	r3, r3
+     c1a:	f88d 3017 	strb.w	r3, [sp, #23]
+     c1e:	f89d 3017 	ldrb.w	r3, [sp, #23]
+     c22:	2b1f      	cmp	r3, #31
+     c24:	bf94      	ite	ls
+     c26:	2301      	movls	r3, #1
+     c28:	2300      	movhi	r3, #0
+     c2a:	b2db      	uxtb	r3, r3
+     c2c:	2b00      	cmp	r3, #0
+     c2e:	d012      	beq.n	c56 <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can1EEEvv+0x72>
+                const auto bit = static_cast<uint8_t>(trailing_zeros);
+     c30:	f89d 3017 	ldrb.w	r3, [sp, #23]
+     c34:	f88d 3016 	strb.w	r3, [sp, #22]
+                _handle_mailbox_isr<Bus>(bit);
+     c38:	f89d 3016 	ldrb.w	r3, [sp, #22]
+     c3c:	4618      	mov	r0, r3
+     c3e:	f000 f947 	bl	ed0 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh>
+                mask &= (~(1U << bit));
+     c42:	f89d 3016 	ldrb.w	r3, [sp, #22]
+     c46:	2201      	movs	r2, #1
+     c48:	fa02 f303 	lsl.w	r3, r2, r3
+     c4c:	43db      	mvns	r3, r3
+     c4e:	9a07      	ldr	r2, [sp, #28]
+     c50:	4013      	ands	r3, r2
+     c52:	9307      	str	r3, [sp, #28]
+            while((trailing_zeros = __CLZ(__RBIT(status & mask))) < 32) {
+     c54:	e7d1      	b.n	bfa <_ZN4r2d27can_bus6detail19_handle_generic_isrINS0_4can1EEEvv+0x16>
+        }
+     c56:	bf00      	nop
+     c58:	b009      	add	sp, #36	; 0x24
+     c5a:	f85d fb04 	ldr.w	pc, [sp], #4
+     c5e:	bf00      	nop
+     c60:	400b8000 	.word	0x400b8000
+
+00000c64 <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv>:
+        static bool init() {
+     c64:	b500      	push	{lr}
+     c66:	b085      	sub	sp, #20
+            constexpr uint32_t can_timeout = 100000;
+     c68:	4b22      	ldr	r3, [pc, #136]	; (cf4 <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv+0x90>)
+     c6a:	9302      	str	r3, [sp, #8]
+            enable_clock<Bus>();
+     c6c:	f000 f9a6 	bl	fbc <_ZN4r2d27can_bus12enable_clockINS0_4can0EEEvv>
+            constexpr auto irqn = static_cast<IRQn_Type>(Bus::irqn);
+     c70:	232b      	movs	r3, #43	; 0x2b
+     c72:	f88d 3007 	strb.w	r3, [sp, #7]
+            NVIC_SetPriority(irqn, 12);
+     c76:	210c      	movs	r1, #12
+     c78:	202b      	movs	r0, #43	; 0x2b
+     c7a:	f7ff fe95 	bl	9a8 <NVIC_SetPriority>
+            NVIC_EnableIRQ(irqn);
+     c7e:	202b      	movs	r0, #43	; 0x2b
+     c80:	f7ff fe7a 	bl	978 <NVIC_EnableIRQ>
+            set_peripheral<typename Bus::tx>();
+     c84:	f000 f9a4 	bl	fd0 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5cantxEEEvv>
+            set_peripheral<typename Bus::rx>();
+     c88:	f000 f9bc 	bl	1004 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5canrxEEEvv>
+            if (!detail::_set_baudrate<Bus, Baud>()) {
+     c8c:	f000 f9d4 	bl	1038 <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv>
+     c90:	4603      	mov	r3, r0
+     c92:	f083 0301 	eor.w	r3, r3, #1
+     c96:	b2db      	uxtb	r3, r3
+     c98:	2b00      	cmp	r3, #0
+     c9a:	d001      	beq.n	ca0 <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv+0x3c>
+                return false;
+     c9c:	2300      	movs	r3, #0
+     c9e:	e025      	b.n	cec <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv+0x88>
+            detail::_reset_mailboxes<Bus>();
+     ca0:	f000 fa5c 	bl	115c <_ZN4r2d27can_bus6detail16_reset_mailboxesINS0_4can0EEEvv>
+            port<Bus>->CAN_IDR = 0xffffffff;
+     ca4:	4b14      	ldr	r3, [pc, #80]	; (cf8 <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv+0x94>)
+     ca6:	f04f 32ff 	mov.w	r2, #4294967295
+     caa:	609a      	str	r2, [r3, #8]
+            detail::_set_mailbox_tx_count<Bus>(4);
+     cac:	2004      	movs	r0, #4
+     cae:	f000 fa6d 	bl	118c <_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh>
+            detail::_enable_bus<Bus>();
+     cb2:	f000 fab3 	bl	121c <_ZN4r2d27can_bus6detail11_enable_busINS0_4can0EEEvv>
+            uint32_t flag = 0;
+     cb6:	2300      	movs	r3, #0
+     cb8:	9300      	str	r3, [sp, #0]
+            uint32_t tick = 0;
+     cba:	2300      	movs	r3, #0
+     cbc:	9303      	str	r3, [sp, #12]
+                flag = port<Bus>->CAN_SR;         
+     cbe:	4b0e      	ldr	r3, [pc, #56]	; (cf8 <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv+0x94>)
+     cc0:	691b      	ldr	r3, [r3, #16]
+     cc2:	9300      	str	r3, [sp, #0]
+                ++tick;
+     cc4:	9b03      	ldr	r3, [sp, #12]
+     cc6:	3301      	adds	r3, #1
+     cc8:	9303      	str	r3, [sp, #12]
+            } while (!(flag & CAN_SR_WAKEUP) && (tick < can_timeout));
+     cca:	9b00      	ldr	r3, [sp, #0]
+     ccc:	f403 1300 	and.w	r3, r3, #2097152	; 0x200000
+     cd0:	2b00      	cmp	r3, #0
+     cd2:	d104      	bne.n	cde <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv+0x7a>
+     cd4:	9b03      	ldr	r3, [sp, #12]
+     cd6:	4a09      	ldr	r2, [pc, #36]	; (cfc <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv+0x98>)
+     cd8:	4293      	cmp	r3, r2
+     cda:	d800      	bhi.n	cde <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv+0x7a>
+            do {
+     cdc:	e7ef      	b.n	cbe <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv+0x5a>
+            return tick != can_timeout;
+     cde:	9b03      	ldr	r3, [sp, #12]
+     ce0:	4a04      	ldr	r2, [pc, #16]	; (cf4 <_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE250000EEEbv+0x90>)
+     ce2:	4293      	cmp	r3, r2
+     ce4:	bf14      	ite	ne
+     ce6:	2301      	movne	r3, #1
+     ce8:	2300      	moveq	r3, #0
+     cea:	b2db      	uxtb	r3, r3
+        }
+     cec:	4618      	mov	r0, r3
+     cee:	b005      	add	sp, #20
+     cf0:	f85d fb04 	ldr.w	pc, [sp], #4
+     cf4:	000186a0 	.word	0x000186a0
+     cf8:	400b4000 	.word	0x400b4000
+     cfc:	0001869f 	.word	0x0001869f
+
+00000d00 <_ZN4r2d27can_bus6detail19_set_mailbox_filterINS0_4can0ELb0EEEvhmm>:
+        void _set_mailbox_filter(uint8_t index, uint32_t id, uint32_t mask){
+     d00:	b500      	push	{lr}
+     d02:	b085      	sub	sp, #20
+     d04:	4603      	mov	r3, r0
+     d06:	9102      	str	r1, [sp, #8]
+     d08:	9201      	str	r2, [sp, #4]
+     d0a:	f88d 300f 	strb.w	r3, [sp, #15]
+            _set_mailbox_mask<Bus, Extended>(index, mask);
+     d0e:	f89d 300f 	ldrb.w	r3, [sp, #15]
+     d12:	9901      	ldr	r1, [sp, #4]
+     d14:	4618      	mov	r0, r3
+     d16:	f000 fa8b 	bl	1230 <_ZN4r2d27can_bus6detail17_set_mailbox_maskINS0_4can0ELb0EEEvhm>
+            _set_mailbox_id<Bus, Extended>(index, id);
+     d1a:	f89d 300f 	ldrb.w	r3, [sp, #15]
+     d1e:	9902      	ldr	r1, [sp, #8]
+     d20:	4618      	mov	r0, r3
+     d22:	f000 faaf 	bl	1284 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0ELb0EEEvhm>
+            port<Bus>->CAN_IER = 1U << index;
+     d26:	f89d 300f 	ldrb.w	r3, [sp, #15]
+     d2a:	4a04      	ldr	r2, [pc, #16]	; (d3c <_ZN4r2d27can_bus6detail19_set_mailbox_filterINS0_4can0ELb0EEEvhmm+0x3c>)
+     d2c:	2101      	movs	r1, #1
+     d2e:	fa01 f303 	lsl.w	r3, r1, r3
+     d32:	6053      	str	r3, [r2, #4]
+        }
+     d34:	bf00      	nop
+     d36:	b005      	add	sp, #20
+     d38:	f85d fb04 	ldr.w	pc, [sp], #4
+     d3c:	400b4000 	.word	0x400b4000
+
+00000d40 <_ZNK4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE5emptyEv>:
+        /**
+         * Return whether the ringbuffer is empty.
+         *
+         * @return
+         */
+        constexpr bool empty() const {
+     d40:	b082      	sub	sp, #8
+     d42:	9001      	str	r0, [sp, #4]
+            return used == 0;
+     d44:	9b01      	ldr	r3, [sp, #4]
+     d46:	f8d3 3308 	ldr.w	r3, [r3, #776]	; 0x308
+     d4a:	2b00      	cmp	r3, #0
+     d4c:	bf0c      	ite	eq
+     d4e:	2301      	moveq	r3, #1
+     d50:	2300      	movne	r3, #0
+     d52:	b2db      	uxtb	r3, r3
+        }
+     d54:	4618      	mov	r0, r3
+     d56:	b002      	add	sp, #8
+     d58:	4770      	bx	lr
+
+00000d5a <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE12copy_and_popEv>:
+        constexpr T copy_and_pop() {
+     d5a:	b430      	push	{r4, r5}
+     d5c:	b084      	sub	sp, #16
+     d5e:	9001      	str	r0, [sp, #4]
+     d60:	9100      	str	r1, [sp, #0]
+            size_t pos = 0;
+     d62:	2300      	movs	r3, #0
+     d64:	9303      	str	r3, [sp, #12]
+            if(tail){
+     d66:	9b00      	ldr	r3, [sp, #0]
+     d68:	f8d3 3304 	ldr.w	r3, [r3, #772]	; 0x304
+     d6c:	2b00      	cmp	r3, #0
+     d6e:	d005      	beq.n	d7c <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE12copy_and_popEv+0x22>
+                pos = tail - 1;
+     d70:	9b00      	ldr	r3, [sp, #0]
+     d72:	f8d3 3304 	ldr.w	r3, [r3, #772]	; 0x304
+     d76:	3b01      	subs	r3, #1
+     d78:	9303      	str	r3, [sp, #12]
+     d7a:	e001      	b.n	d80 <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE12copy_and_popEv+0x26>
+                pos = MaxSize - 1;
+     d7c:	231f      	movs	r3, #31
+     d7e:	9303      	str	r3, [sp, #12]
+            T item = buffer[pos];
+     d80:	9801      	ldr	r0, [sp, #4]
+     d82:	9900      	ldr	r1, [sp, #0]
+     d84:	9a03      	ldr	r2, [sp, #12]
+     d86:	4613      	mov	r3, r2
+     d88:	005b      	lsls	r3, r3, #1
+     d8a:	4413      	add	r3, r2
+     d8c:	00db      	lsls	r3, r3, #3
+     d8e:	440b      	add	r3, r1
+     d90:	4604      	mov	r4, r0
+     d92:	461d      	mov	r5, r3
+     d94:	cd0f      	ldmia	r5!, {r0, r1, r2, r3}
+     d96:	c40f      	stmia	r4!, {r0, r1, r2, r3}
+     d98:	e895 0003 	ldmia.w	r5, {r0, r1}
+     d9c:	e884 0003 	stmia.w	r4, {r0, r1}
+            if(!used){
+     da0:	9b00      	ldr	r3, [sp, #0]
+     da2:	f8d3 3308 	ldr.w	r3, [r3, #776]	; 0x308
+     da6:	2b00      	cmp	r3, #0
+     da8:	d016      	beq.n	dd8 <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE12copy_and_popEv+0x7e>
+            used--;
+     daa:	9b00      	ldr	r3, [sp, #0]
+     dac:	f8d3 3308 	ldr.w	r3, [r3, #776]	; 0x308
+     db0:	1e5a      	subs	r2, r3, #1
+     db2:	9b00      	ldr	r3, [sp, #0]
+     db4:	f8c3 2308 	str.w	r2, [r3, #776]	; 0x308
+            tail = !(tail) ? (MaxSize - 1) : (tail - 1);
+     db8:	9b00      	ldr	r3, [sp, #0]
+     dba:	f8d3 3304 	ldr.w	r3, [r3, #772]	; 0x304
+     dbe:	2b00      	cmp	r3, #0
+     dc0:	d004      	beq.n	dcc <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE12copy_and_popEv+0x72>
+     dc2:	9b00      	ldr	r3, [sp, #0]
+     dc4:	f8d3 3304 	ldr.w	r3, [r3, #772]	; 0x304
+     dc8:	3b01      	subs	r3, #1
+     dca:	e000      	b.n	dce <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE12copy_and_popEv+0x74>
+     dcc:	231f      	movs	r3, #31
+     dce:	9a00      	ldr	r2, [sp, #0]
+     dd0:	f8c2 3304 	str.w	r3, [r2, #772]	; 0x304
+            return item;
+     dd4:	bf00      	nop
+     dd6:	e000      	b.n	dda <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE12copy_and_popEv+0x80>
+                return item;
+     dd8:	bf00      	nop
+        }
+     dda:	9801      	ldr	r0, [sp, #4]
+     ddc:	b004      	add	sp, #16
+     dde:	bc30      	pop	{r4, r5}
+     de0:	4770      	bx	lr
+	...
+
+00000de4 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh>:
+        void _handle_mailbox_isr(const uint8_t index) {
+     de4:	b500      	push	{lr}
+     de6:	b091      	sub	sp, #68	; 0x44
+     de8:	4603      	mov	r3, r0
+     dea:	f88d 3007 	strb.w	r3, [sp, #7]
+            if (!(port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRDY)) {
+     dee:	4a35      	ldr	r2, [pc, #212]	; (ec4 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0xe0>)
+     df0:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     df4:	015b      	lsls	r3, r3, #5
+     df6:	4413      	add	r3, r2
+     df8:	f503 7304 	add.w	r3, r3, #528	; 0x210
+     dfc:	681b      	ldr	r3, [r3, #0]
+     dfe:	f403 0300 	and.w	r3, r3, #8388608	; 0x800000
+     e02:	2b00      	cmp	r3, #0
+     e04:	bf0c      	ite	eq
+     e06:	2301      	moveq	r3, #1
+     e08:	2300      	movne	r3, #0
+     e0a:	b2db      	uxtb	r3, r3
+     e0c:	2b00      	cmp	r3, #0
+     e0e:	d154      	bne.n	eba <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0xd6>
+            switch ((port<Bus>->CAN_MB[index].CAN_MMR >> 24) & 7) {
+     e10:	4a2c      	ldr	r2, [pc, #176]	; (ec4 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0xe0>)
+     e12:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     e16:	3310      	adds	r3, #16
+     e18:	015b      	lsls	r3, r3, #5
+     e1a:	4413      	add	r3, r2
+     e1c:	681b      	ldr	r3, [r3, #0]
+     e1e:	0e1b      	lsrs	r3, r3, #24
+     e20:	f003 0307 	and.w	r3, r3, #7
+     e24:	3b01      	subs	r3, #1
+     e26:	2b03      	cmp	r3, #3
+     e28:	d848      	bhi.n	ebc <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0xd8>
+     e2a:	a201      	add	r2, pc, #4	; (adr r2, e30 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0x4c>)
+     e2c:	f852 f023 	ldr.w	pc, [r2, r3, lsl #2]
+     e30:	00000e41 	.word	0x00000e41
+     e34:	00000e41 	.word	0x00000e41
+     e38:	00000e6b 	.word	0x00000e6b
+     e3c:	00000e41 	.word	0x00000e41
+                    _read_mailbox<Bus>(index, frame);
+     e40:	aa09      	add	r2, sp, #36	; 0x24
+     e42:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     e46:	4611      	mov	r1, r2
+     e48:	4618      	mov	r0, r3
+     e4a:	f000 fa33 	bl	12b4 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE>
+                    _mailbox_rx_stores<Bus>::buffers[index].push(frame);
+     e4e:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     e52:	f44f 7243 	mov.w	r2, #780	; 0x30c
+     e56:	fb02 f303 	mul.w	r3, r2, r3
+     e5a:	4a1b      	ldr	r2, [pc, #108]	; (ec8 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0xe4>)
+     e5c:	4413      	add	r3, r2
+     e5e:	aa09      	add	r2, sp, #36	; 0x24
+     e60:	4611      	mov	r1, r2
+     e62:	4618      	mov	r0, r3
+     e64:	f000 fad5 	bl	1412 <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_>
+                    break;
+     e68:	e028      	b.n	ebc <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0xd8>
+                    auto &queue = _mailbox_tx_queues<Bus>::queues[index - 4];
+     e6a:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     e6e:	3b04      	subs	r3, #4
+     e70:	f44f 7241 	mov.w	r2, #772	; 0x304
+     e74:	fb02 f303 	mul.w	r3, r2, r3
+     e78:	4a14      	ldr	r2, [pc, #80]	; (ecc <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0xe8>)
+     e7a:	4413      	add	r3, r2
+     e7c:	930f      	str	r3, [sp, #60]	; 0x3c
+                    if (!queue.empty()) {
+     e7e:	980f      	ldr	r0, [sp, #60]	; 0x3c
+     e80:	f000 fb0a 	bl	1498 <_ZNK4r2d27can_bus7queue_cINS0_6detail12_can_frame_sELj32EE5emptyEv>
+     e84:	4603      	mov	r3, r0
+     e86:	f083 0301 	eor.w	r3, r3, #1
+     e8a:	b2db      	uxtb	r3, r3
+     e8c:	2b00      	cmp	r3, #0
+     e8e:	d00c      	beq.n	eaa <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0xc6>
+                        const auto frame = queue.copy_and_pop();
+     e90:	ab03      	add	r3, sp, #12
+     e92:	990f      	ldr	r1, [sp, #60]	; 0x3c
+     e94:	4618      	mov	r0, r3
+     e96:	f000 fb0f 	bl	14b8 <_ZN4r2d27can_bus7queue_cINS0_6detail12_can_frame_sELj32EE12copy_and_popEv>
+                        _write_tx_registers<Bus>(frame, index);
+     e9a:	f89d 2007 	ldrb.w	r2, [sp, #7]
+     e9e:	ab03      	add	r3, sp, #12
+     ea0:	4611      	mov	r1, r2
+     ea2:	4618      	mov	r0, r3
+     ea4:	f000 fb2a 	bl	14fc <_ZN4r2d27can_bus6detail19_write_tx_registersINS0_4can0EEEvRKNS1_12_can_frame_sEh>
+                    break;
+     ea8:	e008      	b.n	ebc <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0xd8>
+                        port<Bus>->CAN_IDR = (0x01 << index);
+     eaa:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     eae:	2201      	movs	r2, #1
+     eb0:	409a      	lsls	r2, r3
+     eb2:	4b04      	ldr	r3, [pc, #16]	; (ec4 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0xe0>)
+     eb4:	609a      	str	r2, [r3, #8]
+                    break;
+     eb6:	bf00      	nop
+     eb8:	e000      	b.n	ebc <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh+0xd8>
+                return;
+     eba:	bf00      	nop
+        }
+     ebc:	b011      	add	sp, #68	; 0x44
+     ebe:	f85d fb04 	ldr.w	pc, [sp], #4
+     ec2:	bf00      	nop
+     ec4:	400b4000 	.word	0x400b4000
+     ec8:	20084014 	.word	0x20084014
+     ecc:	20084c44 	.word	0x20084c44
+
+00000ed0 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh>:
+        void _handle_mailbox_isr(const uint8_t index) {
+     ed0:	b500      	push	{lr}
+     ed2:	b091      	sub	sp, #68	; 0x44
+     ed4:	4603      	mov	r3, r0
+     ed6:	f88d 3007 	strb.w	r3, [sp, #7]
+            if (!(port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRDY)) {
+     eda:	4a35      	ldr	r2, [pc, #212]	; (fb0 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0xe0>)
+     edc:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     ee0:	015b      	lsls	r3, r3, #5
+     ee2:	4413      	add	r3, r2
+     ee4:	f503 7304 	add.w	r3, r3, #528	; 0x210
+     ee8:	681b      	ldr	r3, [r3, #0]
+     eea:	f403 0300 	and.w	r3, r3, #8388608	; 0x800000
+     eee:	2b00      	cmp	r3, #0
+     ef0:	bf0c      	ite	eq
+     ef2:	2301      	moveq	r3, #1
+     ef4:	2300      	movne	r3, #0
+     ef6:	b2db      	uxtb	r3, r3
+     ef8:	2b00      	cmp	r3, #0
+     efa:	d154      	bne.n	fa6 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0xd6>
+            switch ((port<Bus>->CAN_MB[index].CAN_MMR >> 24) & 7) {
+     efc:	4a2c      	ldr	r2, [pc, #176]	; (fb0 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0xe0>)
+     efe:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     f02:	3310      	adds	r3, #16
+     f04:	015b      	lsls	r3, r3, #5
+     f06:	4413      	add	r3, r2
+     f08:	681b      	ldr	r3, [r3, #0]
+     f0a:	0e1b      	lsrs	r3, r3, #24
+     f0c:	f003 0307 	and.w	r3, r3, #7
+     f10:	3b01      	subs	r3, #1
+     f12:	2b03      	cmp	r3, #3
+     f14:	d848      	bhi.n	fa8 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0xd8>
+     f16:	a201      	add	r2, pc, #4	; (adr r2, f1c <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0x4c>)
+     f18:	f852 f023 	ldr.w	pc, [r2, r3, lsl #2]
+     f1c:	00000f2d 	.word	0x00000f2d
+     f20:	00000f2d 	.word	0x00000f2d
+     f24:	00000f57 	.word	0x00000f57
+     f28:	00000f2d 	.word	0x00000f2d
+                    _read_mailbox<Bus>(index, frame);
+     f2c:	aa09      	add	r2, sp, #36	; 0x24
+     f2e:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     f32:	4611      	mov	r1, r2
+     f34:	4618      	mov	r0, r3
+     f36:	f000 fb2f 	bl	1598 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE>
+                    _mailbox_rx_stores<Bus>::buffers[index].push(frame);
+     f3a:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     f3e:	f44f 7243 	mov.w	r2, #780	; 0x30c
+     f42:	fb02 f303 	mul.w	r3, r2, r3
+     f46:	4a1b      	ldr	r2, [pc, #108]	; (fb4 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0xe4>)
+     f48:	4413      	add	r3, r2
+     f4a:	aa09      	add	r2, sp, #36	; 0x24
+     f4c:	4611      	mov	r1, r2
+     f4e:	4618      	mov	r0, r3
+     f50:	f000 fa5f 	bl	1412 <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_>
+                    break;
+     f54:	e028      	b.n	fa8 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0xd8>
+                    auto &queue = _mailbox_tx_queues<Bus>::queues[index - 4];
+     f56:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     f5a:	3b04      	subs	r3, #4
+     f5c:	f44f 7241 	mov.w	r2, #772	; 0x304
+     f60:	fb02 f303 	mul.w	r3, r2, r3
+     f64:	4a14      	ldr	r2, [pc, #80]	; (fb8 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0xe8>)
+     f66:	4413      	add	r3, r2
+     f68:	930f      	str	r3, [sp, #60]	; 0x3c
+                    if (!queue.empty()) {
+     f6a:	980f      	ldr	r0, [sp, #60]	; 0x3c
+     f6c:	f000 fa94 	bl	1498 <_ZNK4r2d27can_bus7queue_cINS0_6detail12_can_frame_sELj32EE5emptyEv>
+     f70:	4603      	mov	r3, r0
+     f72:	f083 0301 	eor.w	r3, r3, #1
+     f76:	b2db      	uxtb	r3, r3
+     f78:	2b00      	cmp	r3, #0
+     f7a:	d00c      	beq.n	f96 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0xc6>
+                        const auto frame = queue.copy_and_pop();
+     f7c:	ab03      	add	r3, sp, #12
+     f7e:	990f      	ldr	r1, [sp, #60]	; 0x3c
+     f80:	4618      	mov	r0, r3
+     f82:	f000 fa99 	bl	14b8 <_ZN4r2d27can_bus7queue_cINS0_6detail12_can_frame_sELj32EE12copy_and_popEv>
+                        _write_tx_registers<Bus>(frame, index);
+     f86:	f89d 2007 	ldrb.w	r2, [sp, #7]
+     f8a:	ab03      	add	r3, sp, #12
+     f8c:	4611      	mov	r1, r2
+     f8e:	4618      	mov	r0, r3
+     f90:	f000 fba4 	bl	16dc <_ZN4r2d27can_bus6detail19_write_tx_registersINS0_4can1EEEvRKNS1_12_can_frame_sEh>
+                    break;
+     f94:	e008      	b.n	fa8 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0xd8>
+                        port<Bus>->CAN_IDR = (0x01 << index);
+     f96:	f89d 3007 	ldrb.w	r3, [sp, #7]
+     f9a:	2201      	movs	r2, #1
+     f9c:	409a      	lsls	r2, r3
+     f9e:	4b04      	ldr	r3, [pc, #16]	; (fb0 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0xe0>)
+     fa0:	609a      	str	r2, [r3, #8]
+                    break;
+     fa2:	bf00      	nop
+     fa4:	e000      	b.n	fa8 <_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh+0xd8>
+                return;
+     fa6:	bf00      	nop
+        }
+     fa8:	b011      	add	sp, #68	; 0x44
+     faa:	f85d fb04 	ldr.w	pc, [sp], #4
+     fae:	bf00      	nop
+     fb0:	400b8000 	.word	0x400b8000
+     fb4:	20085854 	.word	0x20085854
+     fb8:	20086484 	.word	0x20086484
+
+00000fbc <_ZN4r2d27can_bus12enable_clockINS0_4can0EEEvv>:
+            PMC->PMC_PCER1 = 1U << (P::instance_id - 32);
+     fbc:	4b03      	ldr	r3, [pc, #12]	; (fcc <_ZN4r2d27can_bus12enable_clockINS0_4can0EEEvv+0x10>)
+     fbe:	f44f 6200 	mov.w	r2, #2048	; 0x800
+     fc2:	f8c3 2100 	str.w	r2, [r3, #256]	; 0x100
+    }
+     fc6:	bf00      	nop
+     fc8:	4770      	bx	lr
+     fca:	bf00      	nop
+     fcc:	400e0600 	.word	0x400e0600
+
+00000fd0 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5cantxEEEvv>:
+    void set_peripheral() {
+     fd0:	b082      	sub	sp, #8
+        pins::port<typename Pin::port>->PIO_IDR = pins::mask<Pin>;
+     fd2:	4b0b      	ldr	r3, [pc, #44]	; (1000 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5cantxEEEvv+0x30>)
+     fd4:	2201      	movs	r2, #1
+     fd6:	645a      	str	r2, [r3, #68]	; 0x44
+        uint32_t t = pins::port<typename Pin::port>->PIO_ABSR;
+     fd8:	4b09      	ldr	r3, [pc, #36]	; (1000 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5cantxEEEvv+0x30>)
+     fda:	6f1b      	ldr	r3, [r3, #112]	; 0x70
+     fdc:	9301      	str	r3, [sp, #4]
+            pins::port<typename Pin::port>->PIO_ABSR &= (~pins::mask<Pin> & t);
+     fde:	4b08      	ldr	r3, [pc, #32]	; (1000 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5cantxEEEvv+0x30>)
+     fe0:	6f1a      	ldr	r2, [r3, #112]	; 0x70
+     fe2:	9b01      	ldr	r3, [sp, #4]
+     fe4:	4013      	ands	r3, r2
+     fe6:	4a06      	ldr	r2, [pc, #24]	; (1000 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5cantxEEEvv+0x30>)
+     fe8:	f023 0301 	bic.w	r3, r3, #1
+     fec:	6713      	str	r3, [r2, #112]	; 0x70
+        pins::port<typename Pin::port>->PIO_PUDR = pins::mask<Pin>;
+     fee:	4b04      	ldr	r3, [pc, #16]	; (1000 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5cantxEEEvv+0x30>)
+     ff0:	2201      	movs	r2, #1
+     ff2:	661a      	str	r2, [r3, #96]	; 0x60
+        pins::port<typename Pin::port>->PIO_PDR = pins::mask<Pin>;
+     ff4:	4b02      	ldr	r3, [pc, #8]	; (1000 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5cantxEEEvv+0x30>)
+     ff6:	2201      	movs	r2, #1
+     ff8:	605a      	str	r2, [r3, #4]
+    }
+     ffa:	bf00      	nop
+     ffc:	b002      	add	sp, #8
+     ffe:	4770      	bx	lr
+    1000:	400e0e00 	.word	0x400e0e00
+
+00001004 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5canrxEEEvv>:
+    void set_peripheral() {
+    1004:	b082      	sub	sp, #8
+        pins::port<typename Pin::port>->PIO_IDR = pins::mask<Pin>;
+    1006:	4b0b      	ldr	r3, [pc, #44]	; (1034 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5canrxEEEvv+0x30>)
+    1008:	2202      	movs	r2, #2
+    100a:	645a      	str	r2, [r3, #68]	; 0x44
+        uint32_t t = pins::port<typename Pin::port>->PIO_ABSR;
+    100c:	4b09      	ldr	r3, [pc, #36]	; (1034 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5canrxEEEvv+0x30>)
+    100e:	6f1b      	ldr	r3, [r3, #112]	; 0x70
+    1010:	9301      	str	r3, [sp, #4]
+            pins::port<typename Pin::port>->PIO_ABSR &= (~pins::mask<Pin> & t);
+    1012:	4b08      	ldr	r3, [pc, #32]	; (1034 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5canrxEEEvv+0x30>)
+    1014:	6f1a      	ldr	r2, [r3, #112]	; 0x70
+    1016:	9b01      	ldr	r3, [sp, #4]
+    1018:	4013      	ands	r3, r2
+    101a:	4a06      	ldr	r2, [pc, #24]	; (1034 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5canrxEEEvv+0x30>)
+    101c:	f023 0302 	bic.w	r3, r3, #2
+    1020:	6713      	str	r3, [r2, #112]	; 0x70
+        pins::port<typename Pin::port>->PIO_PUDR = pins::mask<Pin>;
+    1022:	4b04      	ldr	r3, [pc, #16]	; (1034 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5canrxEEEvv+0x30>)
+    1024:	2202      	movs	r2, #2
+    1026:	661a      	str	r2, [r3, #96]	; 0x60
+        pins::port<typename Pin::port>->PIO_PDR = pins::mask<Pin>;
+    1028:	4b02      	ldr	r3, [pc, #8]	; (1034 <_ZN4r2d27can_bus14set_peripheralINS0_4pins5canrxEEEvv+0x30>)
+    102a:	2202      	movs	r2, #2
+    102c:	605a      	str	r2, [r3, #4]
+    }
+    102e:	bf00      	nop
+    1030:	b002      	add	sp, #8
+    1032:	4770      	bx	lr
+    1034:	400e0e00 	.word	0x400e0e00
+
+00001038 <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv>:
+        bool _set_baudrate() {
+    1038:	b500      	push	{lr}
+    103a:	b08d      	sub	sp, #52	; 0x34
+            constexpr uint32_t min_tq = 8;
+    103c:	2308      	movs	r3, #8
+    103e:	9308      	str	r3, [sp, #32]
+            constexpr uint32_t max_tq = 25;
+    1040:	2319      	movs	r3, #25
+    1042:	9307      	str	r3, [sp, #28]
+            constexpr uint32_t baudrate_max_div = 128;
+    1044:	2380      	movs	r3, #128	; 0x80
+    1046:	9306      	str	r3, [sp, #24]
+            constexpr uint32_t mck = CHIP_FREQ_CPU_MAX;
+    1048:	4b40      	ldr	r3, [pc, #256]	; (114c <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x114>)
+    104a:	9305      	str	r3, [sp, #20]
+            uint32_t prescale = (mck + (Baud * max_tq - 1)) / (mck * max_tq);
+    104c:	2300      	movs	r3, #0
+    104e:	9304      	str	r3, [sp, #16]
+            if (prescale > baudrate_max_div) {
+    1050:	9b04      	ldr	r3, [sp, #16]
+    1052:	2b80      	cmp	r3, #128	; 0x80
+    1054:	d901      	bls.n	105a <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x22>
+                return false;
+    1056:	2300      	movs	r3, #0
+    1058:	e073      	b.n	1142 <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x10a>
+            uint32_t tq = min_tq;
+    105a:	2308      	movs	r3, #8
+    105c:	930b      	str	r3, [sp, #44]	; 0x2c
+            uint32_t mod = 0xFFFFFFFF;
+    105e:	f04f 33ff 	mov.w	r3, #4294967295
+    1062:	930a      	str	r3, [sp, #40]	; 0x28
+            for (uint8_t i = min_tq; i <= max_tq; ++i) {
+    1064:	2308      	movs	r3, #8
+    1066:	f88d 3027 	strb.w	r3, [sp, #39]	; 0x27
+    106a:	f89d 3027 	ldrb.w	r3, [sp, #39]	; 0x27
+    106e:	2b19      	cmp	r3, #25
+    1070:	d82c      	bhi.n	10cc <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x94>
+                if (mck / (Baud * i) > baudrate_max_div) {
+    1072:	f89d 3027 	ldrb.w	r3, [sp, #39]	; 0x27
+    1076:	4a36      	ldr	r2, [pc, #216]	; (1150 <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x118>)
+    1078:	fb02 f303 	mul.w	r3, r2, r3
+    107c:	4a33      	ldr	r2, [pc, #204]	; (114c <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x114>)
+    107e:	fbb2 f3f3 	udiv	r3, r2, r3
+    1082:	2b80      	cmp	r3, #128	; 0x80
+    1084:	d818      	bhi.n	10b8 <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x80>
+                const uint32_t cur_mod = mck % (Baud * i);
+    1086:	f89d 3027 	ldrb.w	r3, [sp, #39]	; 0x27
+    108a:	4a31      	ldr	r2, [pc, #196]	; (1150 <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x118>)
+    108c:	fb02 f303 	mul.w	r3, r2, r3
+    1090:	4a2e      	ldr	r2, [pc, #184]	; (114c <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x114>)
+    1092:	fbb2 f1f3 	udiv	r1, r2, r3
+    1096:	fb03 f301 	mul.w	r3, r3, r1
+    109a:	1ad3      	subs	r3, r2, r3
+    109c:	9303      	str	r3, [sp, #12]
+                if (cur_mod >= mod) {
+    109e:	9a03      	ldr	r2, [sp, #12]
+    10a0:	9b0a      	ldr	r3, [sp, #40]	; 0x28
+    10a2:	429a      	cmp	r2, r3
+    10a4:	d20a      	bcs.n	10bc <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x84>
+                mod = cur_mod;
+    10a6:	9b03      	ldr	r3, [sp, #12]
+    10a8:	930a      	str	r3, [sp, #40]	; 0x28
+                tq = i;
+    10aa:	f89d 3027 	ldrb.w	r3, [sp, #39]	; 0x27
+    10ae:	930b      	str	r3, [sp, #44]	; 0x2c
+                if (!mod) {
+    10b0:	9b0a      	ldr	r3, [sp, #40]	; 0x28
+    10b2:	2b00      	cmp	r3, #0
+    10b4:	d009      	beq.n	10ca <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x92>
+    10b6:	e002      	b.n	10be <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x86>
+                    continue;
+    10b8:	bf00      	nop
+    10ba:	e000      	b.n	10be <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x86>
+                    continue;
+    10bc:	bf00      	nop
+            for (uint8_t i = min_tq; i <= max_tq; ++i) {
+    10be:	f89d 3027 	ldrb.w	r3, [sp, #39]	; 0x27
+    10c2:	3301      	adds	r3, #1
+    10c4:	f88d 3027 	strb.w	r3, [sp, #39]	; 0x27
+    10c8:	e7cf      	b.n	106a <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x32>
+                    break;
+    10ca:	bf00      	nop
+            prescale = mck / (Baud * tq);
+    10cc:	9b0b      	ldr	r3, [sp, #44]	; 0x2c
+    10ce:	4a20      	ldr	r2, [pc, #128]	; (1150 <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x118>)
+    10d0:	fb02 f303 	mul.w	r3, r2, r3
+    10d4:	4a1d      	ldr	r2, [pc, #116]	; (114c <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x114>)
+    10d6:	fbb2 f3f3 	udiv	r3, r2, r3
+    10da:	9304      	str	r3, [sp, #16]
+            const auto bit_time = _can_bit_time[tq - min_tq];
+    10dc:	9b0b      	ldr	r3, [sp, #44]	; 0x2c
+    10de:	f1a3 0208 	sub.w	r2, r3, #8
+    10e2:	491c      	ldr	r1, [pc, #112]	; (1154 <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x11c>)
+    10e4:	4613      	mov	r3, r2
+    10e6:	005b      	lsls	r3, r3, #1
+    10e8:	4413      	add	r3, r2
+    10ea:	005b      	lsls	r3, r3, #1
+    10ec:	18ca      	adds	r2, r1, r3
+    10ee:	ab01      	add	r3, sp, #4
+    10f0:	6810      	ldr	r0, [r2, #0]
+    10f2:	6018      	str	r0, [r3, #0]
+    10f4:	8892      	ldrh	r2, [r2, #4]
+    10f6:	809a      	strh	r2, [r3, #4]
+            detail::_disable_bus<Bus>();
+    10f8:	f000 fb3e 	bl	1778 <_ZN4r2d27can_bus6detail12_disable_busINS0_4can0EEEvv>
+            port<Bus>->CAN_BR = CAN_BR_PHASE2(bit_time.phase2 - 1) |
+    10fc:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1100:	3b01      	subs	r3, #1
+    1102:	f003 0207 	and.w	r2, r3, #7
+                                CAN_BR_PHASE1(bit_time.phase1 - 1) |
+    1106:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    110a:	3b01      	subs	r3, #1
+    110c:	011b      	lsls	r3, r3, #4
+    110e:	f003 0370 	and.w	r3, r3, #112	; 0x70
+            port<Bus>->CAN_BR = CAN_BR_PHASE2(bit_time.phase2 - 1) |
+    1112:	431a      	orrs	r2, r3
+                                CAN_BR_PROPAG(bit_time.propagation - 1) |
+    1114:	f89d 3005 	ldrb.w	r3, [sp, #5]
+    1118:	3b01      	subs	r3, #1
+    111a:	021b      	lsls	r3, r3, #8
+    111c:	f403 63e0 	and.w	r3, r3, #1792	; 0x700
+                                CAN_BR_PHASE1(bit_time.phase1 - 1) |
+    1120:	431a      	orrs	r2, r3
+                                CAN_BR_SJW(bit_time.sync_jump_width - 1) |
+    1122:	f89d 3008 	ldrb.w	r3, [sp, #8]
+    1126:	3b01      	subs	r3, #1
+    1128:	031b      	lsls	r3, r3, #12
+    112a:	f403 5340 	and.w	r3, r3, #12288	; 0x3000
+                                CAN_BR_PROPAG(bit_time.propagation - 1) |
+    112e:	431a      	orrs	r2, r3
+                                CAN_BR_BRP(prescale - 1);
+    1130:	9b04      	ldr	r3, [sp, #16]
+    1132:	3b01      	subs	r3, #1
+    1134:	041b      	lsls	r3, r3, #16
+    1136:	f403 03fe 	and.w	r3, r3, #8323072	; 0x7f0000
+            port<Bus>->CAN_BR = CAN_BR_PHASE2(bit_time.phase2 - 1) |
+    113a:	4907      	ldr	r1, [pc, #28]	; (1158 <_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE250000EEEbv+0x120>)
+                                CAN_BR_SJW(bit_time.sync_jump_width - 1) |
+    113c:	4313      	orrs	r3, r2
+            port<Bus>->CAN_BR = CAN_BR_PHASE2(bit_time.phase2 - 1) |
+    113e:	614b      	str	r3, [r1, #20]
+            return true;
+    1140:	2301      	movs	r3, #1
+        }
+    1142:	4618      	mov	r0, r3
+    1144:	b00d      	add	sp, #52	; 0x34
+    1146:	f85d fb04 	ldr.w	pc, [sp], #4
+    114a:	bf00      	nop
+    114c:	0501bd00 	.word	0x0501bd00
+    1150:	0003d090 	.word	0x0003d090
+    1154:	00002084 	.word	0x00002084
+    1158:	400b4000 	.word	0x400b4000
+
+0000115c <_ZN4r2d27can_bus6detail16_reset_mailboxesINS0_4can0EEEvv>:
+        void _reset_mailboxes() {
+    115c:	b500      	push	{lr}
+    115e:	b083      	sub	sp, #12
+            for (uint8_t i = 0; i < CANMB_NUMBER; i++) {
+    1160:	2300      	movs	r3, #0
+    1162:	f88d 3007 	strb.w	r3, [sp, #7]
+    1166:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    116a:	2b07      	cmp	r3, #7
+    116c:	d80a      	bhi.n	1184 <_ZN4r2d27can_bus6detail16_reset_mailboxesINS0_4can0EEEvv+0x28>
+                _init_mailbox<Bus>(i);
+    116e:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1172:	4618      	mov	r0, r3
+    1174:	f000 fb0c 	bl	1790 <_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh>
+            for (uint8_t i = 0; i < CANMB_NUMBER; i++) {
+    1178:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    117c:	3301      	adds	r3, #1
+    117e:	f88d 3007 	strb.w	r3, [sp, #7]
+    1182:	e7f0      	b.n	1166 <_ZN4r2d27can_bus6detail16_reset_mailboxesINS0_4can0EEEvv+0xa>
+        }
+    1184:	bf00      	nop
+    1186:	b003      	add	sp, #12
+    1188:	f85d fb04 	ldr.w	pc, [sp], #4
+
+0000118c <_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh>:
+        void _set_mailbox_tx_count(const uint8_t tx_boxes) {
+    118c:	b500      	push	{lr}
+    118e:	b085      	sub	sp, #20
+    1190:	4603      	mov	r3, r0
+    1192:	f88d 3007 	strb.w	r3, [sp, #7]
+            for (int i = 0; i < tx_boxes; i++) {
+    1196:	2300      	movs	r3, #0
+    1198:	9303      	str	r3, [sp, #12]
+    119a:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    119e:	9a03      	ldr	r2, [sp, #12]
+    11a0:	429a      	cmp	r2, r3
+    11a2:	da18      	bge.n	11d6 <_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh+0x4a>
+                _set_mailbox_mode<Bus>(i, mailbox_mode::RX);
+    11a4:	9b03      	ldr	r3, [sp, #12]
+    11a6:	b2db      	uxtb	r3, r3
+    11a8:	2101      	movs	r1, #1
+    11aa:	4618      	mov	r0, r3
+    11ac:	f000 fb2e 	bl	180c <_ZN4r2d27can_bus6detail17_set_mailbox_modeINS0_4can0EEEvhh>
+                _set_mailbox_id<Bus>(i, 0x0, false);
+    11b0:	9b03      	ldr	r3, [sp, #12]
+    11b2:	b2db      	uxtb	r3, r3
+    11b4:	2200      	movs	r2, #0
+    11b6:	2100      	movs	r1, #0
+    11b8:	4618      	mov	r0, r3
+    11ba:	f000 fb51 	bl	1860 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0EEEvhmb>
+                _set_mailbox_accept_mask<Bus>(i, 0x7FF, false);
+    11be:	9b03      	ldr	r3, [sp, #12]
+    11c0:	b2db      	uxtb	r3, r3
+    11c2:	2200      	movs	r2, #0
+    11c4:	f240 71ff 	movw	r1, #2047	; 0x7ff
+    11c8:	4618      	mov	r0, r3
+    11ca:	f000 fb75 	bl	18b8 <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb>
+            for (int i = 0; i < tx_boxes; i++) {
+    11ce:	9b03      	ldr	r3, [sp, #12]
+    11d0:	3301      	adds	r3, #1
+    11d2:	9303      	str	r3, [sp, #12]
+    11d4:	e7e1      	b.n	119a <_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh+0xe>
+            for (int i = tx_boxes; i < CANMB_NUMBER; i++) {
+    11d6:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    11da:	9302      	str	r3, [sp, #8]
+    11dc:	9b02      	ldr	r3, [sp, #8]
+    11de:	2b07      	cmp	r3, #7
+    11e0:	dc17      	bgt.n	1212 <_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh+0x86>
+                _set_mailbox_mode<Bus>(i, mailbox_mode::TX);
+    11e2:	9b02      	ldr	r3, [sp, #8]
+    11e4:	b2db      	uxtb	r3, r3
+    11e6:	2103      	movs	r1, #3
+    11e8:	4618      	mov	r0, r3
+    11ea:	f000 fb0f 	bl	180c <_ZN4r2d27can_bus6detail17_set_mailbox_modeINS0_4can0EEEvhh>
+                _set_mailbox_priority<Bus>(i, 10);
+    11ee:	9b02      	ldr	r3, [sp, #8]
+    11f0:	b2db      	uxtb	r3, r3
+    11f2:	210a      	movs	r1, #10
+    11f4:	4618      	mov	r0, r3
+    11f6:	f000 fbb1 	bl	195c <_ZN4r2d27can_bus6detail21_set_mailbox_priorityINS0_4can0EEEvhh>
+                _set_mailbox_accept_mask<Bus>(i, 0x7FF, false);
+    11fa:	9b02      	ldr	r3, [sp, #8]
+    11fc:	b2db      	uxtb	r3, r3
+    11fe:	2200      	movs	r2, #0
+    1200:	f240 71ff 	movw	r1, #2047	; 0x7ff
+    1204:	4618      	mov	r0, r3
+    1206:	f000 fb57 	bl	18b8 <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb>
+            for (int i = tx_boxes; i < CANMB_NUMBER; i++) {
+    120a:	9b02      	ldr	r3, [sp, #8]
+    120c:	3301      	adds	r3, #1
+    120e:	9302      	str	r3, [sp, #8]
+    1210:	e7e4      	b.n	11dc <_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh+0x50>
+        }
+    1212:	bf00      	nop
+    1214:	b005      	add	sp, #20
+    1216:	f85d fb04 	ldr.w	pc, [sp], #4
+	...
+
+0000121c <_ZN4r2d27can_bus6detail11_enable_busINS0_4can0EEEvv>:
+            port<Bus>->CAN_MR |= CAN_MR_CANEN;
+    121c:	4b03      	ldr	r3, [pc, #12]	; (122c <_ZN4r2d27can_bus6detail11_enable_busINS0_4can0EEEvv+0x10>)
+    121e:	681b      	ldr	r3, [r3, #0]
+    1220:	4a02      	ldr	r2, [pc, #8]	; (122c <_ZN4r2d27can_bus6detail11_enable_busINS0_4can0EEEvv+0x10>)
+    1222:	f043 0301 	orr.w	r3, r3, #1
+    1226:	6013      	str	r3, [r2, #0]
+        }
+    1228:	bf00      	nop
+    122a:	4770      	bx	lr
+    122c:	400b4000 	.word	0x400b4000
+
+00001230 <_ZN4r2d27can_bus6detail17_set_mailbox_maskINS0_4can0ELb0EEEvhm>:
+        void _set_mailbox_mask(uint8_t index, uint32_t mask){
+    1230:	b082      	sub	sp, #8
+    1232:	4603      	mov	r3, r0
+    1234:	9100      	str	r1, [sp, #0]
+    1236:	f88d 3007 	strb.w	r3, [sp, #7]
+                port<Bus>->CAN_MB[index].CAN_MAM = CAN_MAM_MIDvA(mask);
+    123a:	9b00      	ldr	r3, [sp, #0]
+    123c:	0499      	lsls	r1, r3, #18
+    123e:	480f      	ldr	r0, [pc, #60]	; (127c <_ZN4r2d27can_bus6detail17_set_mailbox_maskINS0_4can0ELb0EEEvhm+0x4c>)
+    1240:	f89d 2007 	ldrb.w	r2, [sp, #7]
+    1244:	4b0e      	ldr	r3, [pc, #56]	; (1280 <_ZN4r2d27can_bus6detail17_set_mailbox_maskINS0_4can0ELb0EEEvhm+0x50>)
+    1246:	400b      	ands	r3, r1
+    1248:	3210      	adds	r2, #16
+    124a:	0152      	lsls	r2, r2, #5
+    124c:	4402      	add	r2, r0
+    124e:	3204      	adds	r2, #4
+    1250:	6013      	str	r3, [r2, #0]
+                port<Bus>->CAN_MB[index].CAN_MID &= ~CAN_MID_MIDE;                
+    1252:	4a0a      	ldr	r2, [pc, #40]	; (127c <_ZN4r2d27can_bus6detail17_set_mailbox_maskINS0_4can0ELb0EEEvhm+0x4c>)
+    1254:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1258:	015b      	lsls	r3, r3, #5
+    125a:	4413      	add	r3, r2
+    125c:	f503 7302 	add.w	r3, r3, #520	; 0x208
+    1260:	681a      	ldr	r2, [r3, #0]
+    1262:	4906      	ldr	r1, [pc, #24]	; (127c <_ZN4r2d27can_bus6detail17_set_mailbox_maskINS0_4can0ELb0EEEvhm+0x4c>)
+    1264:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1268:	f022 5200 	bic.w	r2, r2, #536870912	; 0x20000000
+    126c:	015b      	lsls	r3, r3, #5
+    126e:	440b      	add	r3, r1
+    1270:	f503 7302 	add.w	r3, r3, #520	; 0x208
+    1274:	601a      	str	r2, [r3, #0]
+        }
+    1276:	bf00      	nop
+    1278:	b002      	add	sp, #8
+    127a:	4770      	bx	lr
+    127c:	400b4000 	.word	0x400b4000
+    1280:	1ffc0000 	.word	0x1ffc0000
+
+00001284 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0ELb0EEEvhm>:
+        void _set_mailbox_id(uint8_t index, uint32_t id){
+    1284:	b082      	sub	sp, #8
+    1286:	4603      	mov	r3, r0
+    1288:	9100      	str	r1, [sp, #0]
+    128a:	f88d 3007 	strb.w	r3, [sp, #7]
+                port<Bus>->CAN_MB[index].CAN_MID = CAN_MID_MIDvA(id);
+    128e:	9b00      	ldr	r3, [sp, #0]
+    1290:	0499      	lsls	r1, r3, #18
+    1292:	4806      	ldr	r0, [pc, #24]	; (12ac <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0ELb0EEEvhm+0x28>)
+    1294:	f89d 2007 	ldrb.w	r2, [sp, #7]
+    1298:	4b05      	ldr	r3, [pc, #20]	; (12b0 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0ELb0EEEvhm+0x2c>)
+    129a:	400b      	ands	r3, r1
+    129c:	0152      	lsls	r2, r2, #5
+    129e:	4402      	add	r2, r0
+    12a0:	f502 7202 	add.w	r2, r2, #520	; 0x208
+    12a4:	6013      	str	r3, [r2, #0]
+        }
+    12a6:	bf00      	nop
+    12a8:	b002      	add	sp, #8
+    12aa:	4770      	bx	lr
+    12ac:	400b4000 	.word	0x400b4000
+    12b0:	1ffc0000 	.word	0x1ffc0000
+
+000012b4 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE>:
+        uint32_t _read_mailbox(const uint8_t index, _can_frame_s &frame) {
+    12b4:	b086      	sub	sp, #24
+    12b6:	4603      	mov	r3, r0
+    12b8:	9100      	str	r1, [sp, #0]
+    12ba:	f88d 3007 	strb.w	r3, [sp, #7]
+            uint32_t retval = 0;
+    12be:	2300      	movs	r3, #0
+    12c0:	9305      	str	r3, [sp, #20]
+            uint32_t status = port<Bus>->CAN_MB[index].CAN_MSR;
+    12c2:	4a4c      	ldr	r2, [pc, #304]	; (13f4 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x140>)
+    12c4:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    12c8:	015b      	lsls	r3, r3, #5
+    12ca:	4413      	add	r3, r2
+    12cc:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    12d0:	681b      	ldr	r3, [r3, #0]
+    12d2:	9304      	str	r3, [sp, #16]
+            if ((status & CAN_MSR_MRDY) && (status & CAN_MSR_MMI)) {
+    12d4:	9b04      	ldr	r3, [sp, #16]
+    12d6:	f403 0300 	and.w	r3, r3, #8388608	; 0x800000
+    12da:	2b00      	cmp	r3, #0
+    12dc:	d006      	beq.n	12ec <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x38>
+    12de:	9b04      	ldr	r3, [sp, #16]
+    12e0:	f003 7380 	and.w	r3, r3, #16777216	; 0x1000000
+    12e4:	2b00      	cmp	r3, #0
+    12e6:	d001      	beq.n	12ec <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x38>
+                retval = mailbox_status::RX_OVER;
+    12e8:	2302      	movs	r3, #2
+    12ea:	9305      	str	r3, [sp, #20]
+            uint32_t id = port<Bus>->CAN_MB[index].CAN_MID;
+    12ec:	4a41      	ldr	r2, [pc, #260]	; (13f4 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x140>)
+    12ee:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    12f2:	015b      	lsls	r3, r3, #5
+    12f4:	4413      	add	r3, r2
+    12f6:	f503 7302 	add.w	r3, r3, #520	; 0x208
+    12fa:	681b      	ldr	r3, [r3, #0]
+    12fc:	9303      	str	r3, [sp, #12]
+            if ((id & CAN_MID_MIDE) == CAN_MID_MIDE) { 
+    12fe:	9b03      	ldr	r3, [sp, #12]
+    1300:	f003 5300 	and.w	r3, r3, #536870912	; 0x20000000
+    1304:	2b00      	cmp	r3, #0
+    1306:	d008      	beq.n	131a <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x66>
+                frame.id = id & 0x1FFFFFFFu;
+    1308:	9b03      	ldr	r3, [sp, #12]
+    130a:	f023 4260 	bic.w	r2, r3, #3758096384	; 0xe0000000
+    130e:	9b00      	ldr	r3, [sp, #0]
+    1310:	601a      	str	r2, [r3, #0]
+                frame.extended = true;
+    1312:	9b00      	ldr	r3, [sp, #0]
+    1314:	2201      	movs	r2, #1
+    1316:	729a      	strb	r2, [r3, #10]
+    1318:	e008      	b.n	132c <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x78>
+                frame.id = (id  >> CAN_MID_MIDvA_Pos) & 0x7ffu;
+    131a:	9b03      	ldr	r3, [sp, #12]
+    131c:	0c9b      	lsrs	r3, r3, #18
+    131e:	f3c3 020a 	ubfx	r2, r3, #0, #11
+    1322:	9b00      	ldr	r3, [sp, #0]
+    1324:	601a      	str	r2, [r3, #0]
+                frame.extended = false;
+    1326:	9b00      	ldr	r3, [sp, #0]
+    1328:	2200      	movs	r2, #0
+    132a:	729a      	strb	r2, [r3, #10]
+            frame.fid    = port<Bus>->CAN_MB[index].CAN_MFID;
+    132c:	4a31      	ldr	r2, [pc, #196]	; (13f4 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x140>)
+    132e:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1332:	015b      	lsls	r3, r3, #5
+    1334:	4413      	add	r3, r2
+    1336:	f503 7303 	add.w	r3, r3, #524	; 0x20c
+    133a:	681a      	ldr	r2, [r3, #0]
+    133c:	9b00      	ldr	r3, [sp, #0]
+    133e:	605a      	str	r2, [r3, #4]
+            frame.length = (status & CAN_MSR_MDLC_Msk) >> CAN_MSR_MDLC_Pos;
+    1340:	9b04      	ldr	r3, [sp, #16]
+    1342:	0c1b      	lsrs	r3, r3, #16
+    1344:	b2db      	uxtb	r3, r3
+    1346:	f003 030f 	and.w	r3, r3, #15
+    134a:	b2da      	uxtb	r2, r3
+    134c:	9b00      	ldr	r3, [sp, #0]
+    134e:	739a      	strb	r2, [r3, #14]
+            frame.time   = (status & CAN_MSR_MTIMESTAMP_Msk);
+    1350:	9b04      	ldr	r3, [sp, #16]
+    1352:	b29a      	uxth	r2, r3
+    1354:	9b00      	ldr	r3, [sp, #0]
+    1356:	819a      	strh	r2, [r3, #12]
+            frame.rtr    = (port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRTR) ? 1 : 0 ;
+    1358:	4a26      	ldr	r2, [pc, #152]	; (13f4 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x140>)
+    135a:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    135e:	015b      	lsls	r3, r3, #5
+    1360:	4413      	add	r3, r2
+    1362:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    1366:	681b      	ldr	r3, [r3, #0]
+    1368:	f403 1380 	and.w	r3, r3, #1048576	; 0x100000
+    136c:	2b00      	cmp	r3, #0
+    136e:	d001      	beq.n	1374 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0xc0>
+    1370:	2201      	movs	r2, #1
+    1372:	e000      	b.n	1376 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0xc2>
+    1374:	2200      	movs	r2, #0
+    1376:	9b00      	ldr	r3, [sp, #0]
+    1378:	721a      	strb	r2, [r3, #8]
+            frame.data.low = port<Bus>->CAN_MB[index].CAN_MDL;
+    137a:	4a1e      	ldr	r2, [pc, #120]	; (13f4 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x140>)
+    137c:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1380:	015b      	lsls	r3, r3, #5
+    1382:	4413      	add	r3, r2
+    1384:	f503 7305 	add.w	r3, r3, #532	; 0x214
+    1388:	681a      	ldr	r2, [r3, #0]
+    138a:	9b00      	ldr	r3, [sp, #0]
+    138c:	611a      	str	r2, [r3, #16]
+            frame.data.high = port<Bus>->CAN_MB[index].CAN_MDH;
+    138e:	4a19      	ldr	r2, [pc, #100]	; (13f4 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x140>)
+    1390:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1394:	015b      	lsls	r3, r3, #5
+    1396:	4413      	add	r3, r2
+    1398:	f503 7306 	add.w	r3, r3, #536	; 0x218
+    139c:	681a      	ldr	r2, [r3, #0]
+    139e:	9b00      	ldr	r3, [sp, #0]
+    13a0:	615a      	str	r2, [r3, #20]
+            status = port<Bus>->CAN_MB[index].CAN_MSR;	
+    13a2:	4a14      	ldr	r2, [pc, #80]	; (13f4 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x140>)
+    13a4:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    13a8:	015b      	lsls	r3, r3, #5
+    13aa:	4413      	add	r3, r2
+    13ac:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    13b0:	681b      	ldr	r3, [r3, #0]
+    13b2:	9304      	str	r3, [sp, #16]
+            if (status & CAN_MSR_MMI) {
+    13b4:	9b04      	ldr	r3, [sp, #16]
+    13b6:	f003 7380 	and.w	r3, r3, #16777216	; 0x1000000
+    13ba:	2b00      	cmp	r3, #0
+    13bc:	d003      	beq.n	13c6 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x112>
+                retval |= mailbox_status::RX_NEED_RD_AGAIN;
+    13be:	9b05      	ldr	r3, [sp, #20]
+    13c0:	f043 0303 	orr.w	r3, r3, #3
+    13c4:	9305      	str	r3, [sp, #20]
+            port<Bus>->CAN_MB[index].CAN_MCR |= CAN_MCR_MTCR;
+    13c6:	4a0b      	ldr	r2, [pc, #44]	; (13f4 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x140>)
+    13c8:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    13cc:	015b      	lsls	r3, r3, #5
+    13ce:	4413      	add	r3, r2
+    13d0:	f503 7307 	add.w	r3, r3, #540	; 0x21c
+    13d4:	681a      	ldr	r2, [r3, #0]
+    13d6:	4907      	ldr	r1, [pc, #28]	; (13f4 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can0EEEmhRNS1_12_can_frame_sE+0x140>)
+    13d8:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    13dc:	f442 0200 	orr.w	r2, r2, #8388608	; 0x800000
+    13e0:	015b      	lsls	r3, r3, #5
+    13e2:	440b      	add	r3, r1
+    13e4:	f503 7307 	add.w	r3, r3, #540	; 0x21c
+    13e8:	601a      	str	r2, [r3, #0]
+            return retval;
+    13ea:	9b05      	ldr	r3, [sp, #20]
+        }
+    13ec:	4618      	mov	r0, r3
+    13ee:	b006      	add	sp, #24
+    13f0:	4770      	bx	lr
+    13f2:	bf00      	nop
+    13f4:	400b4000 	.word	0x400b4000
+
+000013f8 <_ZNK4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4fullEv>:
+        /**
+         * Return whether the ringbuffer is full.
+         *
+         * @return
+         */
+        constexpr bool full() const {
+    13f8:	b082      	sub	sp, #8
+    13fa:	9001      	str	r0, [sp, #4]
+            return used == MaxSize;
+    13fc:	9b01      	ldr	r3, [sp, #4]
+    13fe:	f8d3 3308 	ldr.w	r3, [r3, #776]	; 0x308
+    1402:	2b20      	cmp	r3, #32
+    1404:	bf0c      	ite	eq
+    1406:	2301      	moveq	r3, #1
+    1408:	2300      	movne	r3, #0
+    140a:	b2db      	uxtb	r3, r3
+        }
+    140c:	4618      	mov	r0, r3
+    140e:	b002      	add	sp, #8
+    1410:	4770      	bx	lr
+
+00001412 <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_>:
+        constexpr void push(const T &val) {
+    1412:	b530      	push	{r4, r5, lr}
+    1414:	b083      	sub	sp, #12
+    1416:	9001      	str	r0, [sp, #4]
+    1418:	9100      	str	r1, [sp, #0]
+            if (tail >= MaxSize) {
+    141a:	9b01      	ldr	r3, [sp, #4]
+    141c:	f8d3 3304 	ldr.w	r3, [r3, #772]	; 0x304
+    1420:	2b1f      	cmp	r3, #31
+    1422:	d903      	bls.n	142c <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_+0x1a>
+                tail = 0;
+    1424:	9b01      	ldr	r3, [sp, #4]
+    1426:	2200      	movs	r2, #0
+    1428:	f8c3 2304 	str.w	r2, [r3, #772]	; 0x304
+            buffer[tail++] = val;
+    142c:	9b01      	ldr	r3, [sp, #4]
+    142e:	f8d3 2304 	ldr.w	r2, [r3, #772]	; 0x304
+    1432:	1c51      	adds	r1, r2, #1
+    1434:	9b01      	ldr	r3, [sp, #4]
+    1436:	f8c3 1304 	str.w	r1, [r3, #772]	; 0x304
+    143a:	9901      	ldr	r1, [sp, #4]
+    143c:	4613      	mov	r3, r2
+    143e:	005b      	lsls	r3, r3, #1
+    1440:	4413      	add	r3, r2
+    1442:	00db      	lsls	r3, r3, #3
+    1444:	18ca      	adds	r2, r1, r3
+    1446:	9b00      	ldr	r3, [sp, #0]
+    1448:	4614      	mov	r4, r2
+    144a:	461d      	mov	r5, r3
+    144c:	cd0f      	ldmia	r5!, {r0, r1, r2, r3}
+    144e:	c40f      	stmia	r4!, {r0, r1, r2, r3}
+    1450:	e895 0003 	ldmia.w	r5, {r0, r1}
+    1454:	e884 0003 	stmia.w	r4, {r0, r1}
+            if (full()) {
+    1458:	9801      	ldr	r0, [sp, #4]
+    145a:	f7ff ffcd 	bl	13f8 <_ZNK4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4fullEv>
+    145e:	4603      	mov	r3, r0
+    1460:	2b00      	cmp	r3, #0
+    1462:	d00f      	beq.n	1484 <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_+0x72>
+                tail = head;
+    1464:	9b01      	ldr	r3, [sp, #4]
+    1466:	f8d3 2300 	ldr.w	r2, [r3, #768]	; 0x300
+    146a:	9b01      	ldr	r3, [sp, #4]
+    146c:	f8c3 2304 	str.w	r2, [r3, #772]	; 0x304
+                head = (head + 1) % MaxSize;
+    1470:	9b01      	ldr	r3, [sp, #4]
+    1472:	f8d3 3300 	ldr.w	r3, [r3, #768]	; 0x300
+    1476:	3301      	adds	r3, #1
+    1478:	f003 021f 	and.w	r2, r3, #31
+    147c:	9b01      	ldr	r3, [sp, #4]
+    147e:	f8c3 2300 	str.w	r2, [r3, #768]	; 0x300
+        }
+    1482:	e006      	b.n	1492 <_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_+0x80>
+                used += 1;
+    1484:	9b01      	ldr	r3, [sp, #4]
+    1486:	f8d3 3308 	ldr.w	r3, [r3, #776]	; 0x308
+    148a:	1c5a      	adds	r2, r3, #1
+    148c:	9b01      	ldr	r3, [sp, #4]
+    148e:	f8c3 2308 	str.w	r2, [r3, #776]	; 0x308
+        }
+    1492:	bf00      	nop
+    1494:	b003      	add	sp, #12
+    1496:	bd30      	pop	{r4, r5, pc}
+
+00001498 <_ZNK4r2d27can_bus7queue_cINS0_6detail12_can_frame_sELj32EE5emptyEv>:
+        /**
+         * Is the queue empty?
+         * 
+         * @return
+         */
+        bool empty() const {
+    1498:	b500      	push	{lr}
+    149a:	b083      	sub	sp, #12
+    149c:	9001      	str	r0, [sp, #4]
+            return size() == 0;
+    149e:	9801      	ldr	r0, [sp, #4]
+    14a0:	f000 fa7e 	bl	19a0 <_ZNK4r2d27can_bus7queue_cINS0_6detail12_can_frame_sELj32EE4sizeEv>
+    14a4:	4603      	mov	r3, r0
+    14a6:	2b00      	cmp	r3, #0
+    14a8:	bf0c      	ite	eq
+    14aa:	2301      	moveq	r3, #1
+    14ac:	2300      	movne	r3, #0
+    14ae:	b2db      	uxtb	r3, r3
+        }
+    14b0:	4618      	mov	r0, r3
+    14b2:	b003      	add	sp, #12
+    14b4:	f85d fb04 	ldr.w	pc, [sp], #4
+
+000014b8 <_ZN4r2d27can_bus7queue_cINS0_6detail12_can_frame_sELj32EE12copy_and_popEv>:
+        T copy_and_pop() {
+    14b8:	b430      	push	{r4, r5}
+    14ba:	b082      	sub	sp, #8
+    14bc:	9001      	str	r0, [sp, #4]
+    14be:	9100      	str	r1, [sp, #0]
+            return buffer[--index];
+    14c0:	9b00      	ldr	r3, [sp, #0]
+    14c2:	f8d3 3300 	ldr.w	r3, [r3, #768]	; 0x300
+    14c6:	1e5a      	subs	r2, r3, #1
+    14c8:	9b00      	ldr	r3, [sp, #0]
+    14ca:	f8c3 2300 	str.w	r2, [r3, #768]	; 0x300
+    14ce:	9b00      	ldr	r3, [sp, #0]
+    14d0:	f8d3 2300 	ldr.w	r2, [r3, #768]	; 0x300
+    14d4:	9801      	ldr	r0, [sp, #4]
+    14d6:	9900      	ldr	r1, [sp, #0]
+    14d8:	4613      	mov	r3, r2
+    14da:	005b      	lsls	r3, r3, #1
+    14dc:	4413      	add	r3, r2
+    14de:	00db      	lsls	r3, r3, #3
+    14e0:	440b      	add	r3, r1
+    14e2:	4604      	mov	r4, r0
+    14e4:	461d      	mov	r5, r3
+    14e6:	cd0f      	ldmia	r5!, {r0, r1, r2, r3}
+    14e8:	c40f      	stmia	r4!, {r0, r1, r2, r3}
+    14ea:	e895 0003 	ldmia.w	r5, {r0, r1}
+    14ee:	e884 0003 	stmia.w	r4, {r0, r1}
+        }
+    14f2:	9801      	ldr	r0, [sp, #4]
+    14f4:	b002      	add	sp, #8
+    14f6:	bc30      	pop	{r4, r5}
+    14f8:	4770      	bx	lr
+	...
+
+000014fc <_ZN4r2d27can_bus6detail19_write_tx_registersINS0_4can0EEEvRKNS1_12_can_frame_sEh>:
+        void _write_tx_registers(const _can_frame_s &frame, const uint8_t index) {
+    14fc:	b500      	push	{lr}
+    14fe:	b083      	sub	sp, #12
+    1500:	9001      	str	r0, [sp, #4]
+    1502:	460b      	mov	r3, r1
+    1504:	f88d 3003 	strb.w	r3, [sp, #3]
+            _set_mailbox_id<Bus>(index, frame.id, frame.extended);
+    1508:	9b01      	ldr	r3, [sp, #4]
+    150a:	6819      	ldr	r1, [r3, #0]
+    150c:	9b01      	ldr	r3, [sp, #4]
+    150e:	7a9b      	ldrb	r3, [r3, #10]
+    1510:	2b00      	cmp	r3, #0
+    1512:	bf14      	ite	ne
+    1514:	2301      	movne	r3, #1
+    1516:	2300      	moveq	r3, #0
+    1518:	b2da      	uxtb	r2, r3
+    151a:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    151e:	4618      	mov	r0, r3
+    1520:	f000 f99e 	bl	1860 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0EEEvhmb>
+            _set_mailbox_datalen<Bus>(index, frame.length);        
+    1524:	9b01      	ldr	r3, [sp, #4]
+    1526:	7b9a      	ldrb	r2, [r3, #14]
+    1528:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    152c:	4611      	mov	r1, r2
+    152e:	4618      	mov	r0, r3
+    1530:	f000 fa3e 	bl	19b0 <_ZN4r2d27can_bus6detail20_set_mailbox_datalenINS0_4can0EEEvhh>
+            _set_mailbox_rtr<Bus>(index, frame.rtr);
+    1534:	9b01      	ldr	r3, [sp, #4]
+    1536:	7a1a      	ldrb	r2, [r3, #8]
+    1538:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    153c:	4611      	mov	r1, r2
+    153e:	4618      	mov	r0, r3
+    1540:	f000 fa62 	bl	1a08 <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can0EEEvhh>
+            _set_mailbox_priority<Bus>(index, frame.priority);
+    1544:	9b01      	ldr	r3, [sp, #4]
+    1546:	7a5a      	ldrb	r2, [r3, #9]
+    1548:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    154c:	4611      	mov	r1, r2
+    154e:	4618      	mov	r0, r3
+    1550:	f000 fa04 	bl	195c <_ZN4r2d27can_bus6detail21_set_mailbox_priorityINS0_4can0EEEvhh>
+            port<Bus>->CAN_MB[index].CAN_MDL = frame.data.low;
+    1554:	490f      	ldr	r1, [pc, #60]	; (1594 <_ZN4r2d27can_bus6detail19_write_tx_registersINS0_4can0EEEvRKNS1_12_can_frame_sEh+0x98>)
+    1556:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    155a:	9a01      	ldr	r2, [sp, #4]
+    155c:	6912      	ldr	r2, [r2, #16]
+    155e:	015b      	lsls	r3, r3, #5
+    1560:	440b      	add	r3, r1
+    1562:	f503 7305 	add.w	r3, r3, #532	; 0x214
+    1566:	601a      	str	r2, [r3, #0]
+            port<Bus>->CAN_MB[index].CAN_MDH = frame.data.high;
+    1568:	490a      	ldr	r1, [pc, #40]	; (1594 <_ZN4r2d27can_bus6detail19_write_tx_registersINS0_4can0EEEvRKNS1_12_can_frame_sEh+0x98>)
+    156a:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    156e:	9a01      	ldr	r2, [sp, #4]
+    1570:	6952      	ldr	r2, [r2, #20]
+    1572:	015b      	lsls	r3, r3, #5
+    1574:	440b      	add	r3, r1
+    1576:	f503 7306 	add.w	r3, r3, #536	; 0x218
+    157a:	601a      	str	r2, [r3, #0]
+            port<Bus>->CAN_TCR = (0x1U << index) & 0x000000FF;
+    157c:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    1580:	2201      	movs	r2, #1
+    1582:	fa02 f303 	lsl.w	r3, r2, r3
+    1586:	4a03      	ldr	r2, [pc, #12]	; (1594 <_ZN4r2d27can_bus6detail19_write_tx_registersINS0_4can0EEEvRKNS1_12_can_frame_sEh+0x98>)
+    1588:	b2db      	uxtb	r3, r3
+    158a:	6253      	str	r3, [r2, #36]	; 0x24
+        }
+    158c:	bf00      	nop
+    158e:	b003      	add	sp, #12
+    1590:	f85d fb04 	ldr.w	pc, [sp], #4
+    1594:	400b4000 	.word	0x400b4000
+
+00001598 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE>:
+        uint32_t _read_mailbox(const uint8_t index, _can_frame_s &frame) {
+    1598:	b086      	sub	sp, #24
+    159a:	4603      	mov	r3, r0
+    159c:	9100      	str	r1, [sp, #0]
+    159e:	f88d 3007 	strb.w	r3, [sp, #7]
+            uint32_t retval = 0;
+    15a2:	2300      	movs	r3, #0
+    15a4:	9305      	str	r3, [sp, #20]
+            uint32_t status = port<Bus>->CAN_MB[index].CAN_MSR;
+    15a6:	4a4c      	ldr	r2, [pc, #304]	; (16d8 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x140>)
+    15a8:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    15ac:	015b      	lsls	r3, r3, #5
+    15ae:	4413      	add	r3, r2
+    15b0:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    15b4:	681b      	ldr	r3, [r3, #0]
+    15b6:	9304      	str	r3, [sp, #16]
+            if ((status & CAN_MSR_MRDY) && (status & CAN_MSR_MMI)) {
+    15b8:	9b04      	ldr	r3, [sp, #16]
+    15ba:	f403 0300 	and.w	r3, r3, #8388608	; 0x800000
+    15be:	2b00      	cmp	r3, #0
+    15c0:	d006      	beq.n	15d0 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x38>
+    15c2:	9b04      	ldr	r3, [sp, #16]
+    15c4:	f003 7380 	and.w	r3, r3, #16777216	; 0x1000000
+    15c8:	2b00      	cmp	r3, #0
+    15ca:	d001      	beq.n	15d0 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x38>
+                retval = mailbox_status::RX_OVER;
+    15cc:	2302      	movs	r3, #2
+    15ce:	9305      	str	r3, [sp, #20]
+            uint32_t id = port<Bus>->CAN_MB[index].CAN_MID;
+    15d0:	4a41      	ldr	r2, [pc, #260]	; (16d8 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x140>)
+    15d2:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    15d6:	015b      	lsls	r3, r3, #5
+    15d8:	4413      	add	r3, r2
+    15da:	f503 7302 	add.w	r3, r3, #520	; 0x208
+    15de:	681b      	ldr	r3, [r3, #0]
+    15e0:	9303      	str	r3, [sp, #12]
+            if ((id & CAN_MID_MIDE) == CAN_MID_MIDE) { 
+    15e2:	9b03      	ldr	r3, [sp, #12]
+    15e4:	f003 5300 	and.w	r3, r3, #536870912	; 0x20000000
+    15e8:	2b00      	cmp	r3, #0
+    15ea:	d008      	beq.n	15fe <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x66>
+                frame.id = id & 0x1FFFFFFFu;
+    15ec:	9b03      	ldr	r3, [sp, #12]
+    15ee:	f023 4260 	bic.w	r2, r3, #3758096384	; 0xe0000000
+    15f2:	9b00      	ldr	r3, [sp, #0]
+    15f4:	601a      	str	r2, [r3, #0]
+                frame.extended = true;
+    15f6:	9b00      	ldr	r3, [sp, #0]
+    15f8:	2201      	movs	r2, #1
+    15fa:	729a      	strb	r2, [r3, #10]
+    15fc:	e008      	b.n	1610 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x78>
+                frame.id = (id  >> CAN_MID_MIDvA_Pos) & 0x7ffu;
+    15fe:	9b03      	ldr	r3, [sp, #12]
+    1600:	0c9b      	lsrs	r3, r3, #18
+    1602:	f3c3 020a 	ubfx	r2, r3, #0, #11
+    1606:	9b00      	ldr	r3, [sp, #0]
+    1608:	601a      	str	r2, [r3, #0]
+                frame.extended = false;
+    160a:	9b00      	ldr	r3, [sp, #0]
+    160c:	2200      	movs	r2, #0
+    160e:	729a      	strb	r2, [r3, #10]
+            frame.fid    = port<Bus>->CAN_MB[index].CAN_MFID;
+    1610:	4a31      	ldr	r2, [pc, #196]	; (16d8 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x140>)
+    1612:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1616:	015b      	lsls	r3, r3, #5
+    1618:	4413      	add	r3, r2
+    161a:	f503 7303 	add.w	r3, r3, #524	; 0x20c
+    161e:	681a      	ldr	r2, [r3, #0]
+    1620:	9b00      	ldr	r3, [sp, #0]
+    1622:	605a      	str	r2, [r3, #4]
+            frame.length = (status & CAN_MSR_MDLC_Msk) >> CAN_MSR_MDLC_Pos;
+    1624:	9b04      	ldr	r3, [sp, #16]
+    1626:	0c1b      	lsrs	r3, r3, #16
+    1628:	b2db      	uxtb	r3, r3
+    162a:	f003 030f 	and.w	r3, r3, #15
+    162e:	b2da      	uxtb	r2, r3
+    1630:	9b00      	ldr	r3, [sp, #0]
+    1632:	739a      	strb	r2, [r3, #14]
+            frame.time   = (status & CAN_MSR_MTIMESTAMP_Msk);
+    1634:	9b04      	ldr	r3, [sp, #16]
+    1636:	b29a      	uxth	r2, r3
+    1638:	9b00      	ldr	r3, [sp, #0]
+    163a:	819a      	strh	r2, [r3, #12]
+            frame.rtr    = (port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRTR) ? 1 : 0 ;
+    163c:	4a26      	ldr	r2, [pc, #152]	; (16d8 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x140>)
+    163e:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1642:	015b      	lsls	r3, r3, #5
+    1644:	4413      	add	r3, r2
+    1646:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    164a:	681b      	ldr	r3, [r3, #0]
+    164c:	f403 1380 	and.w	r3, r3, #1048576	; 0x100000
+    1650:	2b00      	cmp	r3, #0
+    1652:	d001      	beq.n	1658 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0xc0>
+    1654:	2201      	movs	r2, #1
+    1656:	e000      	b.n	165a <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0xc2>
+    1658:	2200      	movs	r2, #0
+    165a:	9b00      	ldr	r3, [sp, #0]
+    165c:	721a      	strb	r2, [r3, #8]
+            frame.data.low = port<Bus>->CAN_MB[index].CAN_MDL;
+    165e:	4a1e      	ldr	r2, [pc, #120]	; (16d8 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x140>)
+    1660:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1664:	015b      	lsls	r3, r3, #5
+    1666:	4413      	add	r3, r2
+    1668:	f503 7305 	add.w	r3, r3, #532	; 0x214
+    166c:	681a      	ldr	r2, [r3, #0]
+    166e:	9b00      	ldr	r3, [sp, #0]
+    1670:	611a      	str	r2, [r3, #16]
+            frame.data.high = port<Bus>->CAN_MB[index].CAN_MDH;
+    1672:	4a19      	ldr	r2, [pc, #100]	; (16d8 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x140>)
+    1674:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1678:	015b      	lsls	r3, r3, #5
+    167a:	4413      	add	r3, r2
+    167c:	f503 7306 	add.w	r3, r3, #536	; 0x218
+    1680:	681a      	ldr	r2, [r3, #0]
+    1682:	9b00      	ldr	r3, [sp, #0]
+    1684:	615a      	str	r2, [r3, #20]
+            status = port<Bus>->CAN_MB[index].CAN_MSR;	
+    1686:	4a14      	ldr	r2, [pc, #80]	; (16d8 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x140>)
+    1688:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    168c:	015b      	lsls	r3, r3, #5
+    168e:	4413      	add	r3, r2
+    1690:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    1694:	681b      	ldr	r3, [r3, #0]
+    1696:	9304      	str	r3, [sp, #16]
+            if (status & CAN_MSR_MMI) {
+    1698:	9b04      	ldr	r3, [sp, #16]
+    169a:	f003 7380 	and.w	r3, r3, #16777216	; 0x1000000
+    169e:	2b00      	cmp	r3, #0
+    16a0:	d003      	beq.n	16aa <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x112>
+                retval |= mailbox_status::RX_NEED_RD_AGAIN;
+    16a2:	9b05      	ldr	r3, [sp, #20]
+    16a4:	f043 0303 	orr.w	r3, r3, #3
+    16a8:	9305      	str	r3, [sp, #20]
+            port<Bus>->CAN_MB[index].CAN_MCR |= CAN_MCR_MTCR;
+    16aa:	4a0b      	ldr	r2, [pc, #44]	; (16d8 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x140>)
+    16ac:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    16b0:	015b      	lsls	r3, r3, #5
+    16b2:	4413      	add	r3, r2
+    16b4:	f503 7307 	add.w	r3, r3, #540	; 0x21c
+    16b8:	681a      	ldr	r2, [r3, #0]
+    16ba:	4907      	ldr	r1, [pc, #28]	; (16d8 <_ZN4r2d27can_bus6detail13_read_mailboxINS0_4can1EEEmhRNS1_12_can_frame_sE+0x140>)
+    16bc:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    16c0:	f442 0200 	orr.w	r2, r2, #8388608	; 0x800000
+    16c4:	015b      	lsls	r3, r3, #5
+    16c6:	440b      	add	r3, r1
+    16c8:	f503 7307 	add.w	r3, r3, #540	; 0x21c
+    16cc:	601a      	str	r2, [r3, #0]
+            return retval;
+    16ce:	9b05      	ldr	r3, [sp, #20]
+        }
+    16d0:	4618      	mov	r0, r3
+    16d2:	b006      	add	sp, #24
+    16d4:	4770      	bx	lr
+    16d6:	bf00      	nop
+    16d8:	400b8000 	.word	0x400b8000
+
+000016dc <_ZN4r2d27can_bus6detail19_write_tx_registersINS0_4can1EEEvRKNS1_12_can_frame_sEh>:
+        void _write_tx_registers(const _can_frame_s &frame, const uint8_t index) {
+    16dc:	b500      	push	{lr}
+    16de:	b083      	sub	sp, #12
+    16e0:	9001      	str	r0, [sp, #4]
+    16e2:	460b      	mov	r3, r1
+    16e4:	f88d 3003 	strb.w	r3, [sp, #3]
+            _set_mailbox_id<Bus>(index, frame.id, frame.extended);
+    16e8:	9b01      	ldr	r3, [sp, #4]
+    16ea:	6819      	ldr	r1, [r3, #0]
+    16ec:	9b01      	ldr	r3, [sp, #4]
+    16ee:	7a9b      	ldrb	r3, [r3, #10]
+    16f0:	2b00      	cmp	r3, #0
+    16f2:	bf14      	ite	ne
+    16f4:	2301      	movne	r3, #1
+    16f6:	2300      	moveq	r3, #0
+    16f8:	b2da      	uxtb	r2, r3
+    16fa:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    16fe:	4618      	mov	r0, r3
+    1700:	f000 f9b8 	bl	1a74 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can1EEEvhmb>
+            _set_mailbox_datalen<Bus>(index, frame.length);        
+    1704:	9b01      	ldr	r3, [sp, #4]
+    1706:	7b9a      	ldrb	r2, [r3, #14]
+    1708:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    170c:	4611      	mov	r1, r2
+    170e:	4618      	mov	r0, r3
+    1710:	f000 f9dc 	bl	1acc <_ZN4r2d27can_bus6detail20_set_mailbox_datalenINS0_4can1EEEvhh>
+            _set_mailbox_rtr<Bus>(index, frame.rtr);
+    1714:	9b01      	ldr	r3, [sp, #4]
+    1716:	7a1a      	ldrb	r2, [r3, #8]
+    1718:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    171c:	4611      	mov	r1, r2
+    171e:	4618      	mov	r0, r3
+    1720:	f000 fa00 	bl	1b24 <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can1EEEvhh>
+            _set_mailbox_priority<Bus>(index, frame.priority);
+    1724:	9b01      	ldr	r3, [sp, #4]
+    1726:	7a5a      	ldrb	r2, [r3, #9]
+    1728:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    172c:	4611      	mov	r1, r2
+    172e:	4618      	mov	r0, r3
+    1730:	f000 fa2e 	bl	1b90 <_ZN4r2d27can_bus6detail21_set_mailbox_priorityINS0_4can1EEEvhh>
+            port<Bus>->CAN_MB[index].CAN_MDL = frame.data.low;
+    1734:	490f      	ldr	r1, [pc, #60]	; (1774 <_ZN4r2d27can_bus6detail19_write_tx_registersINS0_4can1EEEvRKNS1_12_can_frame_sEh+0x98>)
+    1736:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    173a:	9a01      	ldr	r2, [sp, #4]
+    173c:	6912      	ldr	r2, [r2, #16]
+    173e:	015b      	lsls	r3, r3, #5
+    1740:	440b      	add	r3, r1
+    1742:	f503 7305 	add.w	r3, r3, #532	; 0x214
+    1746:	601a      	str	r2, [r3, #0]
+            port<Bus>->CAN_MB[index].CAN_MDH = frame.data.high;
+    1748:	490a      	ldr	r1, [pc, #40]	; (1774 <_ZN4r2d27can_bus6detail19_write_tx_registersINS0_4can1EEEvRKNS1_12_can_frame_sEh+0x98>)
+    174a:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    174e:	9a01      	ldr	r2, [sp, #4]
+    1750:	6952      	ldr	r2, [r2, #20]
+    1752:	015b      	lsls	r3, r3, #5
+    1754:	440b      	add	r3, r1
+    1756:	f503 7306 	add.w	r3, r3, #536	; 0x218
+    175a:	601a      	str	r2, [r3, #0]
+            port<Bus>->CAN_TCR = (0x1U << index) & 0x000000FF;
+    175c:	f89d 3003 	ldrb.w	r3, [sp, #3]
+    1760:	2201      	movs	r2, #1
+    1762:	fa02 f303 	lsl.w	r3, r2, r3
+    1766:	4a03      	ldr	r2, [pc, #12]	; (1774 <_ZN4r2d27can_bus6detail19_write_tx_registersINS0_4can1EEEvRKNS1_12_can_frame_sEh+0x98>)
+    1768:	b2db      	uxtb	r3, r3
+    176a:	6253      	str	r3, [r2, #36]	; 0x24
+        }
+    176c:	bf00      	nop
+    176e:	b003      	add	sp, #12
+    1770:	f85d fb04 	ldr.w	pc, [sp], #4
+    1774:	400b8000 	.word	0x400b8000
+
+00001778 <_ZN4r2d27can_bus6detail12_disable_busINS0_4can0EEEvv>:
+            port<Bus>->CAN_MR &= ~CAN_MR_CANEN;
+    1778:	4b04      	ldr	r3, [pc, #16]	; (178c <_ZN4r2d27can_bus6detail12_disable_busINS0_4can0EEEvv+0x14>)
+    177a:	681b      	ldr	r3, [r3, #0]
+    177c:	4a03      	ldr	r2, [pc, #12]	; (178c <_ZN4r2d27can_bus6detail12_disable_busINS0_4can0EEEvv+0x14>)
+    177e:	f023 0301 	bic.w	r3, r3, #1
+    1782:	6013      	str	r3, [r2, #0]
+            (void) port<Bus>->CAN_SR;
+    1784:	4b01      	ldr	r3, [pc, #4]	; (178c <_ZN4r2d27can_bus6detail12_disable_busINS0_4can0EEEvv+0x14>)
+    1786:	691b      	ldr	r3, [r3, #16]
+        }
+    1788:	bf00      	nop
+    178a:	4770      	bx	lr
+    178c:	400b4000 	.word	0x400b4000
+
+00001790 <_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh>:
+        void _init_mailbox(const uint8_t index) {
+    1790:	b082      	sub	sp, #8
+    1792:	4603      	mov	r3, r0
+    1794:	f88d 3007 	strb.w	r3, [sp, #7]
+            port<Bus>->CAN_MB[index].CAN_MMR = 0;
+    1798:	4a1b      	ldr	r2, [pc, #108]	; (1808 <_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh+0x78>)
+    179a:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    179e:	3310      	adds	r3, #16
+    17a0:	015b      	lsls	r3, r3, #5
+    17a2:	4413      	add	r3, r2
+    17a4:	2200      	movs	r2, #0
+    17a6:	601a      	str	r2, [r3, #0]
+            port<Bus>->CAN_MB[index].CAN_MAM = 0;
+    17a8:	4a17      	ldr	r2, [pc, #92]	; (1808 <_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh+0x78>)
+    17aa:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    17ae:	3310      	adds	r3, #16
+    17b0:	015b      	lsls	r3, r3, #5
+    17b2:	4413      	add	r3, r2
+    17b4:	3304      	adds	r3, #4
+    17b6:	2200      	movs	r2, #0
+    17b8:	601a      	str	r2, [r3, #0]
+            port<Bus>->CAN_MB[index].CAN_MID = 0;
+    17ba:	4a13      	ldr	r2, [pc, #76]	; (1808 <_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh+0x78>)
+    17bc:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    17c0:	015b      	lsls	r3, r3, #5
+    17c2:	4413      	add	r3, r2
+    17c4:	f503 7302 	add.w	r3, r3, #520	; 0x208
+    17c8:	2200      	movs	r2, #0
+    17ca:	601a      	str	r2, [r3, #0]
+            port<Bus>->CAN_MB[index].CAN_MDL = 0;
+    17cc:	4a0e      	ldr	r2, [pc, #56]	; (1808 <_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh+0x78>)
+    17ce:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    17d2:	015b      	lsls	r3, r3, #5
+    17d4:	4413      	add	r3, r2
+    17d6:	f503 7305 	add.w	r3, r3, #532	; 0x214
+    17da:	2200      	movs	r2, #0
+    17dc:	601a      	str	r2, [r3, #0]
+            port<Bus>->CAN_MB[index].CAN_MDH = 0;
+    17de:	4a0a      	ldr	r2, [pc, #40]	; (1808 <_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh+0x78>)
+    17e0:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    17e4:	015b      	lsls	r3, r3, #5
+    17e6:	4413      	add	r3, r2
+    17e8:	f503 7306 	add.w	r3, r3, #536	; 0x218
+    17ec:	2200      	movs	r2, #0
+    17ee:	601a      	str	r2, [r3, #0]
+            port<Bus>->CAN_MB[index].CAN_MCR = 0;
+    17f0:	4a05      	ldr	r2, [pc, #20]	; (1808 <_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh+0x78>)
+    17f2:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    17f6:	015b      	lsls	r3, r3, #5
+    17f8:	4413      	add	r3, r2
+    17fa:	f503 7307 	add.w	r3, r3, #540	; 0x21c
+    17fe:	2200      	movs	r2, #0
+    1800:	601a      	str	r2, [r3, #0]
+        }
+    1802:	bf00      	nop
+    1804:	b002      	add	sp, #8
+    1806:	4770      	bx	lr
+    1808:	400b4000 	.word	0x400b4000
+
+0000180c <_ZN4r2d27can_bus6detail17_set_mailbox_modeINS0_4can0EEEvhh>:
+        void _set_mailbox_mode(const uint8_t index, uint8_t mode) {
+    180c:	b082      	sub	sp, #8
+    180e:	4603      	mov	r3, r0
+    1810:	460a      	mov	r2, r1
+    1812:	f88d 3007 	strb.w	r3, [sp, #7]
+    1816:	4613      	mov	r3, r2
+    1818:	f88d 3006 	strb.w	r3, [sp, #6]
+            if (mode > 5) {
+    181c:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    1820:	2b05      	cmp	r3, #5
+    1822:	d902      	bls.n	182a <_ZN4r2d27can_bus6detail17_set_mailbox_modeINS0_4can0EEEvhh+0x1e>
+                mode = 0; // Set disabled on invalid mode
+    1824:	2300      	movs	r3, #0
+    1826:	f88d 3006 	strb.w	r3, [sp, #6]
+                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_MOT_Msk) | (mode << CAN_MMR_MOT_Pos);
+    182a:	4a0c      	ldr	r2, [pc, #48]	; (185c <_ZN4r2d27can_bus6detail17_set_mailbox_modeINS0_4can0EEEvhh+0x50>)
+    182c:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1830:	3310      	adds	r3, #16
+    1832:	015b      	lsls	r3, r3, #5
+    1834:	4413      	add	r3, r2
+    1836:	681b      	ldr	r3, [r3, #0]
+    1838:	f023 62e0 	bic.w	r2, r3, #117440512	; 0x7000000
+    183c:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    1840:	061b      	lsls	r3, r3, #24
+    1842:	4618      	mov	r0, r3
+            port<Bus>->CAN_MB[index].CAN_MMR = 
+    1844:	4905      	ldr	r1, [pc, #20]	; (185c <_ZN4r2d27can_bus6detail17_set_mailbox_modeINS0_4can0EEEvhh+0x50>)
+    1846:	f89d 3007 	ldrb.w	r3, [sp, #7]
+                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_MOT_Msk) | (mode << CAN_MMR_MOT_Pos);
+    184a:	4302      	orrs	r2, r0
+            port<Bus>->CAN_MB[index].CAN_MMR = 
+    184c:	3310      	adds	r3, #16
+    184e:	015b      	lsls	r3, r3, #5
+    1850:	440b      	add	r3, r1
+    1852:	601a      	str	r2, [r3, #0]
+        }
+    1854:	bf00      	nop
+    1856:	b002      	add	sp, #8
+    1858:	4770      	bx	lr
+    185a:	bf00      	nop
+    185c:	400b4000 	.word	0x400b4000
+
+00001860 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0EEEvhmb>:
+        void _set_mailbox_id(const uint8_t index, uint32_t id, bool extended) {
+    1860:	b082      	sub	sp, #8
+    1862:	4603      	mov	r3, r0
+    1864:	9100      	str	r1, [sp, #0]
+    1866:	f88d 3007 	strb.w	r3, [sp, #7]
+    186a:	4613      	mov	r3, r2
+    186c:	f88d 3006 	strb.w	r3, [sp, #6]
+            if (extended) {
+    1870:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    1874:	2b00      	cmp	r3, #0
+    1876:	d00b      	beq.n	1890 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0EEEvhmb+0x30>
+                port<Bus>->CAN_MB[index].CAN_MID = id | CAN_MID_MIDE;
+    1878:	9a00      	ldr	r2, [sp, #0]
+    187a:	490d      	ldr	r1, [pc, #52]	; (18b0 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0EEEvhmb+0x50>)
+    187c:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1880:	f042 5200 	orr.w	r2, r2, #536870912	; 0x20000000
+    1884:	015b      	lsls	r3, r3, #5
+    1886:	440b      	add	r3, r1
+    1888:	f503 7302 	add.w	r3, r3, #520	; 0x208
+    188c:	601a      	str	r2, [r3, #0]
+        }
+    188e:	e00b      	b.n	18a8 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0EEEvhmb+0x48>
+                port<Bus>->CAN_MB[index].CAN_MID = CAN_MID_MIDvA(id);
+    1890:	9b00      	ldr	r3, [sp, #0]
+    1892:	0499      	lsls	r1, r3, #18
+    1894:	4806      	ldr	r0, [pc, #24]	; (18b0 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0EEEvhmb+0x50>)
+    1896:	f89d 2007 	ldrb.w	r2, [sp, #7]
+    189a:	4b06      	ldr	r3, [pc, #24]	; (18b4 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can0EEEvhmb+0x54>)
+    189c:	400b      	ands	r3, r1
+    189e:	0152      	lsls	r2, r2, #5
+    18a0:	4402      	add	r2, r0
+    18a2:	f502 7202 	add.w	r2, r2, #520	; 0x208
+    18a6:	6013      	str	r3, [r2, #0]
+        }
+    18a8:	bf00      	nop
+    18aa:	b002      	add	sp, #8
+    18ac:	4770      	bx	lr
+    18ae:	bf00      	nop
+    18b0:	400b4000 	.word	0x400b4000
+    18b4:	1ffc0000 	.word	0x1ffc0000
+
+000018b8 <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb>:
+        void _set_mailbox_accept_mask(const uint8_t index, const uint32_t mask, bool extended) {
+    18b8:	b082      	sub	sp, #8
+    18ba:	4603      	mov	r3, r0
+    18bc:	9100      	str	r1, [sp, #0]
+    18be:	f88d 3007 	strb.w	r3, [sp, #7]
+    18c2:	4613      	mov	r3, r2
+    18c4:	f88d 3006 	strb.w	r3, [sp, #6]
+            if (extended) {
+    18c8:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    18cc:	2b00      	cmp	r3, #0
+    18ce:	d01d      	beq.n	190c <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb+0x54>
+                port<Bus>->CAN_MB[index].CAN_MAM = mask | CAN_MAM_MIDE;
+    18d0:	9a00      	ldr	r2, [sp, #0]
+    18d2:	4920      	ldr	r1, [pc, #128]	; (1954 <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb+0x9c>)
+    18d4:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    18d8:	f042 5200 	orr.w	r2, r2, #536870912	; 0x20000000
+    18dc:	3310      	adds	r3, #16
+    18de:	015b      	lsls	r3, r3, #5
+    18e0:	440b      	add	r3, r1
+    18e2:	3304      	adds	r3, #4
+    18e4:	601a      	str	r2, [r3, #0]
+                port<Bus>->CAN_MB[index].CAN_MID |= CAN_MAM_MIDE;
+    18e6:	4a1b      	ldr	r2, [pc, #108]	; (1954 <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb+0x9c>)
+    18e8:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    18ec:	015b      	lsls	r3, r3, #5
+    18ee:	4413      	add	r3, r2
+    18f0:	f503 7302 	add.w	r3, r3, #520	; 0x208
+    18f4:	681a      	ldr	r2, [r3, #0]
+    18f6:	4917      	ldr	r1, [pc, #92]	; (1954 <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb+0x9c>)
+    18f8:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    18fc:	f042 5200 	orr.w	r2, r2, #536870912	; 0x20000000
+    1900:	015b      	lsls	r3, r3, #5
+    1902:	440b      	add	r3, r1
+    1904:	f503 7302 	add.w	r3, r3, #520	; 0x208
+    1908:	601a      	str	r2, [r3, #0]
+        }
+    190a:	e020      	b.n	194e <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb+0x96>
+                port<Bus>->CAN_MB[index].CAN_MAM = mask | CAN_MAM_MIDvA(mask);
+    190c:	9b00      	ldr	r3, [sp, #0]
+    190e:	049a      	lsls	r2, r3, #18
+    1910:	4b11      	ldr	r3, [pc, #68]	; (1958 <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb+0xa0>)
+    1912:	4013      	ands	r3, r2
+    1914:	9a00      	ldr	r2, [sp, #0]
+    1916:	480f      	ldr	r0, [pc, #60]	; (1954 <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb+0x9c>)
+    1918:	f89d 1007 	ldrb.w	r1, [sp, #7]
+    191c:	431a      	orrs	r2, r3
+    191e:	f101 0310 	add.w	r3, r1, #16
+    1922:	015b      	lsls	r3, r3, #5
+    1924:	4403      	add	r3, r0
+    1926:	3304      	adds	r3, #4
+    1928:	601a      	str	r2, [r3, #0]
+                port<Bus>->CAN_MB[index].CAN_MID &= ~CAN_MAM_MIDE;
+    192a:	4a0a      	ldr	r2, [pc, #40]	; (1954 <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb+0x9c>)
+    192c:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1930:	015b      	lsls	r3, r3, #5
+    1932:	4413      	add	r3, r2
+    1934:	f503 7302 	add.w	r3, r3, #520	; 0x208
+    1938:	681a      	ldr	r2, [r3, #0]
+    193a:	4906      	ldr	r1, [pc, #24]	; (1954 <_ZN4r2d27can_bus6detail24_set_mailbox_accept_maskINS0_4can0EEEvhmb+0x9c>)
+    193c:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1940:	f022 5200 	bic.w	r2, r2, #536870912	; 0x20000000
+    1944:	015b      	lsls	r3, r3, #5
+    1946:	440b      	add	r3, r1
+    1948:	f503 7302 	add.w	r3, r3, #520	; 0x208
+    194c:	601a      	str	r2, [r3, #0]
+        }
+    194e:	bf00      	nop
+    1950:	b002      	add	sp, #8
+    1952:	4770      	bx	lr
+    1954:	400b4000 	.word	0x400b4000
+    1958:	1ffc0000 	.word	0x1ffc0000
+
+0000195c <_ZN4r2d27can_bus6detail21_set_mailbox_priorityINS0_4can0EEEvhh>:
+        void _set_mailbox_priority(const uint8_t index, const uint8_t priority) {
+    195c:	b082      	sub	sp, #8
+    195e:	4603      	mov	r3, r0
+    1960:	460a      	mov	r2, r1
+    1962:	f88d 3007 	strb.w	r3, [sp, #7]
+    1966:	4613      	mov	r3, r2
+    1968:	f88d 3006 	strb.w	r3, [sp, #6]
+                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_PRIOR_Msk) | (priority << CAN_MMR_PRIOR_Pos);
+    196c:	4a0b      	ldr	r2, [pc, #44]	; (199c <_ZN4r2d27can_bus6detail21_set_mailbox_priorityINS0_4can0EEEvhh+0x40>)
+    196e:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1972:	3310      	adds	r3, #16
+    1974:	015b      	lsls	r3, r3, #5
+    1976:	4413      	add	r3, r2
+    1978:	681b      	ldr	r3, [r3, #0]
+    197a:	f423 2270 	bic.w	r2, r3, #983040	; 0xf0000
+    197e:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    1982:	041b      	lsls	r3, r3, #16
+    1984:	4618      	mov	r0, r3
+            port<Bus>->CAN_MB[index].CAN_MMR = 
+    1986:	4905      	ldr	r1, [pc, #20]	; (199c <_ZN4r2d27can_bus6detail21_set_mailbox_priorityINS0_4can0EEEvhh+0x40>)
+    1988:	f89d 3007 	ldrb.w	r3, [sp, #7]
+                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_PRIOR_Msk) | (priority << CAN_MMR_PRIOR_Pos);
+    198c:	4302      	orrs	r2, r0
+            port<Bus>->CAN_MB[index].CAN_MMR = 
+    198e:	3310      	adds	r3, #16
+    1990:	015b      	lsls	r3, r3, #5
+    1992:	440b      	add	r3, r1
+    1994:	601a      	str	r2, [r3, #0]
+        }
+    1996:	bf00      	nop
+    1998:	b002      	add	sp, #8
+    199a:	4770      	bx	lr
+    199c:	400b4000 	.word	0x400b4000
+
+000019a0 <_ZNK4r2d27can_bus7queue_cINS0_6detail12_can_frame_sELj32EE4sizeEv>:
+        size_t size() const {
+    19a0:	b082      	sub	sp, #8
+    19a2:	9001      	str	r0, [sp, #4]
+            return index;
+    19a4:	9b01      	ldr	r3, [sp, #4]
+    19a6:	f8d3 3300 	ldr.w	r3, [r3, #768]	; 0x300
+        }
+    19aa:	4618      	mov	r0, r3
+    19ac:	b002      	add	sp, #8
+    19ae:	4770      	bx	lr
+
+000019b0 <_ZN4r2d27can_bus6detail20_set_mailbox_datalenINS0_4can0EEEvhh>:
+        void _set_mailbox_datalen(const uint8_t index, uint8_t data_length) {
+    19b0:	b082      	sub	sp, #8
+    19b2:	4603      	mov	r3, r0
+    19b4:	460a      	mov	r2, r1
+    19b6:	f88d 3007 	strb.w	r3, [sp, #7]
+    19ba:	4613      	mov	r3, r2
+    19bc:	f88d 3006 	strb.w	r3, [sp, #6]
+            if (data_length > 8) {
+    19c0:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    19c4:	2b08      	cmp	r3, #8
+    19c6:	d902      	bls.n	19ce <_ZN4r2d27can_bus6detail20_set_mailbox_datalenINS0_4can0EEEvhh+0x1e>
+                data_length = 8;
+    19c8:	2308      	movs	r3, #8
+    19ca:	f88d 3006 	strb.w	r3, [sp, #6]
+                = (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) | CAN_MCR_MDLC(data_length);
+    19ce:	4a0d      	ldr	r2, [pc, #52]	; (1a04 <_ZN4r2d27can_bus6detail20_set_mailbox_datalenINS0_4can0EEEvhh+0x54>)
+    19d0:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    19d4:	015b      	lsls	r3, r3, #5
+    19d6:	4413      	add	r3, r2
+    19d8:	f503 7307 	add.w	r3, r3, #540	; 0x21c
+    19dc:	681b      	ldr	r3, [r3, #0]
+    19de:	f423 2170 	bic.w	r1, r3, #983040	; 0xf0000
+    19e2:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    19e6:	041b      	lsls	r3, r3, #16
+    19e8:	f403 2270 	and.w	r2, r3, #983040	; 0xf0000
+            port<Bus>->CAN_MB[index].CAN_MCR
+    19ec:	4805      	ldr	r0, [pc, #20]	; (1a04 <_ZN4r2d27can_bus6detail20_set_mailbox_datalenINS0_4can0EEEvhh+0x54>)
+    19ee:	f89d 3007 	ldrb.w	r3, [sp, #7]
+                = (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) | CAN_MCR_MDLC(data_length);
+    19f2:	430a      	orrs	r2, r1
+            port<Bus>->CAN_MB[index].CAN_MCR
+    19f4:	015b      	lsls	r3, r3, #5
+    19f6:	4403      	add	r3, r0
+    19f8:	f503 7307 	add.w	r3, r3, #540	; 0x21c
+    19fc:	601a      	str	r2, [r3, #0]
+        }
+    19fe:	bf00      	nop
+    1a00:	b002      	add	sp, #8
+    1a02:	4770      	bx	lr
+    1a04:	400b4000 	.word	0x400b4000
+
+00001a08 <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can0EEEvhh>:
+        void _set_mailbox_rtr(const uint8_t index, const uint8_t rtr) {
+    1a08:	b082      	sub	sp, #8
+    1a0a:	4603      	mov	r3, r0
+    1a0c:	460a      	mov	r2, r1
+    1a0e:	f88d 3007 	strb.w	r3, [sp, #7]
+    1a12:	4613      	mov	r3, r2
+    1a14:	f88d 3006 	strb.w	r3, [sp, #6]
+            if (rtr) {
+    1a18:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    1a1c:	2b00      	cmp	r3, #0
+    1a1e:	d012      	beq.n	1a46 <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can0EEEvhh+0x3e>
+                port<Bus>->CAN_MB[index].CAN_MSR |= CAN_MSR_MRTR;
+    1a20:	4a13      	ldr	r2, [pc, #76]	; (1a70 <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can0EEEvhh+0x68>)
+    1a22:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1a26:	015b      	lsls	r3, r3, #5
+    1a28:	4413      	add	r3, r2
+    1a2a:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    1a2e:	681a      	ldr	r2, [r3, #0]
+    1a30:	490f      	ldr	r1, [pc, #60]	; (1a70 <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can0EEEvhh+0x68>)
+    1a32:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1a36:	f442 1280 	orr.w	r2, r2, #1048576	; 0x100000
+    1a3a:	015b      	lsls	r3, r3, #5
+    1a3c:	440b      	add	r3, r1
+    1a3e:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    1a42:	601a      	str	r2, [r3, #0]
+        }
+    1a44:	e011      	b.n	1a6a <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can0EEEvhh+0x62>
+                port<Bus>->CAN_MB[index].CAN_MSR &= ~CAN_MSR_MRTR;
+    1a46:	4a0a      	ldr	r2, [pc, #40]	; (1a70 <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can0EEEvhh+0x68>)
+    1a48:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1a4c:	015b      	lsls	r3, r3, #5
+    1a4e:	4413      	add	r3, r2
+    1a50:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    1a54:	681a      	ldr	r2, [r3, #0]
+    1a56:	4906      	ldr	r1, [pc, #24]	; (1a70 <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can0EEEvhh+0x68>)
+    1a58:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1a5c:	f422 1280 	bic.w	r2, r2, #1048576	; 0x100000
+    1a60:	015b      	lsls	r3, r3, #5
+    1a62:	440b      	add	r3, r1
+    1a64:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    1a68:	601a      	str	r2, [r3, #0]
+        }
+    1a6a:	bf00      	nop
+    1a6c:	b002      	add	sp, #8
+    1a6e:	4770      	bx	lr
+    1a70:	400b4000 	.word	0x400b4000
+
+00001a74 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can1EEEvhmb>:
+        void _set_mailbox_id(const uint8_t index, uint32_t id, bool extended) {
+    1a74:	b082      	sub	sp, #8
+    1a76:	4603      	mov	r3, r0
+    1a78:	9100      	str	r1, [sp, #0]
+    1a7a:	f88d 3007 	strb.w	r3, [sp, #7]
+    1a7e:	4613      	mov	r3, r2
+    1a80:	f88d 3006 	strb.w	r3, [sp, #6]
+            if (extended) {
+    1a84:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    1a88:	2b00      	cmp	r3, #0
+    1a8a:	d00b      	beq.n	1aa4 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can1EEEvhmb+0x30>
+                port<Bus>->CAN_MB[index].CAN_MID = id | CAN_MID_MIDE;
+    1a8c:	9a00      	ldr	r2, [sp, #0]
+    1a8e:	490d      	ldr	r1, [pc, #52]	; (1ac4 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can1EEEvhmb+0x50>)
+    1a90:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1a94:	f042 5200 	orr.w	r2, r2, #536870912	; 0x20000000
+    1a98:	015b      	lsls	r3, r3, #5
+    1a9a:	440b      	add	r3, r1
+    1a9c:	f503 7302 	add.w	r3, r3, #520	; 0x208
+    1aa0:	601a      	str	r2, [r3, #0]
+        }
+    1aa2:	e00b      	b.n	1abc <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can1EEEvhmb+0x48>
+                port<Bus>->CAN_MB[index].CAN_MID = CAN_MID_MIDvA(id);
+    1aa4:	9b00      	ldr	r3, [sp, #0]
+    1aa6:	0499      	lsls	r1, r3, #18
+    1aa8:	4806      	ldr	r0, [pc, #24]	; (1ac4 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can1EEEvhmb+0x50>)
+    1aaa:	f89d 2007 	ldrb.w	r2, [sp, #7]
+    1aae:	4b06      	ldr	r3, [pc, #24]	; (1ac8 <_ZN4r2d27can_bus6detail15_set_mailbox_idINS0_4can1EEEvhmb+0x54>)
+    1ab0:	400b      	ands	r3, r1
+    1ab2:	0152      	lsls	r2, r2, #5
+    1ab4:	4402      	add	r2, r0
+    1ab6:	f502 7202 	add.w	r2, r2, #520	; 0x208
+    1aba:	6013      	str	r3, [r2, #0]
+        }
+    1abc:	bf00      	nop
+    1abe:	b002      	add	sp, #8
+    1ac0:	4770      	bx	lr
+    1ac2:	bf00      	nop
+    1ac4:	400b8000 	.word	0x400b8000
+    1ac8:	1ffc0000 	.word	0x1ffc0000
+
+00001acc <_ZN4r2d27can_bus6detail20_set_mailbox_datalenINS0_4can1EEEvhh>:
+        void _set_mailbox_datalen(const uint8_t index, uint8_t data_length) {
+    1acc:	b082      	sub	sp, #8
+    1ace:	4603      	mov	r3, r0
+    1ad0:	460a      	mov	r2, r1
+    1ad2:	f88d 3007 	strb.w	r3, [sp, #7]
+    1ad6:	4613      	mov	r3, r2
+    1ad8:	f88d 3006 	strb.w	r3, [sp, #6]
+            if (data_length > 8) {
+    1adc:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    1ae0:	2b08      	cmp	r3, #8
+    1ae2:	d902      	bls.n	1aea <_ZN4r2d27can_bus6detail20_set_mailbox_datalenINS0_4can1EEEvhh+0x1e>
+                data_length = 8;
+    1ae4:	2308      	movs	r3, #8
+    1ae6:	f88d 3006 	strb.w	r3, [sp, #6]
+                = (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) | CAN_MCR_MDLC(data_length);
+    1aea:	4a0d      	ldr	r2, [pc, #52]	; (1b20 <_ZN4r2d27can_bus6detail20_set_mailbox_datalenINS0_4can1EEEvhh+0x54>)
+    1aec:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1af0:	015b      	lsls	r3, r3, #5
+    1af2:	4413      	add	r3, r2
+    1af4:	f503 7307 	add.w	r3, r3, #540	; 0x21c
+    1af8:	681b      	ldr	r3, [r3, #0]
+    1afa:	f423 2170 	bic.w	r1, r3, #983040	; 0xf0000
+    1afe:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    1b02:	041b      	lsls	r3, r3, #16
+    1b04:	f403 2270 	and.w	r2, r3, #983040	; 0xf0000
+            port<Bus>->CAN_MB[index].CAN_MCR
+    1b08:	4805      	ldr	r0, [pc, #20]	; (1b20 <_ZN4r2d27can_bus6detail20_set_mailbox_datalenINS0_4can1EEEvhh+0x54>)
+    1b0a:	f89d 3007 	ldrb.w	r3, [sp, #7]
+                = (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) | CAN_MCR_MDLC(data_length);
+    1b0e:	430a      	orrs	r2, r1
+            port<Bus>->CAN_MB[index].CAN_MCR
+    1b10:	015b      	lsls	r3, r3, #5
+    1b12:	4403      	add	r3, r0
+    1b14:	f503 7307 	add.w	r3, r3, #540	; 0x21c
+    1b18:	601a      	str	r2, [r3, #0]
+        }
+    1b1a:	bf00      	nop
+    1b1c:	b002      	add	sp, #8
+    1b1e:	4770      	bx	lr
+    1b20:	400b8000 	.word	0x400b8000
+
+00001b24 <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can1EEEvhh>:
+        void _set_mailbox_rtr(const uint8_t index, const uint8_t rtr) {
+    1b24:	b082      	sub	sp, #8
+    1b26:	4603      	mov	r3, r0
+    1b28:	460a      	mov	r2, r1
+    1b2a:	f88d 3007 	strb.w	r3, [sp, #7]
+    1b2e:	4613      	mov	r3, r2
+    1b30:	f88d 3006 	strb.w	r3, [sp, #6]
+            if (rtr) {
+    1b34:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    1b38:	2b00      	cmp	r3, #0
+    1b3a:	d012      	beq.n	1b62 <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can1EEEvhh+0x3e>
+                port<Bus>->CAN_MB[index].CAN_MSR |= CAN_MSR_MRTR;
+    1b3c:	4a13      	ldr	r2, [pc, #76]	; (1b8c <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can1EEEvhh+0x68>)
+    1b3e:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1b42:	015b      	lsls	r3, r3, #5
+    1b44:	4413      	add	r3, r2
+    1b46:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    1b4a:	681a      	ldr	r2, [r3, #0]
+    1b4c:	490f      	ldr	r1, [pc, #60]	; (1b8c <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can1EEEvhh+0x68>)
+    1b4e:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1b52:	f442 1280 	orr.w	r2, r2, #1048576	; 0x100000
+    1b56:	015b      	lsls	r3, r3, #5
+    1b58:	440b      	add	r3, r1
+    1b5a:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    1b5e:	601a      	str	r2, [r3, #0]
+        }
+    1b60:	e011      	b.n	1b86 <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can1EEEvhh+0x62>
+                port<Bus>->CAN_MB[index].CAN_MSR &= ~CAN_MSR_MRTR;
+    1b62:	4a0a      	ldr	r2, [pc, #40]	; (1b8c <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can1EEEvhh+0x68>)
+    1b64:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1b68:	015b      	lsls	r3, r3, #5
+    1b6a:	4413      	add	r3, r2
+    1b6c:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    1b70:	681a      	ldr	r2, [r3, #0]
+    1b72:	4906      	ldr	r1, [pc, #24]	; (1b8c <_ZN4r2d27can_bus6detail16_set_mailbox_rtrINS0_4can1EEEvhh+0x68>)
+    1b74:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1b78:	f422 1280 	bic.w	r2, r2, #1048576	; 0x100000
+    1b7c:	015b      	lsls	r3, r3, #5
+    1b7e:	440b      	add	r3, r1
+    1b80:	f503 7304 	add.w	r3, r3, #528	; 0x210
+    1b84:	601a      	str	r2, [r3, #0]
+        }
+    1b86:	bf00      	nop
+    1b88:	b002      	add	sp, #8
+    1b8a:	4770      	bx	lr
+    1b8c:	400b8000 	.word	0x400b8000
+
+00001b90 <_ZN4r2d27can_bus6detail21_set_mailbox_priorityINS0_4can1EEEvhh>:
+        void _set_mailbox_priority(const uint8_t index, const uint8_t priority) {
+    1b90:	b082      	sub	sp, #8
+    1b92:	4603      	mov	r3, r0
+    1b94:	460a      	mov	r2, r1
+    1b96:	f88d 3007 	strb.w	r3, [sp, #7]
+    1b9a:	4613      	mov	r3, r2
+    1b9c:	f88d 3006 	strb.w	r3, [sp, #6]
+                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_PRIOR_Msk) | (priority << CAN_MMR_PRIOR_Pos);
+    1ba0:	4a0b      	ldr	r2, [pc, #44]	; (1bd0 <_ZN4r2d27can_bus6detail21_set_mailbox_priorityINS0_4can1EEEvhh+0x40>)
+    1ba2:	f89d 3007 	ldrb.w	r3, [sp, #7]
+    1ba6:	3310      	adds	r3, #16
+    1ba8:	015b      	lsls	r3, r3, #5
+    1baa:	4413      	add	r3, r2
+    1bac:	681b      	ldr	r3, [r3, #0]
+    1bae:	f423 2270 	bic.w	r2, r3, #983040	; 0xf0000
+    1bb2:	f89d 3006 	ldrb.w	r3, [sp, #6]
+    1bb6:	041b      	lsls	r3, r3, #16
+    1bb8:	4618      	mov	r0, r3
+            port<Bus>->CAN_MB[index].CAN_MMR = 
+    1bba:	4905      	ldr	r1, [pc, #20]	; (1bd0 <_ZN4r2d27can_bus6detail21_set_mailbox_priorityINS0_4can1EEEvhh+0x40>)
+    1bbc:	f89d 3007 	ldrb.w	r3, [sp, #7]
+                (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_PRIOR_Msk) | (priority << CAN_MMR_PRIOR_Pos);
+    1bc0:	4302      	orrs	r2, r0
+            port<Bus>->CAN_MB[index].CAN_MMR = 
+    1bc2:	3310      	adds	r3, #16
+    1bc4:	015b      	lsls	r3, r3, #5
+    1bc6:	440b      	add	r3, r1
+    1bc8:	601a      	str	r2, [r3, #0]
+        }
+    1bca:	bf00      	nop
+    1bcc:	b002      	add	sp, #8
+    1bce:	4770      	bx	lr
+    1bd0:	400b8000 	.word	0x400b8000
+
+00001bd4 <__startup>:
+#else
+      __startup
+#endif
+};
+
+void __attribute__((noreturn)) __startup( void ){
+    1bd4:	b500      	push	{lr}
+    1bd6:	b085      	sub	sp, #20
+   extern unsigned int __bss_end;
+      
+	 unsigned int *s, *d, *e;
+
+	 // clear .bss section 
+	 d = & __bss_start;
+    1bd8:	4b11      	ldr	r3, [pc, #68]	; (1c20 <__startup+0x4c>)
+    1bda:	9302      	str	r3, [sp, #8]
+	 e = & __bss_end;
+    1bdc:	4b11      	ldr	r3, [pc, #68]	; (1c24 <__startup+0x50>)
+    1bde:	9301      	str	r3, [sp, #4]
+	 while( d != e ){
+    1be0:	e004      	b.n	1bec <__startup+0x18>
+        *d++ = 0;
+    1be2:	9b02      	ldr	r3, [sp, #8]
+    1be4:	1d1a      	adds	r2, r3, #4
+    1be6:	9202      	str	r2, [sp, #8]
+    1be8:	2200      	movs	r2, #0
+    1bea:	601a      	str	r2, [r3, #0]
+	 while( d != e ){
+    1bec:	9a02      	ldr	r2, [sp, #8]
+    1bee:	9b01      	ldr	r3, [sp, #4]
+    1bf0:	429a      	cmp	r2, r3
+    1bf2:	d1f6      	bne.n	1be2 <__startup+0xe>
+	 }
+	 	 
+	 // copy .data section from flash to ram
+	 s = & __data_init_start;
+    1bf4:	4b0c      	ldr	r3, [pc, #48]	; (1c28 <__startup+0x54>)
+    1bf6:	9303      	str	r3, [sp, #12]
+	 d = & __data_start;
+    1bf8:	4b0c      	ldr	r3, [pc, #48]	; (1c2c <__startup+0x58>)
+    1bfa:	9302      	str	r3, [sp, #8]
+	 e = & __data_end;
+    1bfc:	4b0c      	ldr	r3, [pc, #48]	; (1c30 <__startup+0x5c>)
+    1bfe:	9301      	str	r3, [sp, #4]
+	 while( d != e ){ 
+    1c00:	e007      	b.n	1c12 <__startup+0x3e>
+	    *d++ = *s++;
+    1c02:	9a03      	ldr	r2, [sp, #12]
+    1c04:	1d13      	adds	r3, r2, #4
+    1c06:	9303      	str	r3, [sp, #12]
+    1c08:	9b02      	ldr	r3, [sp, #8]
+    1c0a:	1d19      	adds	r1, r3, #4
+    1c0c:	9102      	str	r1, [sp, #8]
+    1c0e:	6812      	ldr	r2, [r2, #0]
+    1c10:	601a      	str	r2, [r3, #0]
+	 while( d != e ){ 
+    1c12:	9a02      	ldr	r2, [sp, #8]
+    1c14:	9b01      	ldr	r3, [sp, #4]
+    1c16:	429a      	cmp	r2, r3
+    1c18:	d1f3      	bne.n	1c02 <__startup+0x2e>
+	 }   
+  
+   // call main   
+   (void) main(); 
+    1c1a:	f7fe fef9 	bl	a10 <main>
+   
+   // when main returns: loop till hell freezes down
+   while(1){}	
+    1c1e:	e7fe      	b.n	1c1e <__startup+0x4a>
+    1c20:	20084000 	.word	0x20084000
+    1c24:	20087094 	.word	0x20087094
+    1c28:	000020f8 	.word	0x000020f8
+    1c2c:	20087094 	.word	0x20087094
+    1c30:	200870b0 	.word	0x200870b0
+
+00001c34 <__default_handler>:
+   #pragma weak __TRNG_Handler       = __default_handler
+   #pragma weak __EMAC_Handler       = __default_handler
+   #pragma weak __CAN0_Handler       = __default_handler
+   #pragma weak __CAN1_Handler       = __default_handler
+
+   void __default_handler(void) {} 
+    1c34:	bf00      	nop
+    1c36:	4770      	bx	lr
+
+00001c38 <__aeabi_ldivmod>:
+    1c38:	b97b      	cbnz	r3, 1c5a <__aeabi_ldivmod+0x22>
+    1c3a:	b972      	cbnz	r2, 1c5a <__aeabi_ldivmod+0x22>
+    1c3c:	2900      	cmp	r1, #0
+    1c3e:	bfbe      	ittt	lt
+    1c40:	2000      	movlt	r0, #0
+    1c42:	f04f 4100 	movlt.w	r1, #2147483648	; 0x80000000
+    1c46:	e006      	blt.n	1c56 <__aeabi_ldivmod+0x1e>
+    1c48:	bf08      	it	eq
+    1c4a:	2800      	cmpeq	r0, #0
+    1c4c:	bf1c      	itt	ne
+    1c4e:	f06f 4100 	mvnne.w	r1, #2147483648	; 0x80000000
+    1c52:	f04f 30ff 	movne.w	r0, #4294967295
+    1c56:	f000 b9bf 	b.w	1fd8 <__aeabi_ldiv0>
+    1c5a:	f1ad 0c08 	sub.w	ip, sp, #8
+    1c5e:	e96d ce04 	strd	ip, lr, [sp, #-16]!
+    1c62:	2900      	cmp	r1, #0
+    1c64:	db09      	blt.n	1c7a <__aeabi_ldivmod+0x42>
+    1c66:	2b00      	cmp	r3, #0
+    1c68:	db1a      	blt.n	1ca0 <__aeabi_ldivmod+0x68>
+    1c6a:	f000 f84d 	bl	1d08 <__udivmoddi4>
+    1c6e:	f8dd e004 	ldr.w	lr, [sp, #4]
+    1c72:	e9dd 2302 	ldrd	r2, r3, [sp, #8]
+    1c76:	b004      	add	sp, #16
+    1c78:	4770      	bx	lr
+    1c7a:	4240      	negs	r0, r0
+    1c7c:	eb61 0141 	sbc.w	r1, r1, r1, lsl #1
+    1c80:	2b00      	cmp	r3, #0
+    1c82:	db1b      	blt.n	1cbc <__aeabi_ldivmod+0x84>
+    1c84:	f000 f840 	bl	1d08 <__udivmoddi4>
+    1c88:	f8dd e004 	ldr.w	lr, [sp, #4]
+    1c8c:	e9dd 2302 	ldrd	r2, r3, [sp, #8]
+    1c90:	b004      	add	sp, #16
+    1c92:	4240      	negs	r0, r0
+    1c94:	eb61 0141 	sbc.w	r1, r1, r1, lsl #1
+    1c98:	4252      	negs	r2, r2
+    1c9a:	eb63 0343 	sbc.w	r3, r3, r3, lsl #1
+    1c9e:	4770      	bx	lr
+    1ca0:	4252      	negs	r2, r2
+    1ca2:	eb63 0343 	sbc.w	r3, r3, r3, lsl #1
+    1ca6:	f000 f82f 	bl	1d08 <__udivmoddi4>
+    1caa:	f8dd e004 	ldr.w	lr, [sp, #4]
+    1cae:	e9dd 2302 	ldrd	r2, r3, [sp, #8]
+    1cb2:	b004      	add	sp, #16
+    1cb4:	4240      	negs	r0, r0
+    1cb6:	eb61 0141 	sbc.w	r1, r1, r1, lsl #1
+    1cba:	4770      	bx	lr
+    1cbc:	4252      	negs	r2, r2
+    1cbe:	eb63 0343 	sbc.w	r3, r3, r3, lsl #1
+    1cc2:	f000 f821 	bl	1d08 <__udivmoddi4>
+    1cc6:	f8dd e004 	ldr.w	lr, [sp, #4]
+    1cca:	e9dd 2302 	ldrd	r2, r3, [sp, #8]
+    1cce:	b004      	add	sp, #16
+    1cd0:	4252      	negs	r2, r2
+    1cd2:	eb63 0343 	sbc.w	r3, r3, r3, lsl #1
+    1cd6:	4770      	bx	lr
+
+00001cd8 <__aeabi_uldivmod>:
+    1cd8:	b953      	cbnz	r3, 1cf0 <__aeabi_uldivmod+0x18>
+    1cda:	b94a      	cbnz	r2, 1cf0 <__aeabi_uldivmod+0x18>
+    1cdc:	2900      	cmp	r1, #0
+    1cde:	bf08      	it	eq
+    1ce0:	2800      	cmpeq	r0, #0
+    1ce2:	bf1c      	itt	ne
+    1ce4:	f04f 31ff 	movne.w	r1, #4294967295
+    1ce8:	f04f 30ff 	movne.w	r0, #4294967295
+    1cec:	f000 b974 	b.w	1fd8 <__aeabi_ldiv0>
+    1cf0:	f1ad 0c08 	sub.w	ip, sp, #8
+    1cf4:	e96d ce04 	strd	ip, lr, [sp, #-16]!
+    1cf8:	f000 f806 	bl	1d08 <__udivmoddi4>
+    1cfc:	f8dd e004 	ldr.w	lr, [sp, #4]
+    1d00:	e9dd 2302 	ldrd	r2, r3, [sp, #8]
+    1d04:	b004      	add	sp, #16
+    1d06:	4770      	bx	lr
+
+00001d08 <__udivmoddi4>:
+    1d08:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+    1d0c:	468c      	mov	ip, r1
+    1d0e:	4604      	mov	r4, r0
+    1d10:	9e08      	ldr	r6, [sp, #32]
+    1d12:	2b00      	cmp	r3, #0
+    1d14:	d14b      	bne.n	1dae <__udivmoddi4+0xa6>
+    1d16:	428a      	cmp	r2, r1
+    1d18:	4615      	mov	r5, r2
+    1d1a:	d967      	bls.n	1dec <__udivmoddi4+0xe4>
+    1d1c:	fab2 f282 	clz	r2, r2
+    1d20:	b14a      	cbz	r2, 1d36 <__udivmoddi4+0x2e>
+    1d22:	f1c2 0720 	rsb	r7, r2, #32
+    1d26:	fa01 f302 	lsl.w	r3, r1, r2
+    1d2a:	fa20 f707 	lsr.w	r7, r0, r7
+    1d2e:	4095      	lsls	r5, r2
+    1d30:	ea47 0c03 	orr.w	ip, r7, r3
+    1d34:	4094      	lsls	r4, r2
+    1d36:	ea4f 4e15 	mov.w	lr, r5, lsr #16
+    1d3a:	fbbc f7fe 	udiv	r7, ip, lr
+    1d3e:	fa1f f885 	uxth.w	r8, r5
+    1d42:	fb0e c317 	mls	r3, lr, r7, ip
+    1d46:	fb07 f908 	mul.w	r9, r7, r8
+    1d4a:	0c21      	lsrs	r1, r4, #16
+    1d4c:	ea41 4303 	orr.w	r3, r1, r3, lsl #16
+    1d50:	4599      	cmp	r9, r3
+    1d52:	d909      	bls.n	1d68 <__udivmoddi4+0x60>
+    1d54:	18eb      	adds	r3, r5, r3
+    1d56:	f107 31ff 	add.w	r1, r7, #4294967295
+    1d5a:	f080 811c 	bcs.w	1f96 <__udivmoddi4+0x28e>
+    1d5e:	4599      	cmp	r9, r3
+    1d60:	f240 8119 	bls.w	1f96 <__udivmoddi4+0x28e>
+    1d64:	3f02      	subs	r7, #2
+    1d66:	442b      	add	r3, r5
+    1d68:	eba3 0309 	sub.w	r3, r3, r9
+    1d6c:	fbb3 f0fe 	udiv	r0, r3, lr
+    1d70:	fb0e 3310 	mls	r3, lr, r0, r3
+    1d74:	fb00 f108 	mul.w	r1, r0, r8
+    1d78:	b2a4      	uxth	r4, r4
+    1d7a:	ea44 4403 	orr.w	r4, r4, r3, lsl #16
+    1d7e:	42a1      	cmp	r1, r4
+    1d80:	d909      	bls.n	1d96 <__udivmoddi4+0x8e>
+    1d82:	192c      	adds	r4, r5, r4
+    1d84:	f100 33ff 	add.w	r3, r0, #4294967295
+    1d88:	f080 8107 	bcs.w	1f9a <__udivmoddi4+0x292>
+    1d8c:	42a1      	cmp	r1, r4
+    1d8e:	f240 8104 	bls.w	1f9a <__udivmoddi4+0x292>
+    1d92:	3802      	subs	r0, #2
+    1d94:	442c      	add	r4, r5
+    1d96:	ea40 4007 	orr.w	r0, r0, r7, lsl #16
+    1d9a:	2700      	movs	r7, #0
+    1d9c:	1a64      	subs	r4, r4, r1
+    1d9e:	b11e      	cbz	r6, 1da8 <__udivmoddi4+0xa0>
+    1da0:	2300      	movs	r3, #0
+    1da2:	40d4      	lsrs	r4, r2
+    1da4:	e9c6 4300 	strd	r4, r3, [r6]
+    1da8:	4639      	mov	r1, r7
+    1daa:	e8bd 87f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
+    1dae:	428b      	cmp	r3, r1
+    1db0:	d909      	bls.n	1dc6 <__udivmoddi4+0xbe>
+    1db2:	2e00      	cmp	r6, #0
+    1db4:	f000 80ec 	beq.w	1f90 <__udivmoddi4+0x288>
+    1db8:	2700      	movs	r7, #0
+    1dba:	e9c6 0100 	strd	r0, r1, [r6]
+    1dbe:	4638      	mov	r0, r7
+    1dc0:	4639      	mov	r1, r7
+    1dc2:	e8bd 87f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
+    1dc6:	fab3 f783 	clz	r7, r3
+    1dca:	2f00      	cmp	r7, #0
+    1dcc:	d148      	bne.n	1e60 <__udivmoddi4+0x158>
+    1dce:	428b      	cmp	r3, r1
+    1dd0:	d302      	bcc.n	1dd8 <__udivmoddi4+0xd0>
+    1dd2:	4282      	cmp	r2, r0
+    1dd4:	f200 80fb 	bhi.w	1fce <__udivmoddi4+0x2c6>
+    1dd8:	1a84      	subs	r4, r0, r2
+    1dda:	eb61 0303 	sbc.w	r3, r1, r3
+    1dde:	2001      	movs	r0, #1
+    1de0:	469c      	mov	ip, r3
+    1de2:	2e00      	cmp	r6, #0
+    1de4:	d0e0      	beq.n	1da8 <__udivmoddi4+0xa0>
+    1de6:	e9c6 4c00 	strd	r4, ip, [r6]
+    1dea:	e7dd      	b.n	1da8 <__udivmoddi4+0xa0>
+    1dec:	b902      	cbnz	r2, 1df0 <__udivmoddi4+0xe8>
+    1dee:	deff      	udf	#255	; 0xff
+    1df0:	fab2 f282 	clz	r2, r2
+    1df4:	2a00      	cmp	r2, #0
+    1df6:	f040 808f 	bne.w	1f18 <__udivmoddi4+0x210>
+    1dfa:	2701      	movs	r7, #1
+    1dfc:	1b49      	subs	r1, r1, r5
+    1dfe:	ea4f 4815 	mov.w	r8, r5, lsr #16
+    1e02:	fa1f f985 	uxth.w	r9, r5
+    1e06:	fbb1 fef8 	udiv	lr, r1, r8
+    1e0a:	fb08 111e 	mls	r1, r8, lr, r1
+    1e0e:	fb09 f00e 	mul.w	r0, r9, lr
+    1e12:	ea4f 4c14 	mov.w	ip, r4, lsr #16
+    1e16:	ea4c 4301 	orr.w	r3, ip, r1, lsl #16
+    1e1a:	4298      	cmp	r0, r3
+    1e1c:	d907      	bls.n	1e2e <__udivmoddi4+0x126>
+    1e1e:	18eb      	adds	r3, r5, r3
+    1e20:	f10e 31ff 	add.w	r1, lr, #4294967295
+    1e24:	d202      	bcs.n	1e2c <__udivmoddi4+0x124>
+    1e26:	4298      	cmp	r0, r3
+    1e28:	f200 80cd 	bhi.w	1fc6 <__udivmoddi4+0x2be>
+    1e2c:	468e      	mov	lr, r1
+    1e2e:	1a1b      	subs	r3, r3, r0
+    1e30:	fbb3 f0f8 	udiv	r0, r3, r8
+    1e34:	fb08 3310 	mls	r3, r8, r0, r3
+    1e38:	fb09 f900 	mul.w	r9, r9, r0
+    1e3c:	b2a4      	uxth	r4, r4
+    1e3e:	ea44 4403 	orr.w	r4, r4, r3, lsl #16
+    1e42:	45a1      	cmp	r9, r4
+    1e44:	d907      	bls.n	1e56 <__udivmoddi4+0x14e>
+    1e46:	192c      	adds	r4, r5, r4
+    1e48:	f100 33ff 	add.w	r3, r0, #4294967295
+    1e4c:	d202      	bcs.n	1e54 <__udivmoddi4+0x14c>
+    1e4e:	45a1      	cmp	r9, r4
+    1e50:	f200 80b6 	bhi.w	1fc0 <__udivmoddi4+0x2b8>
+    1e54:	4618      	mov	r0, r3
+    1e56:	eba4 0409 	sub.w	r4, r4, r9
+    1e5a:	ea40 400e 	orr.w	r0, r0, lr, lsl #16
+    1e5e:	e79e      	b.n	1d9e <__udivmoddi4+0x96>
+    1e60:	f1c7 0520 	rsb	r5, r7, #32
+    1e64:	40bb      	lsls	r3, r7
+    1e66:	fa22 fc05 	lsr.w	ip, r2, r5
+    1e6a:	ea4c 0c03 	orr.w	ip, ip, r3
+    1e6e:	fa21 f405 	lsr.w	r4, r1, r5
+    1e72:	ea4f 4e1c 	mov.w	lr, ip, lsr #16
+    1e76:	fbb4 f9fe 	udiv	r9, r4, lr
+    1e7a:	fa1f f88c 	uxth.w	r8, ip
+    1e7e:	fb0e 4419 	mls	r4, lr, r9, r4
+    1e82:	fa20 f305 	lsr.w	r3, r0, r5
+    1e86:	40b9      	lsls	r1, r7
+    1e88:	fb09 fa08 	mul.w	sl, r9, r8
+    1e8c:	4319      	orrs	r1, r3
+    1e8e:	0c0b      	lsrs	r3, r1, #16
+    1e90:	ea43 4404 	orr.w	r4, r3, r4, lsl #16
+    1e94:	45a2      	cmp	sl, r4
+    1e96:	fa02 f207 	lsl.w	r2, r2, r7
+    1e9a:	fa00 f307 	lsl.w	r3, r0, r7
+    1e9e:	d90b      	bls.n	1eb8 <__udivmoddi4+0x1b0>
+    1ea0:	eb1c 0404 	adds.w	r4, ip, r4
+    1ea4:	f109 30ff 	add.w	r0, r9, #4294967295
+    1ea8:	f080 8088 	bcs.w	1fbc <__udivmoddi4+0x2b4>
+    1eac:	45a2      	cmp	sl, r4
+    1eae:	f240 8085 	bls.w	1fbc <__udivmoddi4+0x2b4>
+    1eb2:	f1a9 0902 	sub.w	r9, r9, #2
+    1eb6:	4464      	add	r4, ip
+    1eb8:	eba4 040a 	sub.w	r4, r4, sl
+    1ebc:	fbb4 f0fe 	udiv	r0, r4, lr
+    1ec0:	fb0e 4410 	mls	r4, lr, r0, r4
+    1ec4:	fb00 fa08 	mul.w	sl, r0, r8
+    1ec8:	b289      	uxth	r1, r1
+    1eca:	ea41 4404 	orr.w	r4, r1, r4, lsl #16
+    1ece:	45a2      	cmp	sl, r4
+    1ed0:	d908      	bls.n	1ee4 <__udivmoddi4+0x1dc>
+    1ed2:	eb1c 0404 	adds.w	r4, ip, r4
+    1ed6:	f100 31ff 	add.w	r1, r0, #4294967295
+    1eda:	d26b      	bcs.n	1fb4 <__udivmoddi4+0x2ac>
+    1edc:	45a2      	cmp	sl, r4
+    1ede:	d969      	bls.n	1fb4 <__udivmoddi4+0x2ac>
+    1ee0:	3802      	subs	r0, #2
+    1ee2:	4464      	add	r4, ip
+    1ee4:	ea40 4009 	orr.w	r0, r0, r9, lsl #16
+    1ee8:	fba0 8902 	umull	r8, r9, r0, r2
+    1eec:	eba4 040a 	sub.w	r4, r4, sl
+    1ef0:	454c      	cmp	r4, r9
+    1ef2:	4641      	mov	r1, r8
+    1ef4:	46ce      	mov	lr, r9
+    1ef6:	d354      	bcc.n	1fa2 <__udivmoddi4+0x29a>
+    1ef8:	d051      	beq.n	1f9e <__udivmoddi4+0x296>
+    1efa:	2e00      	cmp	r6, #0
+    1efc:	d069      	beq.n	1fd2 <__udivmoddi4+0x2ca>
+    1efe:	1a5a      	subs	r2, r3, r1
+    1f00:	eb64 040e 	sbc.w	r4, r4, lr
+    1f04:	fa04 f505 	lsl.w	r5, r4, r5
+    1f08:	fa22 f307 	lsr.w	r3, r2, r7
+    1f0c:	40fc      	lsrs	r4, r7
+    1f0e:	431d      	orrs	r5, r3
+    1f10:	e9c6 5400 	strd	r5, r4, [r6]
+    1f14:	2700      	movs	r7, #0
+    1f16:	e747      	b.n	1da8 <__udivmoddi4+0xa0>
+    1f18:	4095      	lsls	r5, r2
+    1f1a:	f1c2 0320 	rsb	r3, r2, #32
+    1f1e:	fa21 f003 	lsr.w	r0, r1, r3
+    1f22:	ea4f 4815 	mov.w	r8, r5, lsr #16
+    1f26:	fbb0 f7f8 	udiv	r7, r0, r8
+    1f2a:	fa1f f985 	uxth.w	r9, r5
+    1f2e:	fb08 0017 	mls	r0, r8, r7, r0
+    1f32:	fa24 f303 	lsr.w	r3, r4, r3
+    1f36:	4091      	lsls	r1, r2
+    1f38:	fb07 fc09 	mul.w	ip, r7, r9
+    1f3c:	430b      	orrs	r3, r1
+    1f3e:	0c19      	lsrs	r1, r3, #16
+    1f40:	ea41 4100 	orr.w	r1, r1, r0, lsl #16
+    1f44:	458c      	cmp	ip, r1
+    1f46:	fa04 f402 	lsl.w	r4, r4, r2
+    1f4a:	d907      	bls.n	1f5c <__udivmoddi4+0x254>
+    1f4c:	1869      	adds	r1, r5, r1
+    1f4e:	f107 30ff 	add.w	r0, r7, #4294967295
+    1f52:	d231      	bcs.n	1fb8 <__udivmoddi4+0x2b0>
+    1f54:	458c      	cmp	ip, r1
+    1f56:	d92f      	bls.n	1fb8 <__udivmoddi4+0x2b0>
+    1f58:	3f02      	subs	r7, #2
+    1f5a:	4429      	add	r1, r5
+    1f5c:	eba1 010c 	sub.w	r1, r1, ip
+    1f60:	fbb1 f0f8 	udiv	r0, r1, r8
+    1f64:	fb08 1c10 	mls	ip, r8, r0, r1
+    1f68:	fb00 fe09 	mul.w	lr, r0, r9
+    1f6c:	b299      	uxth	r1, r3
+    1f6e:	ea41 410c 	orr.w	r1, r1, ip, lsl #16
+    1f72:	458e      	cmp	lr, r1
+    1f74:	d907      	bls.n	1f86 <__udivmoddi4+0x27e>
+    1f76:	1869      	adds	r1, r5, r1
+    1f78:	f100 33ff 	add.w	r3, r0, #4294967295
+    1f7c:	d218      	bcs.n	1fb0 <__udivmoddi4+0x2a8>
+    1f7e:	458e      	cmp	lr, r1
+    1f80:	d916      	bls.n	1fb0 <__udivmoddi4+0x2a8>
+    1f82:	3802      	subs	r0, #2
+    1f84:	4429      	add	r1, r5
+    1f86:	eba1 010e 	sub.w	r1, r1, lr
+    1f8a:	ea40 4707 	orr.w	r7, r0, r7, lsl #16
+    1f8e:	e73a      	b.n	1e06 <__udivmoddi4+0xfe>
+    1f90:	4637      	mov	r7, r6
+    1f92:	4630      	mov	r0, r6
+    1f94:	e708      	b.n	1da8 <__udivmoddi4+0xa0>
+    1f96:	460f      	mov	r7, r1
+    1f98:	e6e6      	b.n	1d68 <__udivmoddi4+0x60>
+    1f9a:	4618      	mov	r0, r3
+    1f9c:	e6fb      	b.n	1d96 <__udivmoddi4+0x8e>
+    1f9e:	4543      	cmp	r3, r8
+    1fa0:	d2ab      	bcs.n	1efa <__udivmoddi4+0x1f2>
+    1fa2:	ebb8 0102 	subs.w	r1, r8, r2
+    1fa6:	eb69 020c 	sbc.w	r2, r9, ip
+    1faa:	3801      	subs	r0, #1
+    1fac:	4696      	mov	lr, r2
+    1fae:	e7a4      	b.n	1efa <__udivmoddi4+0x1f2>
+    1fb0:	4618      	mov	r0, r3
+    1fb2:	e7e8      	b.n	1f86 <__udivmoddi4+0x27e>
+    1fb4:	4608      	mov	r0, r1
+    1fb6:	e795      	b.n	1ee4 <__udivmoddi4+0x1dc>
+    1fb8:	4607      	mov	r7, r0
+    1fba:	e7cf      	b.n	1f5c <__udivmoddi4+0x254>
+    1fbc:	4681      	mov	r9, r0
+    1fbe:	e77b      	b.n	1eb8 <__udivmoddi4+0x1b0>
+    1fc0:	3802      	subs	r0, #2
+    1fc2:	442c      	add	r4, r5
+    1fc4:	e747      	b.n	1e56 <__udivmoddi4+0x14e>
+    1fc6:	f1ae 0e02 	sub.w	lr, lr, #2
+    1fca:	442b      	add	r3, r5
+    1fcc:	e72f      	b.n	1e2e <__udivmoddi4+0x126>
+    1fce:	4638      	mov	r0, r7
+    1fd0:	e707      	b.n	1de2 <__udivmoddi4+0xda>
+    1fd2:	4637      	mov	r7, r6
+    1fd4:	e6e8      	b.n	1da8 <__udivmoddi4+0xa0>
+    1fd6:	bf00      	nop
+
+00001fd8 <__aeabi_ldiv0>:
+    1fd8:	4770      	bx	lr
+    1fda:	bf00      	nop
+
+00001fdc <_ZTVN5hwlib20cout_using_uart_putcE>:
+	...
+    1fe4:	0489 0000 04a7 0000                         ........
+
+00001fec <_ZN5hwlibL3hexE>:
+    1fec:	0010 0000 7274 6575 0000 0000 6166 736c     ....true....fals
+    1ffc:	0065 0000 0031 0000 0030 0000 2e2e 2e2f     e...1...0...../.
+    200c:	2f2e 2e2e 6c2f 6269 6172 6972 7365 682f     ./../libraries/h
+    201c:	6c77 6269 6c2f 6269 6172 7972 742f 7261     wlib/library/tar
+    202c:	6567 7374 682f 6c77 6269 612d 6472 6975     gets/hwlib-ardui
+    203c:	6f6e 642d 6575 682e 7070 0000 7453 7261     no-due.hpp..Star
+    204c:	6974 676e 4420 6575 000a 0000 6f43 7272     ting Due....Corr
+    205c:	6365 2074 6e69 7469 203a 0000 6f47 2074     ect init: ..Got 
+    206c:	6164 6174 6220 6675 6566 3a72 0000 0000     data buffer:....
+    207c:	000a 0000 202c 0000                         ...., ..
+
+00002084 <_ZN4r2d27can_bus6detailL13_can_bit_timeE>:
+    2084:	0308 0202 4b03 0209 0303 4302 030a 0303     .....K.....C....
+    2094:	4603 040b 0303 4803 030c 0404 4303 040d     .F.....H.....C..
+    20a4:	0404 4d03 040e 0504 4003 040f 0505 4303     ...M.....@.....C
+    20b4:	0510 0505 4503 0611 0505 4703 0512 0606     .....E.....G....
+    20c4:	4303 0613 0606 4403 0714 0606 4603 0815     .C.....D.....F..
+    20d4:	0606 4703 0716 0707 4403 0817 0708 4603     ...G.....D.....F
+    20e4:	0718 0808 4303 0819 0808 4403               .....C.....D
