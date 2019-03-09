@@ -1,19 +1,22 @@
 {
     "configurations": [
         {
-            "name": "Linux",
+            "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/../../libraries/hwlib/library",
                 "${workspaceFolder}/../../programs/bmptk/targets/cortex/atmel"
             ],
             "defines": [
-                "__SAM3X8E__"
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "__SAM3X8E__",
+                "HWLIB_TARGET_arduino_due"
             ],
-            "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x64"
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4

@@ -11,7 +11,7 @@
 # settings for Arduino Due projects
 TARGET            ?= arduino_due
 SERIAL_PORT       ?= COM2
-CONSOLE_BAUDRATE  ?= 2400
+CONSOLE_BAUDRATE  ?= 115200
 STACK_SIZE        ?= 81920
 HEAP              ?= BMPTK
 
