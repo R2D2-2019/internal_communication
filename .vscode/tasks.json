@@ -18,7 +18,7 @@
             ],
 
             "windows": {
-                "command": "../../../programs/bmptk/tools/bmptk-make.exe",
+                "command": "..\\..\\..\\programs\\bmptk\\tools\\bmptk-make.exe",
             },
 
             "linux": {
@@ -37,11 +37,30 @@
             ],
 
             "windows": {
-                "command": "../../../programs/bmptk/tools/bmptk-make.exe clean build",
+                "command": "..\\..\\..\\programs\\bmptk\\tools\\bmptk-make.exe  clean build",
             },
 
             "linux": {
                 "command": "make clean build",
+            }
+        },
+        {
+            "label": "bmptk-make upload",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/code"
+            },
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ],
+
+            "windows": {
+                "command": "..\\..\\..\\programs\\bmptk\\tools\\bmptk-make.exe run",
+            },
+
+            "linux": {
+                "command": "make run",
             }
         }
     ]
