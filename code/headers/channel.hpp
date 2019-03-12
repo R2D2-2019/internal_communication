@@ -104,6 +104,9 @@ namespace r2d2::can_bus {
             detail::_set_mailbox_mode<Bus>(ids::rx, mailbox_mode::RX);
             detail::_set_mailbox_id<Bus>(ids::rx, 0x0, false);
             detail::_set_mailbox_accept_mask<Bus>(ids::rx, 0x7FF, false);
+            
+            // Rx interrupt
+            port<Bus>->CAN_IER = 1U << ids::rx;
         }
 
         /**
