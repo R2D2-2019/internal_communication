@@ -31,13 +31,16 @@
             "options": {
                 "cwd": "${workspaceFolder}/code"
             },
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": [
                 "$gcc"
             ],
 
             "windows": {
-                "command": "..\\..\\..\\programs\\bmptk\\tools\\bmptk-make.exe clean build",
+                "command": "..\\..\\..\\programs\\bmptk\\tools\\bmptk-make.exe  clean build",
             },
 
             "linux": {
@@ -50,7 +53,10 @@
             "options": {
                 "cwd": "${workspaceFolder}/code"
             },
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": [
                 "$gcc"
             ],

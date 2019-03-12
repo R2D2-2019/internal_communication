@@ -77,17 +77,17 @@ namespace r2d2::can_bus {
     protected:
         using ids = detail::_mailbox_assignment_s<Priority>;
 
-        static queue_c<detail::_can_frame_s, 32> tx_queue;
-        static ringbuffer_c<detail::_can_frame_s, 32> rx_buffer;
+        inline static queue_c<detail::_can_frame_s, 32> tx_queue;
+        inline static ringbuffer_c<detail::_can_frame_s, 32> rx_buffer;
 
     public:
         /**
          * Initialize the channel mailboxes.
          */
         static void init() {
-            // First, clear mailboxes to known state
-            detail::_init_mailbox(ids::tx);
-            detail::_init_mailbox(ids::rx);
+            // First, clear mailboxes a to known state
+            detail::_init_mailbox<Bus>(ids::tx);
+            detail::_init_mailbox<Bus>(ids::rx);
 
             // Set mailbox mode
 
@@ -118,7 +118,7 @@ namespace r2d2::can_bus {
          *
          * @return
          */
-        static bool has_data() const {
+        static bool has_data() {
             return ! rx_buffer.empty();
         }
 
@@ -126,8 +126,8 @@ namespace r2d2::can_bus {
          * Get last received frame from the channel.
          * This will remove it from the channel receive buffer.
          */
-        static uint8_t[8] last_frame_data() {
-            return rx_buffer.copy_and_pop();
+        static uint8_t *last_frame_data() {
+            return rx_buffer.copy_and_pop().data.bytes;
         }
 
         /**
@@ -141,7 +141,7 @@ namespace r2d2::can_bus {
             const uint32_t mmr = (port<Bus>->CAN_MB[index].CAN_MMR >> 24) & 7;
 
             if (mmr > 4) {
-                return
+                return;
             }
 
             // Transmit
@@ -161,5 +161,5 @@ namespace r2d2::can_bus {
             detail::_read_mailbox<Bus>(index, frame);
             rx_buffer.push(frame);
         }
-    }
+    };
 };

@@ -1,0 +1,1492 @@
+	.cpu cortex-m3
+	.eabi_attribute 20, 1
+	.eabi_attribute 21, 1
+	.eabi_attribute 23, 3
+	.eabi_attribute 24, 1
+	.eabi_attribute 25, 1
+	.eabi_attribute 26, 1
+	.eabi_attribute 30, 4
+	.eabi_attribute 34, 1
+	.eabi_attribute 18, 4
+	.file	"main.cpp"
+	.text
+	.section	.text._ZN6sam3xa10SystemInitEv,"axG",%progbits,_ZN6sam3xa10SystemInitEv,comdat
+	.align	1
+	.weak	_ZN6sam3xa10SystemInitEv
+	.arch armv7-m
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN6sam3xa10SystemInitEv, %function
+_ZN6sam3xa10SystemInitEv:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	mov	r3, #1024
+	ldr	r2, .L21
+	str	r3, [r2]
+	str	r3, [r2, #512]
+	ldr	r3, .L21+4
+	ldr	r2, [r3, #32]
+	lsls	r2, r2, #7
+	bmi	.L2
+	ldr	r2, .L21+8
+	str	r2, [r3, #32]
+.L3:
+	ldr	r2, [r3, #104]
+	lsls	r0, r2, #31
+	bpl	.L3
+.L2:
+	ldr	r2, .L21+12
+	str	r2, [r3, #32]
+.L4:
+	ldr	r2, [r3, #104]
+	lsls	r1, r2, #15
+	bpl	.L4
+	ldr	r2, [r3, #48]
+	bic	r2, r2, #3
+	orr	r2, r2, #1
+	str	r2, [r3, #48]
+.L5:
+	ldr	r2, [r3, #104]
+	lsls	r2, r2, #28
+	bpl	.L5
+	ldr	r2, .L21+16
+	str	r2, [r3, #40]
+.L6:
+	ldr	r2, [r3, #104]
+	lsls	r0, r2, #30
+	bpl	.L6
+	movs	r2, #17
+	str	r2, [r3, #48]
+.L7:
+	ldr	r2, [r3, #104]
+	lsls	r1, r2, #28
+	bpl	.L7
+	movs	r2, #18
+	str	r2, [r3, #48]
+.L8:
+	ldr	r2, [r3, #104]
+	lsls	r2, r2, #28
+	bpl	.L8
+	ldr	r3, .L21+20
+	ldr	r2, .L21+24
+	str	r2, [r3]
+	bx	lr
+.L22:
+	.align	2
+.L21:
+	.word	1074661888
+	.word	1074660864
+	.word	3606537
+	.word	20383753
+	.word	537739009
+	.word	_ZN6sam3xa15SystemCoreClockE
+	.word	84000000
+	.size	_ZN6sam3xa10SystemInitEv, .-_ZN6sam3xa10SystemInitEv
+	.section	.text._ZN3due8pin_infoENS_4pinsE,"ax",%progbits
+	.align	1
+	.weak	_ZN3due8pin_infoENS_4pinsE
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN3due8pin_infoENS_4pinsE, %function
+_ZN3due8pin_infoENS_4pinsE:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	cmp	r0, #81
+	push	{r3, lr}
+	bls	.L24
+	movs	r1, #187
+	ldr	r0, .L25
+	bl	_ZN5hwlib5panicEPKcj
+.L24:
+	ldr	r3, .L25+4
+	add	r0, r3, r0, lsl #1
+	pop	{r3, pc}
+.L26:
+	.align	2
+.L25:
+	.word	.LC1
+	.word	.LANCHOR0
+	.size	_ZN3due8pin_infoENS_4pinsE, .-_ZN3due8pin_infoENS_4pinsE
+	.section	.text._ZN3due11ad_pin_infoENS_7ad_pinsE,"ax",%progbits
+	.align	1
+	.weak	_ZN3due11ad_pin_infoENS_7ad_pinsE
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN3due11ad_pin_infoENS_7ad_pinsE, %function
+_ZN3due11ad_pin_infoENS_7ad_pinsE:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	cmp	r0, #11
+	push	{r3, lr}
+	bls	.L28
+	movs	r1, #233
+	ldr	r0, .L29
+	bl	_ZN5hwlib5panicEPKcj
+.L28:
+	ldr	r3, .L29+4
+	add	r0, r0, r3
+	pop	{r3, pc}
+.L30:
+	.align	2
+.L29:
+	.word	.LC1
+	.word	.LANCHOR1
+	.size	_ZN3due11ad_pin_infoENS_7ad_pinsE, .-_ZN3due11ad_pin_infoENS_7ad_pinsE
+	.section	.text._ZN3due11ad_seq_infoEm,"ax",%progbits
+	.align	1
+	.weak	_ZN3due11ad_seq_infoEm
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN3due11ad_seq_infoEm, %function
+_ZN3due11ad_seq_infoEm:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	cmp	r0, #13
+	push	{r3, lr}
+	bls	.L32
+	movw	r1, #265
+	ldr	r0, .L33
+	bl	_ZN5hwlib5panicEPKcj
+.L32:
+	ldr	r3, .L33+4
+	add	r0, r3, r0, lsl #3
+	pop	{r3, pc}
+.L34:
+	.align	2
+.L33:
+	.word	.LC1
+	.word	.LANCHOR2
+	.size	_ZN3due11ad_seq_infoEm, .-_ZN3due11ad_seq_infoEm
+	.section	.text._ZN3due14port_registersEm,"ax",%progbits
+	.align	1
+	.weak	_ZN3due14port_registersEm
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN3due14port_registersEm, %function
+_ZN3due14port_registersEm:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	mov	r2, #129024
+	push	{r3, lr}
+	ldr	r3, .L39
+	cmp	r0, #3
+	str	r2, [r3, #16]
+	bls	.L38
+	movw	r1, #287
+	ldr	r0, .L39+4
+	bl	_ZN5hwlib5panicEPKcj
+.L38:
+	ldr	r3, .L39+8
+	ldr	r0, [r3, r0, lsl #2]
+	pop	{r3, pc}
+.L40:
+	.align	2
+.L39:
+	.word	1074660864
+	.word	.LC1
+	.word	.LANCHOR3
+	.size	_ZN3due14port_registersEm, .-_ZN3due14port_registersEm
+	.section	.text._ZN3due12ticks_per_usEv,"ax",%progbits
+	.align	1
+	.weak	_ZN3due12ticks_per_usEv
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN3due12ticks_per_usEv, %function
+_ZN3due12ticks_per_usEv:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	movs	r0, #84
+	movs	r1, #0
+	bx	lr
+	.size	_ZN3due12ticks_per_usEv, .-_ZN3due12ticks_per_usEv
+	.section	.text._ZN3due9now_ticksEv,"ax",%progbits
+	.align	1
+	.weak	_ZN3due9now_ticksEv
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN3due9now_ticksEv, %function
+_ZN3due9now_ticksEv:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r3, r4, r5, lr}
+	ldr	r5, .L45
+	ldrb	r4, [r5]	@ zero_extendqisi2
+	cbnz	r4, .L43
+	mov	r2, #32768
+	ldr	r3, .L45+4
+	str	r2, [r3, #4]
+	bl	_ZN6sam3xa10SystemInitEv
+	mov	r3, #1024
+	ldr	r2, .L45+8
+	str	r3, [r2]
+	str	r3, [r2, #512]
+	mvn	r2, #-16777216
+	ldr	r3, .L45+12
+	str	r4, [r3]
+	str	r2, [r3, #4]
+	movs	r2, #5
+	str	r4, [r3, #8]
+	str	r2, [r3]
+	movs	r3, #1
+	strb	r3, [r5]
+.L43:
+	ldr	r3, .L45+12
+	ldr	r0, .L45+16
+	ldr	r3, [r3, #8]
+	ldr	r1, [r0]
+	mvns	r3, r3
+	bic	r3, r3, #-16777216
+	cmp	r1, r3
+	ldr	r2, .L45+20
+	bls	.L44
+	ldrd	r1, r4, [r2]
+	adds	r1, r1, #16777216
+	adc	r4, r4, #0
+	strd	r1, r4, [r2]
+.L44:
+	str	r3, [r0]
+	ldr	r0, [r2]
+	ldr	r1, [r2, #4]
+	orrs	r0, r0, r3
+	pop	{r3, r4, r5, pc}
+.L46:
+	.align	2
+.L45:
+	.word	.LANCHOR4
+	.word	1074666064
+	.word	1074661888
+	.word	-536813552
+	.word	.LANCHOR5
+	.word	.LANCHOR6
+	.size	_ZN3due9now_ticksEv, .-_ZN3due9now_ticksEv
+	.section	.text._ZN5hwlib9uart_putcEc,"ax",%progbits
+	.align	1
+	.weak	_ZN5hwlib9uart_putcEc
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN5hwlib9uart_putcEc, %function
+_ZN5hwlib9uart_putcEc:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	b	_ZN3due9uart_putcEc
+	.size	_ZN5hwlib9uart_putcEc, .-_ZN5hwlib9uart_putcEc
+	.section	.text._ZN5hwlib19uart_char_availableEv,"ax",%progbits
+	.align	1
+	.weak	_ZN5hwlib19uart_char_availableEv
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN5hwlib19uart_char_availableEv, %function
+_ZN5hwlib19uart_char_availableEv:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	b	_ZN3due19uart_char_availableEv
+	.size	_ZN5hwlib19uart_char_availableEv, .-_ZN5hwlib19uart_char_availableEv
+	.section	.text._ZN5hwlib9uart_getcEv,"ax",%progbits
+	.align	1
+	.weak	_ZN5hwlib9uart_getcEv
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN5hwlib9uart_getcEv, %function
+_ZN5hwlib9uart_getcEv:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	b	_ZN3due9uart_getcEv
+	.size	_ZN5hwlib9uart_getcEv, .-_ZN5hwlib9uart_getcEv
+	.section	.text._ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_,"axG",%progbits,_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_,comdat
+	.align	1
+	.weak	_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_, %function
+_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r4, r5, r6, lr}
+	ldr	r3, [r0, #772]
+	mov	r6, r1
+	cmp	r3, #31
+	itt	hi
+	movhi	r3, #0
+	strhi	r3, [r0, #772]
+	ldr	r4, [r0, #772]
+	mov	r5, r0
+	adds	r3, r4, #1
+	str	r3, [r0, #772]
+	movs	r3, #24
+	mla	r4, r3, r4, r0
+	ldmia	r6!, {r0, r1, r2, r3}
+	stmia	r4!, {r0, r1, r2, r3}
+	ldm	r6, {r0, r1}
+	stm	r4, {r0, r1}
+	ldr	r3, [r5, #776]
+	cmp	r3, #32
+	itett	eq
+	ldreq	r3, [r5, #768]
+	addne	r3, r3, #1
+	streq	r3, [r5, #772]
+	addeq	r3, r3, #1
+	itte	eq
+	andeq	r3, r3, #31
+	streq	r3, [r5, #768]
+	strne	r3, [r5, #776]
+	pop	{r4, r5, r6, pc}
+	.size	_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_, .-_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_
+	.section	.text._ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh,"axG",%progbits,_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh,comdat
+	.align	1
+	.weak	_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh, %function
+_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh:
+	@ args = 0, pretend = 0, frame = 24
+	@ frame_needed = 0, uses_anonymous_args = 0
+	ldr	r2, .L70
+	push	{r4, r5, r6, r7, r8, lr}
+	lsls	r3, r0, #5
+	adds	r1, r2, r3
+	ldr	r1, [r1, #528]
+	sub	sp, sp, #24
+	lsls	r1, r1, #8
+	bpl	.L54
+	add	r4, r3, #1073758208
+	add	r4, r4, #720896
+	ldr	r1, [r4, #512]
+	ubfx	r1, r1, #24, #3
+	subs	r1, r1, #1
+	cmp	r1, #3
+	bhi	.L54
+	tbb	[pc, r1]
+.L59:
+	.byte	(.L58-.L59)/2
+	.byte	(.L58-.L59)/2
+	.byte	(.L60-.L59)/2
+	.byte	(.L58-.L59)/2
+	.p2align 1
+.L58:
+	add	r2, r2, r3
+	ldr	r1, [r2, #528]
+	ldr	r2, [r2, #520]
+	add	r3, r3, #1073758208
+	ands	r4, r2, #536870912
+	ittte	ne
+	bicne	r2, r2, #-536870912
+	strne	r2, [sp]
+	movne	r2, #1
+	ubfxeq	r2, r2, #18, #11
+	add	r3, r3, #720896
+	itee	ne
+	strbne	r2, [sp, #10]
+	streq	r2, [sp]
+	strbeq	r4, [sp, #10]
+	ldr	r2, [r3, #524]
+	strh	r1, [sp, #12]	@ movhi
+	str	r2, [sp, #4]
+	ubfx	r2, r1, #16, #4
+	strb	r2, [sp, #14]
+	ldr	r2, [r3, #528]
+	mov	r1, sp
+	ubfx	r2, r2, #20, #1
+	strb	r2, [sp, #8]
+	ldr	r2, [r3, #532]
+	str	r2, [sp, #16]
+	ldr	r2, [r3, #536]
+	str	r2, [sp, #20]
+	ldr	r2, [r3, #528]
+	ldr	r2, [r3, #540]
+	orr	r2, r2, #8388608
+	str	r2, [r3, #540]
+	mov	r2, #780
+	ldr	r3, .L70+4
+	mla	r0, r2, r0, r3
+	bl	_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_
+.L54:
+	add	sp, sp, #24
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, pc}
+.L60:
+	mov	r2, #772
+	subs	r1, r0, #4
+	muls	r1, r2, r1
+	ldr	r5, .L70+8
+	adds	r6, r1, r5
+	ldr	r2, [r6, #768]
+	cmp	r2, #0
+	beq	.L63
+	subs	r2, r2, #1
+	str	r2, [r6, #768]
+	movs	r6, #24
+	mla	r2, r6, r2, r1
+	adds	r1, r2, r5
+	ldrb	lr, [r1, #8]	@ zero_extendqisi2
+	ldrb	ip, [r1, #9]	@ zero_extendqisi2
+	ldrb	r8, [r1, #14]	@ zero_extendqisi2
+	ldrd	r7, r6, [r1, #16]
+	ldrb	r1, [r1, #10]	@ zero_extendqisi2
+	ldr	r5, [r2, r5]
+	ldr	r2, .L70
+	cbz	r1, .L64
+	orr	r5, r5, #536870912
+.L68:
+	cmp	r8, #8
+	it	cs
+	movcs	r8, #8
+	adds	r1, r2, r3
+	str	r5, [r1, #520]
+	add	r2, r2, r3
+	ldr	r1, [r2, #540]
+	bic	r1, r1, #983040
+	orr	r1, r1, r8, lsl #16
+	str	r1, [r2, #540]
+	ldr	r1, [r2, #528]
+	cmp	lr, #0
+	beq	.L66
+	orr	r1, r1, #1048576
+.L69:
+	str	r1, [r2, #528]
+	ldr	r2, [r4, #512]
+	bic	r2, r2, #983040
+	orr	r2, r2, ip, lsl #16
+	str	r2, [r4, #512]
+	ldr	r2, .L70
+	add	r3, r3, r2
+	str	r7, [r3, #532]
+	str	r6, [r3, #536]
+	movs	r3, #1
+	lsl	r0, r3, r0
+	uxtb	r0, r0
+	str	r0, [r2, #36]
+	b	.L54
+.L64:
+	ldr	r1, .L70+12
+	and	r5, r1, r5, lsl #18
+	b	.L68
+.L66:
+	bic	r1, r1, #1048576
+	b	.L69
+.L63:
+	movs	r3, #1
+	lsl	r0, r3, r0
+	ldr	r3, .L70
+	str	r0, [r3, #8]
+	b	.L54
+.L71:
+	.align	2
+.L70:
+	.word	1074479104
+	.word	_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can0EE7buffersE
+	.word	_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can0EE6queuesE
+	.word	536608768
+	.size	_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh, .-_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh
+	.section	.text.__CAN0_Handler,"ax",%progbits
+	.align	1
+	.global	__CAN0_Handler
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	__CAN0_Handler, %function
+__CAN0_Handler:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r3, r4, r5, r6, r7, lr}
+	movs	r6, #1
+	ldr	r3, .L75
+	ldr	r7, [r3, #16]
+	ldr	r5, [r3, #12]
+.L74:
+	and	r4, r7, r5
+	.syntax unified
+@ 491 "../../../programs/bmptk/targets/cortex/atmel/core_cmInstr.h" 1
+	rbit r4, r4
+@ 0 "" 2
+@ 666 "../../../programs/bmptk/targets/cortex/atmel/core_cmInstr.h" 1
+	clz r4, r4
+@ 0 "" 2
+	.thumb
+	.syntax unified
+	uxtb	r4, r4
+	cmp	r4, #31
+	bhi	.L72
+	mov	r0, r4
+	lsl	r4, r6, r4
+	bl	_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can0EEEvh
+	bic	r5, r5, r4
+	b	.L74
+.L72:
+	pop	{r3, r4, r5, r6, r7, pc}
+.L76:
+	.align	2
+.L75:
+	.word	1074479104
+	.size	__CAN0_Handler, .-__CAN0_Handler
+	.section	.text._ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh,"axG",%progbits,_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh,comdat
+	.align	1
+	.weak	_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh, %function
+_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh:
+	@ args = 0, pretend = 0, frame = 24
+	@ frame_needed = 0, uses_anonymous_args = 0
+	ldr	r2, .L93
+	push	{r4, r5, r6, r7, r8, lr}
+	lsls	r3, r0, #5
+	adds	r1, r2, r3
+	ldr	r1, [r1, #528]
+	sub	sp, sp, #24
+	lsls	r1, r1, #8
+	bpl	.L77
+	add	r4, r3, #1073741824
+	add	r4, r4, #753664
+	ldr	r1, [r4, #512]
+	ubfx	r1, r1, #24, #3
+	subs	r1, r1, #1
+	cmp	r1, #3
+	bhi	.L77
+	tbb	[pc, r1]
+.L82:
+	.byte	(.L81-.L82)/2
+	.byte	(.L81-.L82)/2
+	.byte	(.L83-.L82)/2
+	.byte	(.L81-.L82)/2
+	.p2align 1
+.L81:
+	add	r2, r2, r3
+	ldr	r1, [r2, #528]
+	ldr	r2, [r2, #520]
+	add	r3, r3, #1073741824
+	ands	r4, r2, #536870912
+	ittte	ne
+	bicne	r2, r2, #-536870912
+	strne	r2, [sp]
+	movne	r2, #1
+	ubfxeq	r2, r2, #18, #11
+	add	r3, r3, #753664
+	itee	ne
+	strbne	r2, [sp, #10]
+	streq	r2, [sp]
+	strbeq	r4, [sp, #10]
+	ldr	r2, [r3, #524]
+	strh	r1, [sp, #12]	@ movhi
+	str	r2, [sp, #4]
+	ubfx	r2, r1, #16, #4
+	strb	r2, [sp, #14]
+	ldr	r2, [r3, #528]
+	mov	r1, sp
+	ubfx	r2, r2, #20, #1
+	strb	r2, [sp, #8]
+	ldr	r2, [r3, #532]
+	str	r2, [sp, #16]
+	ldr	r2, [r3, #536]
+	str	r2, [sp, #20]
+	ldr	r2, [r3, #528]
+	ldr	r2, [r3, #540]
+	orr	r2, r2, #8388608
+	str	r2, [r3, #540]
+	mov	r2, #780
+	ldr	r3, .L93+4
+	mla	r0, r2, r0, r3
+	bl	_ZN4r2d27can_bus12ringbuffer_cINS0_6detail12_can_frame_sELj32EE4pushERKS3_
+.L77:
+	add	sp, sp, #24
+	@ sp needed
+	pop	{r4, r5, r6, r7, r8, pc}
+.L83:
+	mov	r2, #772
+	subs	r1, r0, #4
+	muls	r1, r2, r1
+	ldr	r5, .L93+8
+	adds	r6, r1, r5
+	ldr	r2, [r6, #768]
+	cmp	r2, #0
+	beq	.L86
+	subs	r2, r2, #1
+	str	r2, [r6, #768]
+	movs	r6, #24
+	mla	r2, r6, r2, r1
+	adds	r1, r2, r5
+	ldrb	lr, [r1, #8]	@ zero_extendqisi2
+	ldrb	ip, [r1, #9]	@ zero_extendqisi2
+	ldrb	r8, [r1, #14]	@ zero_extendqisi2
+	ldrd	r7, r6, [r1, #16]
+	ldrb	r1, [r1, #10]	@ zero_extendqisi2
+	ldr	r5, [r2, r5]
+	ldr	r2, .L93
+	cbz	r1, .L87
+	orr	r5, r5, #536870912
+.L91:
+	cmp	r8, #8
+	it	cs
+	movcs	r8, #8
+	adds	r1, r2, r3
+	str	r5, [r1, #520]
+	add	r2, r2, r3
+	ldr	r1, [r2, #540]
+	bic	r1, r1, #983040
+	orr	r1, r1, r8, lsl #16
+	str	r1, [r2, #540]
+	ldr	r1, [r2, #528]
+	cmp	lr, #0
+	beq	.L89
+	orr	r1, r1, #1048576
+.L92:
+	str	r1, [r2, #528]
+	ldr	r2, [r4, #512]
+	bic	r2, r2, #983040
+	orr	r2, r2, ip, lsl #16
+	str	r2, [r4, #512]
+	ldr	r2, .L93
+	add	r3, r3, r2
+	str	r7, [r3, #532]
+	str	r6, [r3, #536]
+	movs	r3, #1
+	lsl	r0, r3, r0
+	uxtb	r0, r0
+	str	r0, [r2, #36]
+	b	.L77
+.L87:
+	ldr	r1, .L93+12
+	and	r5, r1, r5, lsl #18
+	b	.L91
+.L89:
+	bic	r1, r1, #1048576
+	b	.L92
+.L86:
+	movs	r3, #1
+	lsl	r0, r3, r0
+	ldr	r3, .L93
+	str	r0, [r3, #8]
+	b	.L77
+.L94:
+	.align	2
+.L93:
+	.word	1074495488
+	.word	_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can1EE7buffersE
+	.word	_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can1EE6queuesE
+	.word	536608768
+	.size	_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh, .-_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh
+	.section	.text.__CAN1_Handler,"ax",%progbits
+	.align	1
+	.global	__CAN1_Handler
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	__CAN1_Handler, %function
+__CAN1_Handler:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r3, r4, r5, r6, r7, lr}
+	movs	r6, #1
+	ldr	r3, .L98
+	ldr	r7, [r3, #16]
+	ldr	r5, [r3, #12]
+.L97:
+	and	r4, r7, r5
+	.syntax unified
+@ 491 "../../../programs/bmptk/targets/cortex/atmel/core_cmInstr.h" 1
+	rbit r4, r4
+@ 0 "" 2
+@ 666 "../../../programs/bmptk/targets/cortex/atmel/core_cmInstr.h" 1
+	clz r4, r4
+@ 0 "" 2
+	.thumb
+	.syntax unified
+	uxtb	r4, r4
+	cmp	r4, #31
+	bhi	.L95
+	mov	r0, r4
+	lsl	r4, r6, r4
+	bl	_ZN4r2d27can_bus6detail19_handle_mailbox_isrINS0_4can1EEEvh
+	bic	r5, r5, r4
+	b	.L97
+.L95:
+	pop	{r3, r4, r5, r6, r7, pc}
+.L99:
+	.align	2
+.L98:
+	.word	1074495488
+	.size	__CAN1_Handler, .-__CAN1_Handler
+	.section	.text._ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE1000000EEEbv,"axG",%progbits,_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE1000000EEEbv,comdat
+	.align	1
+	.weak	_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE1000000EEEbv
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE1000000EEEbv, %function
+_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE1000000EEEbv:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	movs	r2, #8
+	ldr	r0, .L108
+	push	{r4, r5, r6, r7, lr}
+	mov	r3, r0
+	mov	r5, #-1
+	mov	r4, r2
+	ldr	r7, .L108+4
+.L103:
+	mul	r6, r7, r2
+	udiv	r1, r0, r6
+	mls	r1, r6, r1, r0
+	cmp	r1, r5
+	bcs	.L101
+	cbz	r1, .L102
+	mov	r5, r1
+	mov	r4, r2
+.L101:
+	adds	r2, r2, #1
+	cmp	r2, #26
+	bne	.L103
+	mov	r2, r4
+.L102:
+	movs	r4, #6
+	ldr	r0, .L108+8
+	sub	r1, r2, #8
+	mla	r1, r4, r1, r0
+	ldrb	r4, [r1, #1]	@ zero_extendqisi2
+	ldrb	r5, [r1, #2]	@ zero_extendqisi2
+	ldrb	r6, [r1, #3]	@ zero_extendqisi2
+	ldrb	r0, [r1, #4]	@ zero_extendqisi2
+	ldr	r1, .L108+12
+	ldr	r7, [r1]
+	bic	r7, r7, #1
+	str	r7, [r1]
+	ldr	r7, [r1, #16]
+	ldr	r7, .L108+4
+	muls	r2, r7, r2
+	udiv	r3, r3, r2
+	subs	r3, r3, #1
+	subs	r2, r6, #1
+	lsls	r3, r3, #16
+	and	r2, r2, #7
+	and	r3, r3, #8323072
+	orrs	r3, r3, r2
+	subs	r2, r5, #1
+	lsls	r2, r2, #4
+	and	r2, r2, #112
+	orrs	r3, r3, r2
+	subs	r2, r4, #1
+	lsls	r2, r2, #8
+	and	r2, r2, #1792
+	orrs	r3, r3, r2
+	subs	r2, r0, #1
+	lsls	r2, r2, #12
+	and	r2, r2, #12288
+	orrs	r3, r3, r2
+	str	r3, [r1, #20]
+	movs	r0, #1
+	pop	{r4, r5, r6, r7, pc}
+.L109:
+	.align	2
+.L108:
+	.word	84000000
+	.word	1000000
+	.word	.LANCHOR7
+	.word	1074479104
+	.size	_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE1000000EEEbv, .-_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE1000000EEEbv
+	.section	.text._ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh,"axG",%progbits,_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh,comdat
+	.align	1
+	.weak	_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh, %function
+_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	movs	r2, #0
+	push	{r4, r5, r6, r7, lr}
+	mov	r6, r2
+	ldr	r7, .L118
+	ldr	r5, .L118+4
+.L112:
+	cmp	r0, r2
+	mov	r4, r0
+	bgt	.L117
+	ldr	r5, .L118+4
+	ldr	r0, .L118
+.L111:
+	cmp	r4, #7
+	bgt	.L110
+	lsls	r2, r4, #5
+	add	r3, r2, #1073758208
+	add	r3, r3, #720896
+	ldr	r1, [r3, #512]
+	adds	r4, r4, #1
+	bic	r1, r1, #117440512
+	orr	r1, r1, #50331648
+	str	r1, [r3, #512]
+	ldr	r1, [r3, #512]
+	bic	r1, r1, #983040
+	orr	r1, r1, #655360
+	str	r1, [r3, #512]
+	str	r5, [r3, #516]
+	adds	r3, r0, r2
+	ldr	r2, [r3, #520]
+	bic	r2, r2, #536870912
+	str	r2, [r3, #520]
+	b	.L111
+.L117:
+	lsls	r3, r2, #5
+	add	r1, r3, #1073758208
+	add	r1, r1, #720896
+	ldr	r4, [r1, #512]
+	add	r3, r3, r7
+	bic	r4, r4, #117440512
+	orr	r4, r4, #16777216
+	str	r4, [r1, #512]
+	str	r6, [r3, #520]
+	str	r5, [r1, #516]
+	ldr	r1, [r3, #520]
+	adds	r2, r2, #1
+	bic	r1, r1, #536870912
+	str	r1, [r3, #520]
+	b	.L112
+.L110:
+	pop	{r4, r5, r6, r7, pc}
+.L119:
+	.align	2
+.L118:
+	.word	1074479104
+	.word	536610815
+	.size	_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh, .-_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh
+	.section	.text._ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh,"axG",%progbits,_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh,comdat
+	.align	1
+	.weak	_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh, %function
+_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
+	movs	r3, #0
+	lsls	r0, r0, #5
+	add	r2, r0, #1073758208
+	add	r2, r2, #720896
+	str	r3, [r2, #512]
+	str	r3, [r2, #516]
+	str	r3, [r2, #520]
+	str	r3, [r2, #532]
+	str	r3, [r2, #536]
+	str	r3, [r2, #540]
+	bx	lr
+	.size	_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh, .-_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh
+	.section	.text._ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE1000000EEEbv,"axG",%progbits,_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE1000000EEEbv,comdat
+	.align	1
+	.weak	_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE1000000EEEbv
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE1000000EEEbv, %function
+_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE1000000EEEbv:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	mov	r2, #2048
+	movs	r1, #192
+	ldr	r3, .L131
+	push	{r4, lr}
+	str	r2, [r3, #256]
+	ldr	r3, .L131+4
+	strb	r1, [r3, #811]
+	movs	r1, #1
+	str	r2, [r3, #4]
+	ldr	r3, .L131+8
+	str	r1, [r3, #68]
+	ldr	r2, [r3, #112]
+	ldr	r0, [r3, #112]
+	ands	r2, r2, r0
+	bic	r2, r2, #1
+	str	r2, [r3, #112]
+	str	r1, [r3, #96]
+	str	r1, [r3, #4]
+	movs	r1, #2
+	str	r1, [r3, #68]
+	ldr	r2, [r3, #112]
+	ldr	r0, [r3, #112]
+	ands	r2, r2, r0
+	bic	r2, r2, #2
+	str	r2, [r3, #112]
+	str	r1, [r3, #96]
+	str	r1, [r3, #4]
+	bl	_ZN4r2d27can_bus6detail13_set_baudrateINS0_4can0ELNS0_8baudrateE1000000EEEbv
+	cbz	r0, .L122
+	movs	r4, #0
+.L123:
+	uxtb	r0, r4
+	adds	r4, r4, #1
+	bl	_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh
+	cmp	r4, #8
+	bne	.L123
+	mov	r3, #-1
+	ldr	r4, .L131+12
+	movs	r0, #4
+	str	r3, [r4, #8]
+	bl	_ZN4r2d27can_bus6detail21_set_mailbox_tx_countINS0_4can0EEEvh
+	movs	r0, #0
+	ldr	r3, [r4]
+	orr	r3, r3, #1
+	str	r3, [r4]
+	ldr	r3, .L131+16
+.L125:
+	ldr	r2, [r4, #16]
+	adds	r0, r0, #1
+	lsls	r2, r2, #10
+	bmi	.L124
+	cmp	r0, r3
+	bne	.L125
+.L124:
+	subs	r0, r0, r3
+	it	ne
+	movne	r0, #1
+.L122:
+	pop	{r4, pc}
+.L132:
+	.align	2
+.L131:
+	.word	1074660864
+	.word	-536813312
+	.word	1074662912
+	.word	1074479104
+	.word	100000
+	.size	_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE1000000EEEbv, .-_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE1000000EEEbv
+	.section	.text._ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE4initEv,"axG",%progbits,_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE4initEv,comdat
+	.align	1
+	.weak	_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE4initEv
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE4initEv, %function
+_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE4initEv:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	push	{r3, lr}
+	movs	r0, #2
+	bl	_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh
+	movs	r0, #3
+	bl	_ZN4r2d27can_bus6detail13_init_mailboxINS0_4can0EEEvh
+	ldr	r3, .L134
+	ldr	r1, .L134+4
+	ldr	r2, [r3, #576]
+	bic	r2, r2, #117440512
+	orr	r2, r2, #50331648
+	str	r2, [r3, #576]
+	ldr	r2, [r3, #576]
+	bic	r2, r2, #983040
+	orr	r2, r2, #655360
+	str	r2, [r3, #576]
+	str	r1, [r3, #580]
+	ldr	r2, [r3, #584]
+	bic	r2, r2, #536870912
+	str	r2, [r3, #584]
+	ldr	r2, [r3, #608]
+	bic	r2, r2, #117440512
+	orr	r2, r2, #16777216
+	str	r2, [r3, #608]
+	movs	r2, #0
+	str	r2, [r3, #616]
+	str	r1, [r3, #612]
+	ldr	r2, [r3, #616]
+	bic	r2, r2, #536870912
+	str	r2, [r3, #616]
+	pop	{r3, pc}
+.L135:
+	.align	2
+.L134:
+	.word	1074479104
+	.word	536610815
+	.size	_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE4initEv, .-_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE4initEv
+	.section	.text.startup.main,"ax",%progbits
+	.align	1
+	.global	main
+	.syntax unified
+	.thumb
+	.thumb_func
+	.fpu softvfp
+	.type	main, %function
+main:
+	@ args = 0, pretend = 0, frame = 0
+	@ frame_needed = 0, uses_anonymous_args = 0
+	mov	r2, #32768
+	push	{r3, r4, r5, r6, r7, lr}
+	ldr	r3, .L138
+	mov	r0, #1000
+	str	r2, [r3, #4]
+	bl	_ZN5hwlib7wait_msEi
+	movs	r7, #24
+	bl	_ZN4r2d27can_bus10controllerINS0_4can0EE4initILNS0_8baudrateE1000000EEEbv
+	movs	r6, #4
+	bl	_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE4initEv
+	ldr	r4, .L138+4
+	ldr	r5, .L138+8
+.L137:
+	movs	r1, #1
+	ldr	r3, [r4, #768]
+	mov	r0, #1000
+	adds	r2, r3, #1
+	muls	r3, r7, r3
+	str	r2, [r4, #768]
+	str	r1, [r3, r4]
+	adds	r2, r3, r4
+	movw	r1, #513
+	movs	r3, #3
+	strh	r1, [r2, #16]	@ movhi
+	strb	r3, [r2, #14]
+	strb	r3, [r2, #18]
+	str	r6, [r5, #4]
+	bl	_ZN5hwlib7wait_msEi
+	b	.L137
+.L139:
+	.align	2
+.L138:
+	.word	1074666064
+	.word	_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE8tx_queueE
+	.word	1074479104
+	.size	main, .-main
+	.weak	_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can1EE6queuesE
+	.section	.bss._ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can1EE6queuesE,"awG",%nobits,_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can1EE6queuesE,comdat
+	.align	2
+	.type	_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can1EE6queuesE, %object
+	.size	_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can1EE6queuesE, 3088
+_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can1EE6queuesE:
+	.space	3088
+	.weak	_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can1EE7buffersE
+	.section	.bss._ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can1EE7buffersE,"awG",%nobits,_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can1EE7buffersE,comdat
+	.align	2
+	.type	_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can1EE7buffersE, %object
+	.size	_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can1EE7buffersE, 3120
+_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can1EE7buffersE:
+	.space	3120
+	.weak	_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can0EE6queuesE
+	.section	.bss._ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can0EE6queuesE,"awG",%nobits,_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can0EE6queuesE,comdat
+	.align	2
+	.type	_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can0EE6queuesE, %object
+	.size	_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can0EE6queuesE, 3088
+_ZN4r2d27can_bus6detail18_mailbox_tx_queuesINS0_4can0EE6queuesE:
+	.space	3088
+	.weak	_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can0EE7buffersE
+	.section	.bss._ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can0EE7buffersE,"awG",%nobits,_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can0EE7buffersE,comdat
+	.align	2
+	.type	_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can0EE7buffersE, %object
+	.size	_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can0EE7buffersE, 3120
+_ZN4r2d27can_bus6detail18_mailbox_rx_storesINS0_4can0EE7buffersE:
+	.space	3120
+	.weak	_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE8tx_queueE
+	.section	.bss._ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE8tx_queueE,"awG",%nobits,_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE8tx_queueE,comdat
+	.align	2
+	.type	_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE8tx_queueE, %object
+	.size	_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE8tx_queueE, 772
+_ZN4r2d27can_bus9channel_cINS0_4can0ELNS0_8priorityE1EE8tx_queueE:
+	.space	772
+	.weak	_ZN6sam3xa15SystemCoreClockE
+	.section	.bss._ZZN3due9now_ticksEvE4high,"aw",%nobits
+	.align	3
+	.set	.LANCHOR6,. + 0
+	.type	_ZZN3due9now_ticksEvE4high, %object
+	.size	_ZZN3due9now_ticksEvE4high, 8
+_ZZN3due9now_ticksEvE4high:
+	.space	8
+	.section	.bss._ZZN3due9now_ticksEvE8last_low,"aw",%nobits
+	.align	2
+	.set	.LANCHOR5,. + 0
+	.type	_ZZN3due9now_ticksEvE8last_low, %object
+	.size	_ZZN3due9now_ticksEvE8last_low, 4
+_ZZN3due9now_ticksEvE8last_low:
+	.space	4
+	.section	.bss._ZZN3due9now_ticksEvE9init_done,"aw",%nobits
+	.set	.LANCHOR4,. + 0
+	.type	_ZZN3due9now_ticksEvE9init_done, %object
+	.size	_ZZN3due9now_ticksEvE9init_done, 1
+_ZZN3due9now_ticksEvE9init_done:
+	.space	1
+	.section	.data._ZN6sam3xa15SystemCoreClockE,"aw"
+	.align	2
+	.type	_ZN6sam3xa15SystemCoreClockE, %object
+	.size	_ZN6sam3xa15SystemCoreClockE, 4
+_ZN6sam3xa15SystemCoreClockE:
+	.word	4000000
+	.section	.rodata.CSWTCH.44,"a"
+	.align	2
+	.set	.LANCHOR3,. + 0
+	.type	CSWTCH.44, %object
+	.size	CSWTCH.44, 16
+CSWTCH.44:
+	.word	1074662912
+	.word	1074663424
+	.word	1074663936
+	.word	1074664448
+	.section	.rodata._ZN3due8pin_infoENS_4pinsE.str1.1,"aMS",%progbits,1
+.LC1:
+	.ascii	"../../../libraries/hwlib/library/targets/hwlib-ardu"
+	.ascii	"ino-due.hpp\000"
+	.section	.rodata._ZN4r2d27can_bus6detailL13_can_bit_timeE,"a"
+	.set	.LANCHOR7,. + 0
+	.type	_ZN4r2d27can_bus6detailL13_can_bit_timeE, %object
+	.size	_ZN4r2d27can_bus6detailL13_can_bit_timeE, 108
+_ZN4r2d27can_bus6detailL13_can_bit_timeE:
+	.byte	8
+	.byte	3
+	.byte	2
+	.byte	2
+	.byte	3
+	.byte	75
+	.byte	9
+	.byte	2
+	.byte	3
+	.byte	3
+	.byte	2
+	.byte	67
+	.byte	10
+	.byte	3
+	.byte	3
+	.byte	3
+	.byte	3
+	.byte	70
+	.byte	11
+	.byte	4
+	.byte	3
+	.byte	3
+	.byte	3
+	.byte	72
+	.byte	12
+	.byte	3
+	.byte	4
+	.byte	4
+	.byte	3
+	.byte	67
+	.byte	13
+	.byte	4
+	.byte	4
+	.byte	4
+	.byte	3
+	.byte	77
+	.byte	14
+	.byte	4
+	.byte	4
+	.byte	5
+	.byte	3
+	.byte	64
+	.byte	15
+	.byte	4
+	.byte	5
+	.byte	5
+	.byte	3
+	.byte	67
+	.byte	16
+	.byte	5
+	.byte	5
+	.byte	5
+	.byte	3
+	.byte	69
+	.byte	17
+	.byte	6
+	.byte	5
+	.byte	5
+	.byte	3
+	.byte	71
+	.byte	18
+	.byte	5
+	.byte	6
+	.byte	6
+	.byte	3
+	.byte	67
+	.byte	19
+	.byte	6
+	.byte	6
+	.byte	6
+	.byte	3
+	.byte	68
+	.byte	20
+	.byte	7
+	.byte	6
+	.byte	6
+	.byte	3
+	.byte	70
+	.byte	21
+	.byte	8
+	.byte	6
+	.byte	6
+	.byte	3
+	.byte	71
+	.byte	22
+	.byte	7
+	.byte	7
+	.byte	7
+	.byte	3
+	.byte	68
+	.byte	23
+	.byte	8
+	.byte	8
+	.byte	7
+	.byte	3
+	.byte	70
+	.byte	24
+	.byte	7
+	.byte	8
+	.byte	8
+	.byte	3
+	.byte	67
+	.byte	25
+	.byte	8
+	.byte	8
+	.byte	8
+	.byte	3
+	.byte	68
+	.section	.rodata._ZZN3due11ad_pin_infoENS_7ad_pinsEE17ad_pin_info_array,"a"
+	.set	.LANCHOR1,. + 0
+	.type	_ZZN3due11ad_pin_infoENS_7ad_pinsEE17ad_pin_info_array, %object
+	.size	_ZZN3due11ad_pin_infoENS_7ad_pinsEE17ad_pin_info_array, 12
+_ZZN3due11ad_pin_infoENS_7ad_pinsEE17ad_pin_info_array:
+	.byte	7
+	.byte	6
+	.byte	5
+	.byte	4
+	.byte	3
+	.byte	2
+	.byte	1
+	.byte	0
+	.byte	10
+	.byte	11
+	.byte	12
+	.byte	13
+	.section	.rodata._ZZN3due11ad_seq_infoEmE12ad_seq_array,"a"
+	.align	2
+	.set	.LANCHOR2,. + 0
+	.type	_ZZN3due11ad_seq_infoEmE12ad_seq_array, %object
+	.size	_ZZN3due11ad_seq_infoEmE12ad_seq_array, 112
+_ZZN3due11ad_seq_infoEmE12ad_seq_array:
+	.word	-16
+	.word	-1
+	.word	-225
+	.word	-1
+	.word	-3329
+	.word	-1
+	.word	-49153
+	.word	-1
+	.word	-720897
+	.word	-1
+	.word	-10485761
+	.word	-1
+	.word	-150994945
+	.word	-1
+	.word	2147483647
+	.word	-1
+	.word	-1
+	.word	-8
+	.word	-1
+	.word	-97
+	.word	-1
+	.word	-1281
+	.word	-1
+	.word	-16385
+	.word	-1
+	.word	-196609
+	.word	-1
+	.word	-2097153
+	.section	.rodata._ZZN3due8pin_infoENS_4pinsEE14pin_info_array,"a"
+	.set	.LANCHOR0,. + 0
+	.type	_ZZN3due8pin_infoENS_4pinsEE14pin_info_array, %object
+	.size	_ZZN3due8pin_infoENS_4pinsEE14pin_info_array, 164
+_ZZN3due8pin_infoENS_4pinsEE14pin_info_array:
+	.byte	0
+	.byte	8
+	.byte	0
+	.byte	9
+	.byte	1
+	.byte	25
+	.byte	2
+	.byte	28
+	.byte	2
+	.byte	26
+	.byte	2
+	.byte	25
+	.byte	2
+	.byte	24
+	.byte	2
+	.byte	23
+	.byte	2
+	.byte	22
+	.byte	2
+	.byte	21
+	.byte	2
+	.byte	29
+	.byte	3
+	.byte	7
+	.byte	3
+	.byte	8
+	.byte	1
+	.byte	27
+	.byte	3
+	.byte	4
+	.byte	3
+	.byte	5
+	.byte	0
+	.byte	13
+	.byte	0
+	.byte	12
+	.byte	0
+	.byte	11
+	.byte	0
+	.byte	10
+	.byte	1
+	.byte	12
+	.byte	1
+	.byte	13
+	.byte	1
+	.byte	26
+	.byte	0
+	.byte	14
+	.byte	0
+	.byte	15
+	.byte	3
+	.byte	0
+	.byte	3
+	.byte	1
+	.byte	3
+	.byte	2
+	.byte	3
+	.byte	3
+	.byte	3
+	.byte	6
+	.byte	3
+	.byte	9
+	.byte	0
+	.byte	7
+	.byte	3
+	.byte	10
+	.byte	2
+	.byte	1
+	.byte	2
+	.byte	2
+	.byte	2
+	.byte	3
+	.byte	2
+	.byte	4
+	.byte	2
+	.byte	5
+	.byte	2
+	.byte	6
+	.byte	2
+	.byte	7
+	.byte	2
+	.byte	8
+	.byte	2
+	.byte	9
+	.byte	0
+	.byte	19
+	.byte	0
+	.byte	20
+	.byte	2
+	.byte	19
+	.byte	2
+	.byte	18
+	.byte	2
+	.byte	17
+	.byte	2
+	.byte	16
+	.byte	2
+	.byte	15
+	.byte	2
+	.byte	14
+	.byte	2
+	.byte	13
+	.byte	2
+	.byte	12
+	.byte	1
+	.byte	21
+	.byte	1
+	.byte	14
+	.byte	0
+	.byte	16
+	.byte	0
+	.byte	24
+	.byte	0
+	.byte	23
+	.byte	0
+	.byte	22
+	.byte	0
+	.byte	6
+	.byte	0
+	.byte	4
+	.byte	0
+	.byte	3
+	.byte	0
+	.byte	2
+	.byte	1
+	.byte	17
+	.byte	1
+	.byte	18
+	.byte	1
+	.byte	19
+	.byte	1
+	.byte	20
+	.byte	1
+	.byte	15
+	.byte	1
+	.byte	16
+	.byte	0
+	.byte	1
+	.byte	0
+	.byte	0
+	.byte	1
+	.byte	13
+	.byte	1
+	.byte	12
+	.byte	0
+	.byte	18
+	.byte	0
+	.byte	17
+	.byte	0
+	.byte	9
+	.byte	0
+	.byte	8
+	.byte	1
+	.byte	27
+	.byte	0
+	.byte	27
+	.byte	0
+	.byte	25
+	.byte	0
+	.byte	26
+	.byte	2
+	.byte	29
+	.byte	2
+	.byte	26
+	.ident	"GCC: (GNU Tools for Arm Embedded Processors 8-2018-q4-major) 8.2.1 20181213 (release) [gcc-8-branch revision 267074]"

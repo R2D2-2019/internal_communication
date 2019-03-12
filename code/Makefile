@@ -17,6 +17,8 @@ HEADERS := $(wildcard headers/*.hpp)
 # other places to look for files for this project
 SEARCH  := ./headers ./src
 
+SERIAL_PORT := /dev/ttyACM0
+
 # set REATIVE to the next higher directory 
 # and defer to the Makefile.due there
 RELATIVE := $(RELATIVE)../
