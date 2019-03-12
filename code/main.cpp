@@ -29,9 +29,9 @@ int main(void) {
         for (size_t i = 0; i < 3; i++) {
             frame.data.bytes[i] = data[i];
         }
-        
+
         frame.length = 3;
-        frame.id = 0x01;
+        frame.id = 0x03;
         
         channel::send_frame(frame);
 

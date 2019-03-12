@@ -98,12 +98,12 @@ namespace r2d2::can_bus {
             // Tx
             detail::_set_mailbox_mode<Bus>(ids::tx, mailbox_mode::TX);
             detail::_set_mailbox_priority<Bus>(ids::tx, 10);
-            detail::_set_mailbox_accept_mask<Bus>(ids::tx, 0x7FF, false);
+            detail::_set_mailbox_accept_mask<Bus>(ids::tx, ~0x7FF, false);
 
             // Rx
             detail::_set_mailbox_mode<Bus>(ids::rx, mailbox_mode::RX);
             detail::_set_mailbox_id<Bus>(ids::rx, 0x0, false);
-            detail::_set_mailbox_accept_mask<Bus>(ids::rx, 0x7FF, false);
+            detail::_set_mailbox_accept_mask<Bus>(ids::rx, ~0x7FF, false);
             
             // Rx interrupt
             port<Bus>->CAN_IER = 1U << ids::rx;
@@ -134,7 +134,14 @@ namespace r2d2::can_bus {
          * This will remove it from the channel receive buffer.
          */
         static uint8_t *last_frame_data() {
-            return rx_buffer.copy_and_pop().data.bytes;
+            const auto frame = rx_buffer.copy_and_pop();
+
+            uint8_t buffer[8] = {};
+            for (uint8_t i = 0; i < frame.length; i++) {
+                buffer[i] = frame.data.bytes[i];
+            }
+
+            return buffer;
         }
 
         /**
