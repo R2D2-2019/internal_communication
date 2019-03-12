@@ -23,7 +23,8 @@ int main(void) {
         0x1, 0x2, 0x3
     };
 
-    for (;;){
+    for (;;) {
+        // Send a frame
         can_frame frame;
 
         for (size_t i = 0; i < 3; i++) {
@@ -36,6 +37,19 @@ int main(void) {
         channel::send_frame(frame);
 
         hwlib::cout << "Send frame\r\n";
+
+        // Have we received something?
+        while (channel::has_data()) {
+            hwlib::cout << "Received data!\r\n";
+
+            const auto bytes = channel::last_frame_data();
+
+            for (const auto byte : bytes) {
+                hwlib::cout << byte << ' ';
+            }
+
+            hwlib::cout << "\r\n";
+        }
 
         hwlib::wait_ms(500);
     }

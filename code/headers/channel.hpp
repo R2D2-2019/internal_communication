@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 
 #include "can.hpp"
@@ -132,13 +133,22 @@ namespace r2d2::can_bus {
         /**
          * Get last received frame from the channel.
          * This will remove it from the channel receive buffer.
+         * 
+         * @return
          */
-        static uint8_t *last_frame_data() {
+        static std::array<uint8_t, 8> last_frame_data() {
             const auto frame = rx_buffer.copy_and_pop();
 
-            uint8_t buffer[8] = {};
+            std::array<uint8_t, 8> buffer;
+
+            // Copy data into the buffer
             for (uint8_t i = 0; i < frame.length; i++) {
                 buffer[i] = frame.data.bytes[i];
+            }
+
+            // Set the rest of the buffer to 0
+            for (uint8_t i = frame.length; i < buffer.max_size(); i++) {
+                buffer[i] = 0;
             }
 
             return buffer;
