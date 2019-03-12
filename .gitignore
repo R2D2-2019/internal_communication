@@ -1,8 +1,10 @@
+/.idea
 *.o
 *.elf
 *.bin
 *.c
 *.map
 *.ld
-/.idea
+*.lss
+*.lst
 settings.json
