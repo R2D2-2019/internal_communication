@@ -807,17 +807,3 @@ namespace r2d2::can_bus {
         }
     };
 }
-
-extern "C" {
-    void __CAN0_Handler() {
-        r2d2::can_bus::detail::_handle_generic_isr<
-            r2d2::can_bus::can0
-        >();
-    }
-
-    void __CAN1_Handler() {
-        r2d2::can_bus::detail::_handle_generic_isr<
-            r2d2::can_bus::can1
-        >();
-    }
-}

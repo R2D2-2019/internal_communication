@@ -42,24 +42,28 @@ namespace r2d2::can_bus {
 
         template<>
         struct _mailbox_assignment_s<priority::HIGH> {
+            constexpr static uint32_t mask = 0x3;
             constexpr static uint8_t tx = 0;
             constexpr static uint8_t rx = 1;
         };
 
         template<>
         struct _mailbox_assignment_s<priority::NORMAL> {
+            constexpr static uint32_t mask = (0x3 << 2);
             constexpr static uint8_t tx = 2;
             constexpr static uint8_t rx = 3;
         };
 
         template<>
         struct _mailbox_assignment_s<priority::LOW> {
+            constexpr static uint32_t mask = (0x3 << 4);
             constexpr static uint8_t tx = 4;
             constexpr static uint8_t rx = 5;
         };
 
         template<>
         struct _mailbox_assignment_s<priority::DATA_STREAM> {
+            constexpr static uint32_t mask = (0x3 << 6);
             constexpr static uint8_t tx = 6;
             constexpr static uint8_t rx = 7;
         };
@@ -148,7 +152,7 @@ namespace r2d2::can_bus {
             if (mmr == 3) {
                 if (! tx_queue.empty()) {
                     const auto frame = tx_queue.copy_and_pop();
-                    detail::_write_tx_registers(frame, ids::tx);
+                    detail::_write_tx_registers<Bus>(frame, ids::tx);
                 } else {
                     port<Bus>->CAN_IDR = (0x01 << ids::tx);
                 }
@@ -162,4 +166,55 @@ namespace r2d2::can_bus {
             rx_buffer.push(frame);
         }
     };
+
+    namespace detail {
+        template<typename Bus>
+        void _route_isr(const uint32_t status) {
+            if ((status & 1) != 0) {
+                channel_c<Bus, priority::HIGH>::handle_interrupt(0);
+            }
+
+            if ((status & (1 << 1)) != 0) {
+                channel_c<Bus, priority::HIGH>::handle_interrupt(1);
+            }
+
+            if ((status & (1 << 2)) != 0) {
+                channel_c<Bus, priority::NORMAL>::handle_interrupt(2);
+            }
+
+            if ((status & (1 << 3)) != 0) {
+                channel_c<Bus, priority::NORMAL>::handle_interrupt(3);
+            }
+
+            if ((status & (1 << 4)) != 0) {
+                channel_c<Bus, priority::LOW>::handle_interrupt(4);
+            }
+
+            if ((status & (1 << 5)) != 0) {
+                channel_c<Bus, priority::LOW>::handle_interrupt(5);
+            }
+
+            if ((status & (1 << 6)) != 0) {
+                channel_c<Bus, priority::NORMAL>::handle_interrupt(6);
+            }
+
+            if ((status & (1 << 7)) != 0) {
+                channel_c<Bus, priority::NORMAL>::handle_interrupt(7);
+            }
+        }
+    }
 };
+
+extern "C" {
+    void __CAN0_Handler() {
+        r2d2::can_bus::detail::_route_isr<r2d2::can_bus::can0>(
+            CAN0->CAN_SR & CAN0->CAN_IMR
+        );
+    }
+
+    void __CAN1_Handler() {
+        r2d2::can_bus::detail::_route_isr<r2d2::can_bus::can1>(
+            CAN1->CAN_SR & CAN1->CAN_IMR
+        );
+    }
+}
