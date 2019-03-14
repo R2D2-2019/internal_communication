@@ -33,7 +33,7 @@ namespace r2d2::can_bus {
          * Base class for compile time priority
          * assignments. Specializations of this class
          * will offer tx and rx compile time constants
-         * that represent mailboxes to be used with the givne
+         * that represent mailboxes to be used with the given
          * priority level.
          *
          * @tparam Priority
@@ -113,6 +113,11 @@ namespace r2d2::can_bus {
          */
         static void send_frame(const detail::_can_frame_s &frame) {
             tx_queue.push(frame);
+
+            // Enabling the interrupt on the CAN mailbox with the TX id
+            // will cause a interrupt when the CAN controller is ready.
+            // At that point will the frame be removed from the tx_queue
+            // and put on the bus.
             port<Bus>->CAN_IER = (0x01 << ids::tx);
         }
 
@@ -154,22 +159,31 @@ namespace r2d2::can_bus {
          * Handle a interrupt meant for this channel.
          */
         static void handle_interrupt(const uint8_t index) {
+            // Is the mailbox ready?
             if (!(port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRDY)) {
                 return;
             }
 
+            // Get the MOT (Mailbox Object Type) from the Message Mode (MMR) register
             const uint32_t mmr = (port<Bus>->CAN_MB[index].CAN_MMR >> 24) & 7;
 
+            // if the MOT is 5 (MB_PRODUCER) or 6 (reserved), ignore
             if (mmr > 4) {
                 return;
             }
 
             // Transmit
             if (mmr == 3) {
-                if (! tx_queue.empty()) {
-                    const auto frame = tx_queue.copy_and_pop();
-                    detail::_write_tx_registers<Bus>(frame, ids::tx);
-                } else {
+                if (tx_queue.empty()) {
+                    return;
+                }
+
+                // Put the data on the bus
+                const auto frame = tx_queue.copy_and_pop();
+                detail::_write_tx_registers<Bus>(frame, ids::tx);
+
+                if (tx_queue.empty()) {
+                    // Nothing left to send, disable interrupt on the tx mailbox
                     port<Bus>->CAN_IDR = (0x01 << ids::tx);
                 }
 
@@ -185,6 +199,19 @@ namespace r2d2::can_bus {
     };
 
     namespace detail {
+        /**
+         * With the given status gained from
+         * ANDing the Status Register (SR) with the
+         * Interrupt Mask Register (IMR), call the required
+         * interrupt handlers.
+         *
+         * It's possible that multiple mailboxes are included in
+         * the interrupt, so every one has to be checked.
+         *
+         * @internal
+         * @tparam Bus
+         * @param status
+         */
         template<typename Bus>
         void _route_isr(const uint32_t status) {
             if ((status & 1) != 0) {

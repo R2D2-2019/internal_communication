@@ -6,44 +6,64 @@
 #include "queue.hpp"
 
 namespace r2d2::can_bus {
+    /**
+     * PIO A helper representation.
+     *
+     * @internal
+     */
     struct pioa {
         constexpr static uint32_t instance_id = ID_PIOA;
         constexpr static uint32_t irqn = static_cast<uint32_t>(PIOA_IRQn);
     };
 
+    /**
+     * PIO B helper representation.
+     *
+     * @internal
+     */
     struct piob {
         constexpr static uint32_t instance_id = ID_PIOB;
         constexpr static uint32_t irqn = static_cast<uint32_t>(PIOB_IRQn);
     };
 
-    struct pioc {
-        constexpr static uint32_t instance_id = ID_PIOC;
-        constexpr static uint32_t irqn = static_cast<uint32_t>(PIOC_IRQn);
-    };
-
-    struct piod {
-        constexpr static uint32_t instance_id = ID_PIOD;
-        constexpr static uint32_t irqn = static_cast<uint32_t>(PIOD_IRQn);
-    };
-
     namespace pins {
+        /**
+         * Get the PIO mask for a given pin.
+         *
+         * @internal
+         * @tparam Pin
+         */
         template<typename Pin>
         constexpr uint32_t mask = 1U << Pin::number;
 
-        template<typename Pin>
-        constexpr uint32_t adc_channel = 1U << Pin::adc_channel;
-
-        template<typename Pin>
-        constexpr uint32_t pwm_channel = 1U << Pin::pwm_channel;
-
-        template<typename Pin>
+        /**
+         * Get the port for a given pin.
+         *
+         * @internal
+         */
+        template<typename>
         const Pio *port = nullptr;
 
-        template<>
+        /**
+         * Get the port for a given pin.
+         *
+         * @internal
+         */        template<>
         Pio *const port<pioa> = PIOA;
     }
 
+    /**
+     * PIO Peripheral A helper representation.
+     *
+     * @internal
+     */
     struct pio_periph_a {};
+
+    /**
+     * PIO Peripheral B helper representation.
+     *
+     * @internal
+     */
     struct pio_periph_b {};
 
     /**
@@ -63,17 +83,12 @@ namespace r2d2::can_bus {
     }
 
     /**
-     * Enable the clock on multiple peripherals.
+     * Change the peripheral multiplexer
+     * to the secondary function.
      *
-     * @tparam P
-     * @tparam Args
+     * @internal
+     * @tparam Pin
      */
-    template<typename P, typename P2, typename ...Args>
-    void enable_clock() {
-        enable_clock<P>();
-        enable_clock<P2, Args...>();
-    }
-
     template<typename Pin>
     void set_peripheral() {
         // Disable interrupts on the pin
@@ -87,20 +102,30 @@ namespace r2d2::can_bus {
             pins::port<typename Pin::port>->PIO_ABSR = (pins::mask<Pin> | t);
         }
 
-        // disable pull ups
+        // Disable pullups
         pins::port<typename Pin::port>->PIO_PUDR = pins::mask<Pin>;
 
-        // remove pin from pio controller
+        // Remove pin from PIO controller
         pins::port<typename Pin::port>->PIO_PDR = pins::mask<Pin>;
     }
 
     namespace pins {
+        /**
+         * Pin helper.
+         *
+         * @internal
+         */
         struct d53 {
             using port = piob;
             constexpr static uint32_t number = 14;
             constexpr static uint32_t pwm_channel = 2;
         };
 
+        /**
+         * Pin helper.
+         *
+         * @internal
+         */
         struct dac0 {
             using port = piob;
             using periph = pio_periph_a;
@@ -109,12 +134,22 @@ namespace r2d2::can_bus {
             constexpr static uint32_t dacc_channel = 0;
         };
 
+        /**
+         * Pin helper.
+         *
+         * @internal
+         */
         struct canrx {
             using port = pioa;
             using periph = pio_periph_a;
             constexpr static uint32_t number = 1;
         };
 
+        /**
+         * Pin helper.
+         *
+         * @internal
+         */
         struct cantx {
             using port = pioa;
             using periph = pio_periph_a;
@@ -122,6 +157,10 @@ namespace r2d2::can_bus {
         };
     }
 
+    /**
+     * This structure represents the CAN 0 hardware
+     * controller.
+     */
     struct can0 {
         constexpr static uint32_t instance_id = ID_CAN0;
         constexpr static uint32_t irqn = static_cast<uint32_t>(CAN0_IRQn);
@@ -130,6 +169,10 @@ namespace r2d2::can_bus {
         using rx = pins::canrx;
     };
 
+    /**
+     * This structure represents the CAN 1 hardware
+     * controller.
+     */
     struct can1 {
         constexpr static uint32_t instance_id = ID_CAN1;
         constexpr static uint32_t irqn = static_cast<uint32_t>(CAN1_IRQn);
@@ -140,15 +183,42 @@ namespace r2d2::can_bus {
         using rx = pins::dac0;
     };
 
+    /**
+     * Helper to get the correct CAN
+     * memory mapped pointer.
+     *
+     * @internal
+     * @tparam CAN
+     */
     template<typename CAN>
     Can *const port = nullptr;
 
+    /**
+     * Helper to get the correct CAN
+     * memory mapped pointer.
+     *
+     * @internal
+     * @tparam CAN
+     */
     template<>
     Can *const port<can0> = CAN0;
 
+    /**
+     * Helper to get the correct CAN
+     * memory mapped pointer.
+     *
+     * @internal
+     * @tparam CAN
+     */
     template<>
     Can *const port<can1> = CAN1;
 
+    /**
+     * All modes that a CAN mailbox
+     * can have.
+     *
+     * @internal
+     */
     enum mailbox_mode {
         DISABLE = 0,
         RX = 1,
@@ -158,14 +228,28 @@ namespace r2d2::can_bus {
         PRODUCER = 5
     };
 
+    /**
+     * All statuses that a mailbox can
+     * have.
+     *
+     * @internal
+     */
     enum mailbox_status {
         TRANSFER_OK = 0,
         NOT_READY = 0x01,
         RX_OVER = 0x02,
         RX_NEED_RD_AGAIN = 0x03,
+
+        // This is not from the datasheet; this
+        // is notification of a badly configured message
+        // that doesn't use the extended id.
         RX_FAILURE_STD_RECEIVED = 0x04
     };
 
+    /**
+     * All baudrates that are generally used
+     * with a CAN bus. 1000k is picked the default.
+     */
     enum baudrate : uint32_t {
         BPS_1000K = 1000000,
         BPS_800K = 800000,
@@ -180,6 +264,18 @@ namespace r2d2::can_bus {
     };
 
     namespace detail {
+        /**
+         * Representation of a CAN frame
+         * that is put on the network. The frame
+         * format has been adjusted from a "normal" CAN
+         * frame in the following ways:
+         *  - The channel priority decides the ID
+         *  - Extended ID mode is in use, but the extended ID is used
+         *    to store the packet_type (1 byte), sequence number (5 bits) and
+         *    the sequence total (5 bits).
+         *
+         * @internal
+         */
         struct _can_frame_s {
             uint32_t fid; // Family id
             uint8_t rtr; // Remote transmission request
@@ -196,22 +292,8 @@ namespace r2d2::can_bus {
                     uint32_t high;
                 };
 
-                uint8_t bytes[8];    
+                uint8_t bytes[8];
             } data;
-        };
-
-        template<typename Bus>
-        struct _mailbox_tx_queues {
-            using queue_type = queue_c<_can_frame_s, 32>;
-
-            static inline queue_type queues[4] = {};
-        };
-
-        template<typename Bus>
-        struct _mailbox_rx_stores {
-            using ringbuffer_type = ringbuffer_c<_can_frame_s, 32>;
-
-            static inline ringbuffer_type buffers[4] = {};
         };
 
         /**
@@ -227,7 +309,7 @@ namespace r2d2::can_bus {
                 mode = 0; // Set disabled on invalid mode
             }
 
-            port<Bus>->CAN_MB[index].CAN_MMR = 
+            port<Bus>->CAN_MB[index].CAN_MMR =
                 (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_MOT_Msk) | (mode << CAN_MMR_MOT_Pos);
         }
 
@@ -269,13 +351,9 @@ namespace r2d2::can_bus {
          * @param data_length 
          */
         template<typename Bus>
-        void _set_mailbox_datalen(const uint8_t index, uint8_t data_length) {
-            if (data_length > 8) {
-                data_length = 8;
-            }
-
-            port<Bus>->CAN_MB[index].CAN_MCR = 
-                (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) | 
+        void _set_mailbox_datalen(const uint8_t index, const uint8_t data_length) {
+            port<Bus>->CAN_MB[index].CAN_MCR =
+                (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) |
                 CAN_MCR_MDLC(data_length);
         }
 
@@ -295,25 +373,30 @@ namespace r2d2::can_bus {
             uint32_t id = port<Bus>->CAN_MB[index].CAN_MID;
 
             // Extended id
-            if ((id & CAN_MID_MIDE) == CAN_MID_MIDE) { 
+            if ((id & CAN_MID_MIDE) == CAN_MID_MIDE) {
                 frame.packet_type = (id >> 10) & 0xFF;
                 frame.sequence_id = (id >> 5) & 0x1F;
                 frame.sequence_total = (id >> 5) & 0x1F;
-            } 
-            // Standard ID
-            else { 
+            }
+            // Standard ID, this is an error.
+            else {
                 retval = mailbox_status::RX_FAILURE_STD_RECEIVED;
                 return retval;
             }
-            
-            hwlib::cout << hwlib::hex << "id: " << id << "\r\n";
-            hwlib::cout << hwlib::dec;
 
+            // Family id
             frame.fid    = port<Bus>->CAN_MB[index].CAN_MFID;
+
+            // Data length
             frame.length = (status & CAN_MSR_MDLC_Msk) >> CAN_MSR_MDLC_Pos;
+
+            // Timestamp given by the CAN controller
             frame.time   = (status & CAN_MSR_MTIMESTAMP_Msk);
+
+            // Remote Transmission Request?
             frame.rtr    = (port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRTR) ? 1 : 0 ;
 
+            // 64 bits of data
             frame.data.low = port<Bus>->CAN_MB[index].CAN_MDL;
             frame.data.high = port<Bus>->CAN_MB[index].CAN_MDH;
 
@@ -321,7 +404,7 @@ namespace r2d2::can_bus {
              * Read the mailbox status again to check whether the software
              * needs to re-read mailbox data register. 
              */
-            status = port<Bus>->CAN_MB[index].CAN_MSR;	
+            status = port<Bus>->CAN_MB[index].CAN_MSR;
             if (status & CAN_MSR_MMI) {
                 retval |= mailbox_status::RX_NEED_RD_AGAIN;
             } else {
@@ -346,12 +429,12 @@ namespace r2d2::can_bus {
         void _write_tx_registers(const _can_frame_s &frame, const uint8_t index) {
             // Set sequence id and total
             port<Bus>->CAN_MB[index].CAN_MID |=
-                ((index + 1) << 18) | 
+                ((index + 1) << 18) |
                 (frame.packet_type << 10) |
                 ((frame.sequence_id & 0x1F) << 5) |
                 (frame.sequence_total & 0x1F);
 
-            _set_mailbox_datalen<Bus>(index, frame.length);        
+            _set_mailbox_datalen<Bus>(index, frame.length);
             _set_mailbox_rtr<Bus>(index, frame.rtr);
 
             // Set mailbox data
@@ -377,14 +460,13 @@ namespace r2d2::can_bus {
             (void) port<Bus>->CAN_SR;
         }
 
-        template<typename Bus>
-        void _enable_bus() {
-            // Enable CAN hardware
-            port<Bus>->CAN_MR |= CAN_MR_CANEN;
-
-            // TODO: enablePin stuff?
-        }
-
+        /**
+         * Helper struct that defines timing
+         * settings used with different Time
+         * Quantums.
+         *
+         * @internal
+         */
         struct _can_bit_timing_t {
             uint8_t time_quantum;      //! CAN_BIT_SYNC + uc_prog + uc_phase1 + uc_phase2 = uc_tq, 8 <= uc_tq <= 25.
             uint8_t propagation;    //! Propagation segment, (3-bits + 1), 1~8;
@@ -502,12 +584,12 @@ namespace r2d2::can_bus {
         }
 
         /**
-         * Initialize the mailbox to a default state.
+         * Initialize the mailbox to a default (known) state.
          * 
          * @internal
          * @tparam Bus
          * @param index
-         */ 
+         */
         template<typename Bus>
         void _init_mailbox(const uint8_t index) {
             port<Bus>->CAN_MB[index].CAN_MMR = 0;
@@ -523,8 +605,15 @@ namespace r2d2::can_bus {
     * @tparam Bus 
     */
     template<typename Bus>
-    class controller {
+    class controller_c {
     public:
+        /**
+         * Initialize the CAN controller.
+         *
+         * @internal
+         * @tparam Baud
+         * @return
+         */
         template<baudrate Baud = BPS_1000K>
         static bool init() {
             constexpr uint32_t can_timeout = 100000;
@@ -542,6 +631,7 @@ namespace r2d2::can_bus {
             set_peripheral<typename Bus::tx>();
             set_peripheral<typename Bus::rx>();
 
+            // Set the baudrate, return on failure.
             if (!detail::_set_baudrate<Bus, Baud>()) {
                 return false;
             }
@@ -549,13 +639,15 @@ namespace r2d2::can_bus {
             // Disable all CAN interrupts by default
             port<Bus>->CAN_IDR = 0xFFFFFFFF;
 
-            detail::_enable_bus<Bus>();
+            // Enable CAN hardware controller
+            port<Bus>->CAN_MR |= CAN_MR_CANEN;
 
+            // Wait for the CAN bus to wake up.
             uint32_t flag = 0;
             uint32_t tick = 0;
 
             do {
-                flag = port<Bus>->CAN_SR;         
+                flag = port<Bus>->CAN_SR;
                 ++tick;
             } while (!(flag & CAN_SR_WAKEUP) && (tick < can_timeout));
 
