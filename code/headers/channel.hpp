@@ -43,28 +43,24 @@ namespace r2d2::can_bus {
 
         template<>
         struct _mailbox_assignment_s<priority::HIGH> {
-            constexpr static uint32_t mask = 0x3;
             constexpr static uint8_t tx = 0;
             constexpr static uint8_t rx = 1;
         };
 
         template<>
         struct _mailbox_assignment_s<priority::NORMAL> {
-            constexpr static uint32_t mask = (0x3 << 2);
             constexpr static uint8_t tx = 2;
             constexpr static uint8_t rx = 3;
         };
 
         template<>
         struct _mailbox_assignment_s<priority::LOW> {
-            constexpr static uint32_t mask = (0x3 << 4);
             constexpr static uint8_t tx = 4;
             constexpr static uint8_t rx = 5;
         };
 
         template<>
         struct _mailbox_assignment_s<priority::DATA_STREAM> {
-            constexpr static uint32_t mask = (0x3 << 6);
             constexpr static uint8_t tx = 6;
             constexpr static uint8_t rx = 7;
         };
@@ -96,15 +92,22 @@ namespace r2d2::can_bus {
 
             // Set mailbox mode
 
+            /**
+             * The acceptance mask is constructed as follows:
+             * 
+             * 
+             */
+            constexpr uint32_t accept_mask = 0x0;
+
             // Tx
             detail::_set_mailbox_mode<Bus>(ids::tx, mailbox_mode::TX);
             detail::_set_mailbox_priority<Bus>(ids::tx, 10);
-            detail::_set_mailbox_accept_mask<Bus>(ids::tx, ~0x7FF, false);
+            detail::_set_mailbox_accept_mask<Bus>(ids::tx, accept_mask, true);
 
             // Rx
             detail::_set_mailbox_mode<Bus>(ids::rx, mailbox_mode::RX);
-            detail::_set_mailbox_id<Bus>(ids::rx, 0x0, false);
-            detail::_set_mailbox_accept_mask<Bus>(ids::rx, ~0x7FF, false);
+            detail::_set_mailbox_id<Bus>(ids::rx, 0x0, true);
+            detail::_set_mailbox_accept_mask<Bus>(ids::rx, accept_mask, true);
             
             // Rx interrupt
             port<Bus>->CAN_IER = 1U << ids::rx;
@@ -183,6 +186,9 @@ namespace r2d2::can_bus {
             // Receive
             detail::_can_frame_s frame;
             detail::_read_mailbox<Bus>(index, frame);
+
+            hwlib::cout << "0b" << hwlib::bin << (port<Bus>->CAN_MB[index].CAN_MID) << hwlib::endl;
+
             rx_buffer.push(frame);
         }
     };

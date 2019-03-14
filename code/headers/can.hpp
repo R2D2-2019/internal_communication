@@ -696,15 +696,6 @@ namespace r2d2::can_bus {
         }
 
         template<typename Bus, bool Extended = false>
-        void _set_mailbox_id(uint8_t index, uint32_t id){
-            if constexpr (Extended) {
-                port<Bus>->CAN_MB[index].CAN_MID = id | CAN_MID_MIDE;
-            } else {
-                port<Bus>->CAN_MB[index].CAN_MID = CAN_MID_MIDvA(id);
-            }
-        }
-
-        template<typename Bus, bool Extended = false>
         void _set_mailbox_filter(uint8_t index, uint32_t id, uint32_t mask){
             _set_mailbox_mask<Bus, Extended>(index, mask);
             _set_mailbox_id<Bus, Extended>(index, id);
