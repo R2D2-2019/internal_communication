@@ -94,7 +94,6 @@ namespace r2d2::can_bus {
             constexpr uint32_t accept_mask = 0x7FF << 18;
 
             // Tx
-            port<Bus>->CAN_MB[ids::tx].CAN_MID = (ids::rx << 18) | CAN_MID_MIDE;
             detail::_set_mailbox_mode<Bus>(ids::tx, mailbox_mode::TX);
             detail::_set_mailbox_accept_mask<Bus>(ids::tx, accept_mask);
 
@@ -105,11 +104,6 @@ namespace r2d2::can_bus {
             
             // Rx interrupt
             port<Bus>->CAN_IER = 1U << ids::rx;
-
-            // Set mailbox priority
-            /*port<Bus>->CAN_MB[ids::tx].CAN_MMR = 
-                (port<Bus>->CAN_MB[ids::tx].CAN_MMR & ~CAN_MMR_PRIOR_Msk) 
-                | (static_cast<uint32_t>(Priority) << CAN_MMR_PRIOR_Pos);*/
         }
 
         /**
