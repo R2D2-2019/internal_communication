@@ -104,8 +104,10 @@ namespace r2d2::can_bus {
             detail::_set_mailbox_accept_mask<Bus>(ids::tx, accept_mask);
 
             // Rx
+            // Set mailbox id, data portion is untouched
+            port<Bus>->CAN_MB[ids::rx].CAN_MID = (ids::rx << 18) | CAN_MID_MIDE;
+
             detail::_set_mailbox_mode<Bus>(ids::rx, mailbox_mode::RX);
-            detail::_set_mailbox_id<Bus>(ids::rx, (ids::rx << 18));
             detail::_set_mailbox_accept_mask<Bus>(ids::rx, accept_mask);
             
             // Rx interrupt
@@ -192,19 +194,6 @@ namespace r2d2::can_bus {
             detail::_read_mailbox<Bus>(index, frame);
 
             rx_buffer.push(frame);
-        }
-
-        /**
-         * Get a preconfigured frame for
-         * sending on this channel.
-         * 
-         * @return detail::_can_frame_s 
-         */
-        static detail::_can_frame_s bootstrap_frame() {
-            detail::_can_frame_s frame;
-            frame.id = ids::rx;
-
-            return frame;
         }
     };
 

@@ -192,7 +192,6 @@ namespace r2d2::can_bus {
 
     namespace detail {
         struct _can_frame_s {
-            uint32_t id; // EID/SID
             uint32_t fid; // Family id
             uint8_t rtr; // Remote transmission request
             uint8_t packet_type;
@@ -258,19 +257,6 @@ namespace r2d2::can_bus {
         }
 
         /**
-         * Set the id portion of a given mailbox.
-         * 
-         * @tparam Bus 
-         * @param index 
-         * @param id 
-         * @param extended 
-         */
-        template<typename Bus>
-        void _set_mailbox_id(const uint8_t index, const uint32_t id) {
-            port<Bus>->CAN_MB[index].CAN_MID = id | CAN_MID_MIDE;            
-        }
-
-        /**
          * Set the rtr for the given mailbox.
          * 
          * @tparam Bus 
@@ -320,7 +306,6 @@ namespace r2d2::can_bus {
 
             // Extended id
             if ((id & CAN_MID_MIDE) == CAN_MID_MIDE) { 
-                frame.id = (id >> 18) & 0x7FF;
                 frame.packet_type = (id >> 10) & 0xFF;
                 frame.sequence_id = (id >> 5) & 0x1F;
                 frame.sequence_total = (id >> 5) & 0x1F;
@@ -366,7 +351,12 @@ namespace r2d2::can_bus {
          */
         template<typename Bus>
         void _write_tx_registers(const _can_frame_s &frame, const uint8_t index) {
-            _set_mailbox_id<Bus>(index, frame.id);
+            // Set sequence id and total
+            port<Bus>->CAN_MB[index].CAN_MID |= 
+                (frame.packet_type << 10) |
+                ((frame.sequence_id & 0x1F) << 5) |
+                (frame.sequence_total & 0x1F);
+
             _set_mailbox_datalen<Bus>(index, frame.length);        
             _set_mailbox_rtr<Bus>(index, frame.rtr);
 

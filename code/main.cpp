@@ -30,8 +30,8 @@ int main(void) {
     };
 
     for (;;) {
-        auto high_frame = channel_high::bootstrap_frame();
-        auto normal_frame = channel_normal::bootstrap_frame();
+        r2d2::can_bus::detail::_can_frame_s high_frame;
+        r2d2::can_bus::detail::_can_frame_s normal_frame;
 
         for (size_t i = 0; i < 3; i++) {
             high_frame.data.bytes[i] = data[i];
