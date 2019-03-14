@@ -14,18 +14,18 @@ namespace r2d2::can_bus {
      */
     enum class priority {
         // High priority packet
-        HIGH,
+        HIGH = 0,
 
         // Normal priority packet, default
-        NORMAL,
+        NORMAL = 1,
 
         // Low priority packet, used when there is no hard time constraint on the delivery of the data
-        LOW,
+        LOW = 2,
 
         // Data stream packet. Used when a stream of packets (e.g. video data) is put on the bus.
         // Assigning this will given these packets the lowest priority, preventing the large data stream
         // from clogging up the bus.
-        DATA_STREAM
+        DATA_STREAM = 3
     };
 
     namespace detail {
@@ -97,20 +97,24 @@ namespace r2d2::can_bus {
              * 
              * 
              */
-            constexpr uint32_t accept_mask = 0x0;
+            constexpr uint32_t accept_mask = 0 | (0x3FF << 18);
 
             // Tx
             detail::_set_mailbox_mode<Bus>(ids::tx, mailbox_mode::TX);
-            detail::_set_mailbox_priority<Bus>(ids::tx, 10);
-            detail::_set_mailbox_accept_mask<Bus>(ids::tx, accept_mask, true);
+            detail::_set_mailbox_accept_mask<Bus>(ids::tx, accept_mask);
 
             // Rx
             detail::_set_mailbox_mode<Bus>(ids::rx, mailbox_mode::RX);
-            detail::_set_mailbox_id<Bus>(ids::rx, 0x0, true);
-            detail::_set_mailbox_accept_mask<Bus>(ids::rx, accept_mask, true);
+            detail::_set_mailbox_id<Bus>(ids::rx, (ids::rx << 18));
+            detail::_set_mailbox_accept_mask<Bus>(ids::rx, accept_mask);
             
             // Rx interrupt
             port<Bus>->CAN_IER = 1U << ids::rx;
+
+            // Set mailbox priority
+            port<Bus>->CAN_MB[ids::tx].CAN_MMR = 
+                (port<Bus>->CAN_MB[ids::tx].CAN_MMR & ~CAN_MMR_PRIOR_Msk) 
+                | (static_cast<uint32_t>(Priority) << CAN_MMR_PRIOR_Pos);
         }
 
         /**
@@ -187,9 +191,20 @@ namespace r2d2::can_bus {
             detail::_can_frame_s frame;
             detail::_read_mailbox<Bus>(index, frame);
 
-            hwlib::cout << "0b" << hwlib::bin << (port<Bus>->CAN_MB[index].CAN_MID) << hwlib::endl;
-
             rx_buffer.push(frame);
+        }
+
+        /**
+         * Get a preconfigured frame for
+         * sending on this channel.
+         * 
+         * @return detail::_can_frame_s 
+         */
+        static detail::_can_frame_s bootstrap_frame() {
+            detail::_can_frame_s frame;
+            frame.id = ids::rx;
+
+            return frame;
         }
     };
 
