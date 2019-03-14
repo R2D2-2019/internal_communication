@@ -62,7 +62,7 @@ int main(void) {
             hwlib::cout << "\r\n";
         }
 
-         while (channel_normal::has_data()) {
+        while (channel_normal::has_data()) {
             hwlib::cout << "Received data on the normal channel!\r\n";
 
             const auto bytes = channel_normal::last_frame_data();

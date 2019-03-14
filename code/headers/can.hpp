@@ -306,6 +306,9 @@ namespace r2d2::can_bus {
                 return retval;
             }
             
+            hwlib::cout << hwlib::hex << "id: " << id << "\r\n";
+            hwlib::cout << hwlib::dec;
+
             frame.fid    = port<Bus>->CAN_MB[index].CAN_MFID;
             frame.length = (status & CAN_MSR_MDLC_Msk) >> CAN_MSR_MDLC_Pos;
             frame.time   = (status & CAN_MSR_MTIMESTAMP_Msk);
@@ -342,7 +345,8 @@ namespace r2d2::can_bus {
         template<typename Bus>
         void _write_tx_registers(const _can_frame_s &frame, const uint8_t index) {
             // Set sequence id and total
-            port<Bus>->CAN_MB[index].CAN_MID |= 
+            port<Bus>->CAN_MB[index].CAN_MID = 
+                (index << 18) |
                 (frame.packet_type << 10) |
                 ((frame.sequence_id & 0x1F) << 5) |
                 (frame.sequence_total & 0x1F);

@@ -107,9 +107,9 @@ namespace r2d2::can_bus {
             port<Bus>->CAN_IER = 1U << ids::rx;
 
             // Set mailbox priority
-            port<Bus>->CAN_MB[ids::tx].CAN_MMR = 
+            /*port<Bus>->CAN_MB[ids::tx].CAN_MMR = 
                 (port<Bus>->CAN_MB[ids::tx].CAN_MMR & ~CAN_MMR_PRIOR_Msk) 
-                | (static_cast<uint32_t>(Priority) << CAN_MMR_PRIOR_Pos);
+                | (static_cast<uint32_t>(Priority) << CAN_MMR_PRIOR_Pos);*/
         }
 
         /**
