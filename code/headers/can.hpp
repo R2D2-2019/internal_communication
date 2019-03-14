@@ -345,8 +345,8 @@ namespace r2d2::can_bus {
         template<typename Bus>
         void _write_tx_registers(const _can_frame_s &frame, const uint8_t index) {
             // Set sequence id and total
-            port<Bus>->CAN_MB[index].CAN_MID = 
-                (index << 18) |
+            port<Bus>->CAN_MB[index].CAN_MID |=
+                ((index + 1) << 18) | 
                 (frame.packet_type << 10) |
                 ((frame.sequence_id & 0x1F) << 5) |
                 (frame.sequence_total & 0x1F);
@@ -359,66 +359,6 @@ namespace r2d2::can_bus {
             port<Bus>->CAN_MB[index].CAN_MDH = frame.data.high;
 
             port<Bus>->CAN_TCR = (0x1U << index) & 0x000000FF;
-        }
-
-        /**
-         * Handle a isr for a mailbox.
-         * 
-         * @tparam Bus 
-         * @param mb 
-         */
-        template<typename Bus>
-        void _handle_mailbox_isr(const uint8_t index) {
-            _can_frame_s frame;
-
-            // Mailbox ready?
-            if (!(port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRDY)) {
-                return;
-            }
-
-            switch ((port<Bus>->CAN_MB[index].CAN_MMR >> 24) & 7) {
-                case 1: // Fallthrough
-                case 2: // Fallthrough
-                case 4: 
-                    _read_mailbox<Bus>(index, frame);
-                    _mailbox_rx_stores<Bus>::buffers[index].push(frame);
-                    break;
-
-                // Transmit
-                case 3:
-                    auto &queue = _mailbox_tx_queues<Bus>::queues[index - 4];
-                    
-                    if (!queue.empty()) {
-                        const auto frame = queue.copy_and_pop();
-                        _write_tx_registers<Bus>(frame, index);
-                    } else {
-                        port<Bus>->CAN_IDR = (0x01 << index);
-                    }
-
-                    break;
-            }
-        }
-
-        /**
-         * Handle an interrupt from the CAN bus.
-         * 
-         * @tparam Bus 
-         */
-        template<typename Bus>
-        void _handle_generic_isr() {
-            const uint32_t status = port<Bus>->CAN_SR;
-            uint32_t mask = port<Bus>->CAN_IMR;
-
-            uint8_t trailing_zeros = 0;
-            while((trailing_zeros = __CLZ(__RBIT(status & mask))) < 32) {
-                const auto bit = static_cast<uint8_t>(trailing_zeros);
-
-                // Callback
-                _handle_mailbox_isr<Bus>(bit);
-
-                // remove current bit from mask
-                mask &= (~(1U << bit));
-            }
         }
 
         /**

@@ -14,7 +14,7 @@ int main(void) {
     using can = r2d2::can_bus::controller<bus>;
 
     using channel_high = r2d2::can_bus::channel_c<
-        bus, r2d2::can_bus::priority::NORMAL
+        bus, r2d2::can_bus::priority::HIGH
     >;
 
     using channel_normal = r2d2::can_bus::channel_c<
