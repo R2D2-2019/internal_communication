@@ -33,6 +33,9 @@ int main(void) {
         r2d2::can_bus::detail::_can_frame_s high_frame;
         r2d2::can_bus::detail::_can_frame_s normal_frame;
 
+        high_frame = {};
+        normal_frame = {};
+
         for (size_t i = 0; i < 3; i++) {
             high_frame.data.bytes[i] = data[i];
             normal_frame.data.bytes[i] = data[i];

@@ -179,17 +179,6 @@ namespace r2d2::can_bus {
         BPS_5K = 5000,
     };
 
-    enum mailbox {
-        MAILBOX_0,
-        MAILBOX_1,
-        MAILBOX_2,
-        MAILBOX_3,
-        MAILBOX_4,
-        MAILBOX_5,
-        MAILBOX_6,
-        MAILBOX_7
-    };
-
     namespace detail {
         struct _can_frame_s {
             uint32_t fid; // Family id
@@ -285,8 +274,9 @@ namespace r2d2::can_bus {
                 data_length = 8;
             }
 
-            port<Bus>->CAN_MB[index].CAN_MCR
-                = (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) | CAN_MCR_MDLC(data_length);
+            port<Bus>->CAN_MB[index].CAN_MCR = 
+                (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) | 
+                CAN_MCR_MDLC(data_length);
         }
 
         template<typename Bus>
@@ -583,19 +573,6 @@ namespace r2d2::can_bus {
             port<Bus>->CAN_MB[index].CAN_MDH = 0;
             port<Bus>->CAN_MB[index].CAN_MCR = 0;
         }
-
-        /**
-         * Reset all mail boxes for the given bus.
-         * 
-         * @internal
-         * @tparam Bus
-         */ 
-        template<typename Bus>
-        void _reset_mailboxes() {
-            for (uint8_t i = 0; i < CANMB_NUMBER; i++) {
-                _init_mailbox<Bus>(i);
-            }
-        }
     }
 
     /**
@@ -624,9 +601,6 @@ namespace r2d2::can_bus {
             if (!detail::_set_baudrate<Bus, Baud>()) {
                 return false;
             }
-
-            // TODO: mailbox stuf?
-            detail::_reset_mailboxes<Bus>();
 
             // Disable all CAN interrupts by default
             port<Bus>->CAN_IDR = 0xFFFFFFFF;

@@ -91,22 +91,15 @@ namespace r2d2::can_bus {
             detail::_init_mailbox<Bus>(ids::rx);
 
             // Set mailbox mode
-
-            /**
-             * The acceptance mask is constructed as follows:
-             * 
-             * 
-             */
-            constexpr uint32_t accept_mask = 0 | (0x3FF << 18);
+            constexpr uint32_t accept_mask = 0x7FF << 18;
 
             // Tx
+            port<Bus>->CAN_MB[ids::tx].CAN_MID = (ids::rx << 18) | CAN_MID_MIDE;
             detail::_set_mailbox_mode<Bus>(ids::tx, mailbox_mode::TX);
             detail::_set_mailbox_accept_mask<Bus>(ids::tx, accept_mask);
 
             // Rx
-            // Set mailbox id, data portion is untouched
             port<Bus>->CAN_MB[ids::rx].CAN_MID = (ids::rx << 18) | CAN_MID_MIDE;
-
             detail::_set_mailbox_mode<Bus>(ids::rx, mailbox_mode::RX);
             detail::_set_mailbox_accept_mask<Bus>(ids::rx, accept_mask);
             
