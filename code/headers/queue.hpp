@@ -54,14 +54,28 @@ namespace r2d2 {
         /**
          * Get the next in the queue.
          */
-        T front() const {
+        T &front() {
+            return buffer[0];
+        }
+
+        /**
+         * Get the next in the queue.
+         */
+        T const& front() const {
             return buffer[0];
         }
 
         /**
          * Get the last item in the queue.
          */
-        T back() const {
+        T &back() {
+            return buffer[index - 1];
+        }
+
+        /**
+         * Get the last item in the queue.
+         */
+        T const& back() const{
             return buffer[index - 1];
         }
 
