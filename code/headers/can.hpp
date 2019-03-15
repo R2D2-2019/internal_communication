@@ -243,7 +243,7 @@ namespace r2d2::can_bus {
         // This is not from the datasheet; this
         // is notification of a badly configured message
         // that doesn't use the extended id.
-        RX_FAILURE_STD_RECEIVED = 0x04
+            RX_FAILURE_STD_RECEIVED = 0x04
     };
 
     /**
@@ -305,10 +305,6 @@ namespace r2d2::can_bus {
          */
         template<typename Bus>
         void _set_mailbox_mode(const uint8_t index, uint8_t mode) {
-            if (mode > 5) {
-                mode = 0; // Set disabled on invalid mode
-            }
-
             port<Bus>->CAN_MB[index].CAN_MMR =
                 (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_MOT_Msk) | (mode << CAN_MMR_MOT_Pos);
         }
@@ -325,36 +321,6 @@ namespace r2d2::can_bus {
         void _set_mailbox_accept_mask(const uint8_t index, const uint32_t mask) {
             port<Bus>->CAN_MB[index].CAN_MAM = mask | CAN_MAM_MIDE;
             port<Bus>->CAN_MB[index].CAN_MID |= CAN_MAM_MIDE;
-        }
-
-        /**
-         * Set the rtr for the given mailbox.
-         * 
-         * @tparam Bus 
-         * @param index 
-         * @param rtr 
-         */
-        template<typename Bus>
-        void _set_mailbox_rtr(const uint8_t index, const uint8_t rtr) {
-            if (rtr) {
-                port<Bus>->CAN_MB[index].CAN_MSR |= CAN_MSR_MRTR;
-            } else {
-                port<Bus>->CAN_MB[index].CAN_MSR &= ~CAN_MSR_MRTR;
-            }
-        }
-
-        /**
-         * Set the data length for the given mailbox.
-         * 
-         * @tparam Bus 
-         * @param index 
-         * @param data_length 
-         */
-        template<typename Bus>
-        void _set_mailbox_datalen(const uint8_t index, const uint8_t data_length) {
-            port<Bus>->CAN_MB[index].CAN_MCR =
-                (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) |
-                CAN_MCR_MDLC(data_length);
         }
 
         template<typename Bus>
@@ -378,23 +344,23 @@ namespace r2d2::can_bus {
                 frame.sequence_id = (id >> 5) & 0x1F;
                 frame.sequence_total = (id >> 5) & 0x1F;
             }
-            // Standard ID, this is an error.
+                // Standard ID, this is an error.
             else {
                 retval = mailbox_status::RX_FAILURE_STD_RECEIVED;
                 return retval;
             }
 
             // Family id
-            frame.fid    = port<Bus>->CAN_MB[index].CAN_MFID;
+            frame.fid = port<Bus>->CAN_MB[index].CAN_MFID;
 
             // Data length
             frame.length = (status & CAN_MSR_MDLC_Msk) >> CAN_MSR_MDLC_Pos;
 
             // Timestamp given by the CAN controller
-            frame.time   = (status & CAN_MSR_MTIMESTAMP_Msk);
+            frame.time = (status & CAN_MSR_MTIMESTAMP_Msk);
 
             // Remote Transmission Request?
-            frame.rtr    = (port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRTR) ? 1 : 0 ;
+            frame.rtr = (port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRTR) ? 1 : 0;
 
             // 64 bits of data
             frame.data.low = port<Bus>->CAN_MB[index].CAN_MDL;
@@ -434,30 +400,23 @@ namespace r2d2::can_bus {
                 ((frame.sequence_id & 0x1F) << 5) |
                 (frame.sequence_total & 0x1F);
 
-            _set_mailbox_datalen<Bus>(index, frame.length);
-            _set_mailbox_rtr<Bus>(index, frame.rtr);
+            // Set the data length on the mailbox.
+            port<Bus>->CAN_MB[index].CAN_MCR =
+                (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) |
+                CAN_MCR_MDLC(frame.length);
+
+            // Remote Transmission Request
+            if (frame.rtr) {
+                port<Bus>->CAN_MB[index].CAN_MSR |= CAN_MSR_MRTR;
+            } else {
+                port<Bus>->CAN_MB[index].CAN_MSR &= ~CAN_MSR_MRTR;
+            }
 
             // Set mailbox data
             port<Bus>->CAN_MB[index].CAN_MDL = frame.data.low;
             port<Bus>->CAN_MB[index].CAN_MDH = frame.data.high;
 
             port<Bus>->CAN_TCR = (0x1U << index) & 0x000000FF;
-        }
-
-        /**
-         * Disable the given CAN bus and clear
-         * the SR register.
-         *
-         * @internal
-         * @tparam Bus
-         */
-        template<typename Bus>
-        void _disable_bus() {
-            // Disable CAN hardware if previously enabled
-            port<Bus>->CAN_MR &= ~CAN_MR_CANEN;
-
-            // Read status register to be sure it's cleaned out
-            (void) port<Bus>->CAN_SR;
         }
 
         /**
@@ -571,7 +530,10 @@ namespace r2d2::can_bus {
             const auto bit_time = _can_bit_time[tq - min_tq];
 
             // Before modifying CANBR, disable CAN controller.
-            detail::_disable_bus<Bus>();
+            port<Bus>->CAN_MR &= ~CAN_MR_CANEN;
+
+            // Read status register to be sure it's cleaned out
+            (void) port<Bus>->CAN_SR;
 
             // Write to CAN baudrate register
             port<Bus>->CAN_BR = CAN_BR_PHASE2(bit_time.phase2 - 1) |

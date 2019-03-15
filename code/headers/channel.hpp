@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <cstring>
 
 #include "can.hpp"
 #include "queue.hpp"
@@ -134,11 +135,11 @@ namespace r2d2::can_bus {
         static void send_frame(const T &data) {
             detail::_can_frame_s frame{};
 
-            const auto *ptr = reinterpret_cast<const uint8_t *>(&data);
-
-            for (size_t i = 0; i < sizeof(T); i++) {
-                frame.data.bytes[i] = ptr[i];
-            }
+            memcpy(
+                (void *) frame.data.bytes,
+                (const void *) &data,
+                sizeof(T)
+            );
 
             frame.length = sizeof(T);
             frame.packet_type = packet_type_v<T>;
@@ -194,9 +195,11 @@ namespace r2d2::can_bus {
             frame_s frame{};
             frame.type = static_cast<packet_type>(can_frame.packet_type);
 
-            for (size_t i = 0; i < can_frame.length; i++) {
-                frame.bytes[i] = can_frame.data.bytes[i];
-            }
+            memcpy(
+                (void *) frame.bytes,
+                (const void *) can_frame.data.bytes,
+                8
+            );
 
             for (auto *mod : comm_module_register_s::reg) {
                 if (!mod) {
