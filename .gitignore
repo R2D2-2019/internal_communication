@@ -8,3 +8,4 @@
 *.lss
 *.lst
 settings.json
+CMakeLists.txt
