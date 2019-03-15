@@ -199,7 +199,11 @@ namespace r2d2::can_bus {
             }
 
             for (auto *mod : comm_module_register_s::reg) {
-                if (mod && mod->accepts_packet_type(frame.type)) {
+                if (!mod) {
+                    break;
+                }
+
+                if (mod->accepts_packet_type(frame.type)) {
                     mod->accept_packet(frame);
                 }
             }
