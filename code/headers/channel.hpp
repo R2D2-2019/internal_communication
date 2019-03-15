@@ -6,75 +6,7 @@
 #include "can.hpp"
 #include "queue.hpp"
 #include "ringbuffer.hpp"
-
-namespace r2d2 {
-    struct frame_s {
-        packet_type type;
-        uint8_t bytes[8];
-
-        /**
-         * Consider the data in the frame as
-         * the given datatype. The returned data is
-         * a reference and as such non-owning.
-         *
-         * @tparam T
-         * @return
-         */
-        template<
-            typename T,
-            typename = std::enable_if_t<
-                is_suitable_packet_v<T> && !is_extended_packet_v<T>
-            >
-        >
-        T &as_type() {
-            return *(reinterpret_cast<T *>(&bytes));
-        }
-
-        /**
-         * Consider the data in the frame
-         * as the datatype associated with the given
-         * packet type. The returned data is
-         * a reference and as such non-owning.
-         *
-         * @tparam P
-         * @return
-         */
-        template<packet_type P>
-        auto as_packet_type() -> packet_data_t<P> & {
-            return *(reinterpret_cast<packet_data_t<P> *>(&bytes));
-        }
-    };
-
-    /**
-     * Base class for the communication module.
-     * This is used to prevent circular dependencies and
-     * allow for mocks.
-     */
-    class base_comm_c {
-    protected:
-        ringbuffer_c<frame_s, 32> rx_buffer;
-
-    public:
-        /**
-         * Does this module accept the given packet
-         * type?
-         *
-         * @param p
-         * @return
-         */
-        virtual bool accepts_packet_type(const packet_type &p) const = 0;
-
-        /**
-         * Accept the given frame. This will
-         * insert it into the rx buffer.
-         *
-         * @param frame
-         */
-        void accept_packet(const frame_s &frame) {
-            rx_buffer.push(frame);
-        }
-    };
-}
+#include "frame.hpp"
 
 namespace r2d2::can_bus {
     /**
@@ -184,8 +116,9 @@ namespace r2d2::can_bus {
     protected:
         using ids = detail::_mailbox_assignment_s<Priority>;
 
+        // Transfer queue for this channel, is processed in the
+        // send interrupt.
         inline static queue_c<detail::_can_frame_s, 32> tx_queue;
-        inline static ringbuffer_c<detail::_can_frame_s, 32> rx_buffer;
 
     public:
         /**
@@ -217,7 +150,19 @@ namespace r2d2::can_bus {
          *
          * @param frame
          */
-        static void send_frame(const detail::_can_frame_s &frame) {
+        template<typename T>
+        static void send_frame(const T &data) {
+            detail::_can_frame_s frame{};
+
+            const auto *ptr = reinterpret_cast<const uint8_t *>(&data);
+
+            for (size_t i = 0; i < sizeof(T); i++) {
+                frame.data.bytes[i] = ptr[i];
+            }
+
+            frame.length = sizeof(T);
+            frame.packet_type = packet_type_v<T>;
+
             tx_queue.push(frame);
 
             // Enabling the interrupt on the CAN mailbox with the TX id
@@ -225,40 +170,6 @@ namespace r2d2::can_bus {
             // At that point will the frame be removed from the tx_queue
             // and put on the bus.
             port<Bus>->CAN_IER = (0x01 << ids::tx);
-        }
-
-        /**
-         * Is there any received data on this channel
-         * that needs processing?
-         *
-         * @return
-         */
-        static bool has_data() {
-            return !rx_buffer.empty();
-        }
-
-        /**
-         * Get last received frame from the channel.
-         * This will remove it from the channel receive buffer.
-         * 
-         * @return
-         */
-        static std::array<uint8_t, 8> last_frame_data() {
-            const auto frame = rx_buffer.copy_and_pop();
-
-            std::array<uint8_t, 8> buffer;
-
-            // Copy data into the buffer
-            for (uint8_t i = 0; i < frame.length; i++) {
-                buffer[i] = frame.data.bytes[i];
-            }
-
-            // Set the rest of the buffer to 0
-            for (uint8_t i = frame.length; i < buffer.max_size(); i++) {
-                buffer[i] = 0;
-            }
-
-            return buffer;
         }
 
         /**

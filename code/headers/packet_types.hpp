@@ -1,5 +1,4 @@
-#ifndef R2D2_PACKET_TYPES_HPP
-#define R2D2_PACKET_TYPES_HPP
+#pragma once
 
 /*
  * This macro is used to quickly add packet helper structs
@@ -113,5 +112,3 @@ namespace r2d2 {
 
     R2D2_INTERNAL_PACKET_HELPER(packet_distance_s, GET_DISTANCE)
 }
-
-#endif //R2D2_PACKET_TYPES_HPP
