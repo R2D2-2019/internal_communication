@@ -54,25 +54,30 @@ namespace r2d2 {
         constexpr T copy_and_pop() {
             size_t pos = 0;
 
-            // get previous position
-            if(tail){
+            // Get previous position
+            if (tail) {
                 pos = tail - 1;
             } else {
+                // Tail is at 0, shift to end
                 pos = MaxSize - 1;
             }
 
             T item = buffer[pos];
 
-            if(!used){
-                // at last item
+            if (!used) {
+                // At last item
                 return item;
             }
 
-            // remove last item
+            // Remove last item
             used--;
 
-            // move tail back 1 or back to maxsize - 1
-            tail = !(tail) ? (MaxSize - 1) : (tail - 1);
+            // Move tail back 1 or back to maxsize - 1
+            if (!(tail)) {
+                tail = MaxSize - 1;
+            } else {
+                tail--;
+            }
 
             return item;
         }
