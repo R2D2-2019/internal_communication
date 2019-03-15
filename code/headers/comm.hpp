@@ -24,7 +24,7 @@ namespace r2d2 {
         /**
          * Helper to get a channel type.
          */
-        template<can_bus::priority Priority>
+        template<priority Priority>
         using channel = can_bus::channel_c<bus, Priority>;
 
         /**
@@ -46,10 +46,10 @@ namespace r2d2 {
                 can_bus::comm_module_register_s::clear_register();
                 can_bus::controller_c<bus>::init();
 
-                channel<can_bus::priority::HIGH>::init();
-                channel<can_bus::priority::NORMAL>::init();
-                channel<can_bus::priority::LOW>::init();
-                channel<can_bus::priority::DATA_STREAM>::init();
+                channel<priority::HIGH>::init();
+                channel<priority::NORMAL>::init();
+                channel<priority::LOW>::init();
+                channel<priority::DATA_STREAM>::init();
 
                 initialized = true;
             }
@@ -71,15 +71,15 @@ namespace r2d2 {
                 is_suitable_packet_v<T> && !is_extended_packet_v<T>
             >
         >
-        void send(const T &data, const can_bus::priority prio = can_bus::priority::NORMAL) const {
-            if (prio == can_bus::priority::NORMAL) {
-                channel<can_bus::priority::NORMAL>::send_frame(data);
-            } else if (prio == can_bus::priority::HIGH) {
-                channel<can_bus::priority::HIGH>::send_frame(data);
-            } else if (prio == can_bus::priority::LOW) {
-                channel<can_bus::priority::LOW>::send_frame(data);
+        void send(const T &data, const priority prio = priority::NORMAL) const {
+            if (prio == priority::NORMAL) {
+                channel<priority::NORMAL>::send_frame(data);
+            } else if (prio == priority::HIGH) {
+                channel<priority::HIGH>::send_frame(data);
+            } else if (prio == priority::LOW) {
+                channel<priority::LOW>::send_frame(data);
             } else {
-                channel<can_bus::priority::DATA_STREAM>::send_frame(data);
+                channel<priority::DATA_STREAM>::send_frame(data);
             }
         }
 
