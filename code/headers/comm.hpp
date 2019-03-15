@@ -58,34 +58,6 @@ namespace r2d2 {
          */
         std::array<packet_id, 16> listen_for;
 
-        using callback_type = void (*)(const frame_s &f, void *userdata);
-
-        std::array<void*, 16> callback_userdata;
-        std::array<callback_type, 16> callbacks;
-
-        /**
-         * Get the index for the callbacks for
-         * the given packet type.
-         *
-         * @internal
-         * @param p
-         * @return
-         */
-        uint8_t get_callback_index(const packet_type &p) const {
-            for (uint8_t i : listen_for) {
-                if (i == p) {
-                    return i;
-                }
-            }
-
-            return 0;
-        }
-
-        void invoke_callback(const frame_s &f) {
-            const auto index = get_callback_index(f.type);
-            callbacks[index](f, callback_userdata[index]);
-        }
-
     public:
         /**
          * Initialize the communication link for a module.
@@ -108,17 +80,6 @@ namespace r2d2 {
             }
 
             can_bus::comm_module_register_s::register_module(this);
-        }
-
-        template<typename F>
-        void on_receive(const packet_type &p, F handler) {
-            // Get the id in the listen_for array for the index
-            const auto index = get_callback_index(p);
-
-            callback_userdata[index] = (void *) &handler;
-            callbacks[index] = [](const frame_s &f, void *userdata) {
-                (*static_cast<decltype(handler) *>(userdata))(f);
-            };
         }
 
         /**

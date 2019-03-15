@@ -16,18 +16,9 @@ int main(void) {
         r2d2::packet_type::GET_DISTANCE
     });
 
-    // Possibility 1
-    int counter = 0;
-    comm.on_receive(r2d2::packet_type::GET_DISTANCE, [&counter](const r2d2::frame_s &frame) {
-        hwlib::cout << "Received frame of type: " << static_cast<uint8_t>(frame.type) << "\r\n";
-        counter += 1;
-    });
-
     packet_distance_s distance;
     distance.mm = 404;
 
-
-    // Possibility 2:
     for (;;) {
         hwlib::cout << "Send frame\r\n";
 
