@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace r2d2::can_bus {
+namespace r2d2 {
     /**
      * Simple queue implementation.
      * 

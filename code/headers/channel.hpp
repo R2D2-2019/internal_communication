@@ -7,6 +7,75 @@
 #include "queue.hpp"
 #include "ringbuffer.hpp"
 
+namespace r2d2 {
+    struct frame_s {
+        packet_type type;
+        uint8_t bytes[8];
+
+        /**
+         * Consider the data in the frame as
+         * the given datatype. The returned data is
+         * a reference and as such non-owning.
+         *
+         * @tparam T
+         * @return
+         */
+        template<
+            typename T,
+            typename = std::enable_if_t<
+                is_suitable_packet_v<T> && !is_extended_packet_v<T>
+            >
+        >
+        T &as_type() {
+            return *(reinterpret_cast<T *>(&bytes));
+        }
+
+        /**
+         * Consider the data in the frame
+         * as the datatype associated with the given
+         * packet type. The returned data is
+         * a reference and as such non-owning.
+         *
+         * @tparam P
+         * @return
+         */
+        template<packet_type P>
+        auto as_packet_type() -> packet_data_t<P> & {
+            return *(reinterpret_cast<packet_data_t<P> *>(&bytes));
+        }
+    };
+
+    /**
+     * Base class for the communication module.
+     * This is used to prevent circular dependencies and
+     * allow for mocks.
+     */
+    class base_comm_c {
+    protected:
+        ringbuffer_c<frame_s, 32> rx_buffer;
+
+    public:
+        /**
+         * Does this module accept the given packet
+         * type?
+         *
+         * @param p
+         * @return
+         */
+        virtual bool accepts_packet_type(const packet_type &p) const = 0;
+
+        /**
+         * Accept the given frame. This will
+         * insert it into the rx buffer.
+         *
+         * @param frame
+         */
+        void accept_packet(const frame_s &frame) {
+            rx_buffer.push(frame);
+        }
+    };
+}
+
 namespace r2d2::can_bus {
     /**
      * All priority levels that can be assigned
@@ -14,18 +83,55 @@ namespace r2d2::can_bus {
      */
     enum class priority {
         // High priority packet
-        HIGH = 0,
+            HIGH = 0,
 
         // Normal priority packet, default
-        NORMAL = 1,
+            NORMAL = 1,
 
         // Low priority packet, used when there is no hard time constraint on the delivery of the data
-        LOW = 2,
+            LOW = 2,
 
         // Data stream packet. Used when a stream of packets (e.g. video data) is put on the bus.
         // Assigning this will given these packets the lowest priority, preventing the large data stream
         // from clogging up the bus.
-        DATA_STREAM = 3
+            DATA_STREAM = 3
+    };
+
+    /**
+     * The maximum amount of modules allowed
+     * on a single microcontroller.
+     */
+    constexpr uint8_t max_modules = 8;
+
+    /**
+     * This register stores all communication modules
+     * that are on this microcontroller.
+     *
+     * @internal
+     */
+    struct comm_module_register_s {
+        inline static std::array<base_comm_c *, max_modules> reg;
+
+        /**
+         * Clear the registered modules in the array.
+         * Primarily used for initialization.
+         */
+        static void clear_register() {
+            reg.fill(nullptr);
+        }
+
+        /**
+         * Register a module within the registration.
+         *
+         * @param c
+         */
+        static void register_module(base_comm_c *c) {
+            for (size_t i = 0; i < reg.max_size(); i++) {
+                if (reg[i] == nullptr) {
+                    reg[i] = c;
+                }
+            }
+        }
     };
 
     namespace detail {
@@ -101,7 +207,7 @@ namespace r2d2::can_bus {
             port<Bus>->CAN_MB[ids::rx].CAN_MID = (ids::rx << 18) | CAN_MID_MIDE;
             detail::_set_mailbox_mode<Bus>(ids::rx, mailbox_mode::RX);
             detail::_set_mailbox_accept_mask<Bus>(ids::rx, accept_mask);
-            
+
             // Rx interrupt
             port<Bus>->CAN_IER = 1U << ids::rx;
         }
@@ -128,7 +234,7 @@ namespace r2d2::can_bus {
          * @return
          */
         static bool has_data() {
-            return ! rx_buffer.empty();
+            return !rx_buffer.empty();
         }
 
         /**
@@ -191,10 +297,21 @@ namespace r2d2::can_bus {
             }
 
             // Receive
-            detail::_can_frame_s frame;
-            detail::_read_mailbox<Bus>(index, frame);
+            detail::_can_frame_s can_frame;
+            detail::_read_mailbox<Bus>(index, can_frame);
 
-            rx_buffer.push(frame);
+            frame_s frame{};
+            frame.type = static_cast<packet_type>(can_frame.packet_type);
+
+            for (size_t i = 0; i < can_frame.length; i++) {
+                frame.bytes[i] = can_frame.data.bytes[i];
+            }
+
+            for (auto *mod : comm_module_register_s::reg) {
+                if (mod && mod->accepts_packet_type(frame.type)) {
+                    mod->accept_packet(frame);
+                }
+            }
         }
     };
 
@@ -250,15 +367,15 @@ namespace r2d2::can_bus {
 };
 
 extern "C" {
-    void __CAN0_Handler() {
-        r2d2::can_bus::detail::_route_isr<r2d2::can_bus::can0>(
-            CAN0->CAN_SR & CAN0->CAN_IMR
-        );
-    }
+void __CAN0_Handler() {
+    r2d2::can_bus::detail::_route_isr<r2d2::can_bus::can0>(
+        CAN0->CAN_SR & CAN0->CAN_IMR
+    );
+}
 
-    void __CAN1_Handler() {
-        r2d2::can_bus::detail::_route_isr<r2d2::can_bus::can1>(
-            CAN1->CAN_SR & CAN1->CAN_IMR
-        );
-    }
+void __CAN1_Handler() {
+    r2d2::can_bus::detail::_route_isr<r2d2::can_bus::can1>(
+        CAN1->CAN_SR & CAN1->CAN_IMR
+    );
+}
 }

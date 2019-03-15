@@ -1,7 +1,9 @@
 #pragma once
 
+#include <array>
 #include <type_traits>
 
+#include "packet_types.hpp"
 #include "channel.hpp"
 
 namespace r2d2 {
@@ -11,10 +13,17 @@ namespace r2d2 {
      * a translation between higher level datatypes and the underlying
      * priorities and raw byte transfers.
      */
-    class comm_c {
+    class comm_c : public base_comm_c {
     protected:
+        /**
+         * Force use of a specific CAN bus
+         * for the module.
+         */
         using bus = can_bus::can0;
 
+        /**
+         * Helper to get a channel type.
+         */
         template<can_bus::priority Priority>
         using channel = can_bus::channel_c<bus, Priority>;
 
@@ -43,15 +52,51 @@ namespace r2d2 {
             return bytes;
         }
 
+        /**
+         * A list of packets that this module
+         * will listen for on the network.
+         */
+        std::array<packet_id, 16> listen_for;
+
+        using callback_type = void (*)(const frame_s &f, void *userdata);
+
+        std::array<void*, 16> callback_userdata;
+        std::array<callback_type, 16> callbacks;
+
+        /**
+         * Get the index for the callbacks for
+         * the given packet type.
+         *
+         * @internal
+         * @param p
+         * @return
+         */
+        uint8_t get_callback_index(const packet_type &p) const {
+            for (uint8_t i : listen_for) {
+                if (i == p) {
+                    return i;
+                }
+            }
+
+            return 0;
+        }
+
+        void invoke_callback(const frame_s &f) {
+            const auto index = get_callback_index(f.type);
+            callbacks[index](f, callback_userdata[index]);
+        }
+
     public:
         /**
          * Initialize the communication link for a module.
          * Will initialize the CAN subsystem if not yet initialized.
          */
-        comm_c() {
+        explicit comm_c(const std::array<packet_id, 16> &listen_for)
+            : listen_for(listen_for) {
             static bool initialized = false;
 
             if (!initialized) {
+                can_bus::comm_module_register_s::clear_register();
                 can_bus::controller_c<bus>::init();
 
                 channel<can_bus::priority::HIGH>::init();
@@ -61,6 +106,19 @@ namespace r2d2 {
 
                 initialized = true;
             }
+
+            can_bus::comm_module_register_s::register_module(this);
+        }
+
+        template<typename F>
+        void on_receive(const packet_type &p, F handler) {
+            // Get the id in the listen_for array for the index
+            const auto index = get_callback_index(p);
+
+            callback_userdata[index] = (void *) &handler;
+            callbacks[index] = [](const frame_s &f, void *userdata) {
+                (*static_cast<decltype(handler) *>(userdata))(f);
+            };
         }
 
         /**
@@ -74,7 +132,7 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                std::is_pod_v<T> && sizeof(T) <= 8
+                is_suitable_packet_v<T> && !is_extended_packet_v<T>
             >
         >
         void send(const T &data, const can_bus::priority prio = can_bus::priority::NORMAL) const {
@@ -87,6 +145,7 @@ namespace r2d2 {
             }
 
             frame.length = sizeof(T);
+            frame.packet_type = packet_type_v<T>;
 
             if (prio == can_bus::priority::NORMAL) {
                 channel<can_bus::priority::NORMAL>::send_frame(frame);
@@ -105,65 +164,34 @@ namespace r2d2 {
          * @return
          */
         bool has_data() const {
-            if (channel<can_bus::priority::HIGH>::has_data()) {
-                return true;
-            }
-
-            if (channel<can_bus::priority::NORMAL>::has_data()) {
-                return true;
-            }
-
-            if (channel<can_bus::priority::LOW>::has_data()) {
-                return true;
-            }
-
-            return channel<can_bus::priority::DATA_STREAM>::has_data();
+            return !rx_buffer.empty();
         }
 
         /**
-         * Get data that is awaiting processing.
-         * Data will be filled in the given type T.
+        * Get data that is awaiting processing.
+        *
+        * @tparam T
+        * @return
+        */
+        frame_s get_data() {
+            return rx_buffer.copy_and_pop();
+        }
+
+        /**
+         * Does this module accept the given packet
+         * type?
          *
-         * @tparam T
+         * @param p
          * @return
          */
-        template<
-            typename T,
-            typename = std::enable_if_t<
-                std::is_pod_v<T> && sizeof(T) <= 8
-            >
-        >
-        T get_data() const {
-            // Array of uint8_t that contains raw representation
-            auto bytes = seek_channels_for_data();
-
-            // Cast the array to a pointer of type T and dereference
-            return *(reinterpret_cast<T *>(&bytes));
-        }
-
-        /**
-         * Get data that is awaiting processing.
-         * Data will be filled in the given structure.
-         *
-         * @tparam T
-         * @param fill
-         */
-        template<
-            typename T,
-            typename = std::enable_if_t<
-                std::is_pod_v<T> && sizeof(T) <= 8
-            >
-        >
-        void get_data(T &fill) const {
-            // Array of uint8_t that contains raw representation
-            const auto bytes = seek_channels_for_data();
-
-            // Consider the variable to be filled as an uint8_t[]
-            // and fill it with the given bytes
-            auto *ptr = reinterpret_cast<uint8_t *>(&fill);
-            for (size_t i = 0; i < sizeof(T); i++) {
-                ptr[i] = bytes[i];
+        bool accepts_packet_type(const packet_type &p) const override {
+            for (const auto &packet : listen_for) {
+                if (packet == p) {
+                    return true;
+                }
             }
+
+            return false;
         }
     };
 }
