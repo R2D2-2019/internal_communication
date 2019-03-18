@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include <cstdint>
 
 namespace r2d2 {
@@ -27,14 +28,28 @@ namespace r2d2 {
 
         /**
          * Pop an item from the queue.
+         * Won't do anything if the queue is already empty.
          */
         void pop() {
             if (empty()) {
                 return;
             }
 
-            for (size_t i = 1; i < index; i++) {
-                buffer[i - 1] = buffer[i];
+            if constexpr (std::is_pod_v<T>) {
+                /*
+                 * Since the destination address is before
+                 * the source address, a memcpy can be used instead
+                 * of memmove.
+                 */
+                memcpy(
+                    (void *) buffer,
+                    (const void *) (buffer + 1),
+                    index
+                );
+            } else {
+                for (size_t i = 1; i < index; i++) {
+                    buffer[i - 1] = buffer[i];
+                }
             }
 
             index -= 1;

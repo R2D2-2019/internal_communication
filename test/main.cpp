@@ -77,7 +77,7 @@ TEST_CASE("Ringbuffer operator[] works", "[ringbuffer]") {
 
 /** QUEUE **/
 
-TEST_CASE("Queue store data", "[queue]") {
+TEST_CASE("Queue stores POD data", "[queue]") {
     queue_c<int, 16> q;
 
     q.push(12);
@@ -85,6 +85,27 @@ TEST_CASE("Queue store data", "[queue]") {
 
     REQUIRE(q.copy_and_pop() == 12);
     REQUIRE(q.copy_and_pop() == 24);
+}
+
+TEST_CASE("Queue stores non-POD data", "[queue]") {
+    struct x {
+        int a;
+
+        x() : a(0) {}
+        x(int a) : a(a) {}
+
+        virtual void foo() {};
+    };
+
+    static_assert(! std::is_pod_v<x>);
+
+    queue_c<x, 16> q;
+
+    q.push(x(3));
+    q.push(x(5));
+
+    REQUIRE(q.copy_and_pop().a == 3);
+    REQUIRE(q.copy_and_pop().a == 5);
 }
 
 TEST_CASE("Queue front and back work", "[queue]") {
@@ -97,7 +118,7 @@ TEST_CASE("Queue front and back work", "[queue]") {
     REQUIRE(q.back() == 24);
 }
 
-TEST_CASE("Queue popping and empty queue works", "[queue]") {
+TEST_CASE("Queue popping an empty queue works", "[queue]") {
     queue_c<int, 2> q;
 
     q.pop();
