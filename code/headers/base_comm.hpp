@@ -76,7 +76,7 @@ namespace r2d2 {
          * A list of packets that this module
          * will listen for on the network.
          */
-        std::array<frame_id, 8> listen_for;
+        std::array<frame_id, 8> listen_for{};
 
     public:
         /**
