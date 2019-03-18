@@ -10,9 +10,11 @@ int main() {
 
     hwlib::wait_ms(10);
 
-    r2d2::comm_c comm(
+    r2d2::comm_c comm;
+
+    comm.listen_for_frames(
         {
-            r2d2::packet_type::GET_DISTANCE
+            r2d2::frame_type::GET_DISTANCE
         }
     );
 
@@ -29,8 +31,8 @@ int main() {
             auto frame = comm.get_data();
 
             switch (frame.type) {
-                case packet_type::GET_DISTANCE: {
-                    const auto received = frame.as_packet_type<packet_type::GET_DISTANCE>();
+                case frame_type::GET_DISTANCE: {
+                    const auto received = frame.as_frame_type<frame_type::GET_DISTANCE>();
                     hwlib::cout << "Received distance: " << received.mm << "\r\n";
                 }
                     break;

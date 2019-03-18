@@ -7,7 +7,7 @@
 #include "can.hpp"
 #include "queue.hpp"
 #include "ringbuffer.hpp"
-#include "frame.hpp"
+#include "base_comm.hpp"
 
 namespace r2d2::can_bus {
     /**
@@ -142,7 +142,7 @@ namespace r2d2::can_bus {
             );
 
             frame.length = sizeof(T);
-            frame.packet_type = packet_type_v<T>;
+            frame.frame_type = frame_type_v<T>;
 
             tx_queue.push(frame);
 
@@ -193,7 +193,7 @@ namespace r2d2::can_bus {
             detail::_read_mailbox<Bus>(index, can_frame);
 
             frame_s frame{};
-            frame.type = static_cast<packet_type>(can_frame.packet_type);
+            frame.type = static_cast<frame_type>(can_frame.frame_type);
 
             memcpy(
                 (void *) frame.bytes,
@@ -206,8 +206,8 @@ namespace r2d2::can_bus {
                     break;
                 }
 
-                if (mod->accepts_packet_type(frame.type)) {
-                    mod->accept_packet(frame);
+                if (mod->accepts_frame(frame.type)) {
+                    mod->accept_frame(frame);
                 }
             }
         }

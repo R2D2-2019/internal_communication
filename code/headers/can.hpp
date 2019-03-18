@@ -279,7 +279,7 @@ namespace r2d2::can_bus {
         struct _can_frame_s {
             uint32_t fid; // Family id
             uint8_t rtr; // Remote transmission request
-            uint8_t packet_type;
+            uint8_t frame_type;
             uint8_t sequence_id;
             uint8_t sequence_total;
             uint16_t time;
@@ -340,7 +340,7 @@ namespace r2d2::can_bus {
 
             // Extended id
             if ((id & CAN_MID_MIDE) == CAN_MID_MIDE) {
-                frame.packet_type = (id >> 10) & 0xFF;
+                frame.frame_type = (id >> 10) & 0xFF;
                 frame.sequence_id = (id >> 5) & 0x1F;
                 frame.sequence_total = (id >> 5) & 0x1F;
             }
@@ -396,7 +396,7 @@ namespace r2d2::can_bus {
             // Set sequence id and total
             port<Bus>->CAN_MB[index].CAN_MID |=
                 ((index + 1) << 18) |
-                (frame.packet_type << 10) |
+                (frame.frame_type << 10) |
                 ((frame.sequence_id & 0x1F) << 5) |
                 (frame.sequence_total & 0x1F);
 

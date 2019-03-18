@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <type_traits>
 
 #include "packet_types.hpp"
@@ -27,19 +26,14 @@ namespace r2d2 {
         template<priority Priority>
         using channel = can_bus::channel_c<bus, Priority>;
 
-        /**
-         * A list of packets that this module
-         * will listen for on the network.
-         */
-        std::array<packet_id, 16> listen_for;
-
     public:
         /**
          * Initialize the communication link for a module.
          * Will initialize the CAN subsystem if not yet initialized.
+         *
+         * @param listen_for
          */
-        explicit comm_c(const std::array<packet_id, 16> &listen_for)
-            : listen_for(listen_for) {
+        comm_c() {
             static bool initialized = false;
 
             if (!initialized) {
@@ -68,7 +62,7 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_packet_v<T> && !is_extended_packet_v<T>
+                is_suitable_frame_v<T> && !is_extended_frame_v<T>
             >
         >
         void send(const T &data, const priority prio = priority::NORMAL) const {
@@ -81,42 +75,6 @@ namespace r2d2 {
             } else {
                 channel<priority::DATA_STREAM>::send_frame(data);
             }
-        }
-
-        /**
-         * Is there any data ready for processing?
-         *
-         * @return
-         */
-        bool has_data() const {
-            return !rx_buffer.empty();
-        }
-
-        /**
-        * Get data that is awaiting processing.
-        *
-        * @tparam T
-        * @return
-        */
-        frame_s get_data() {
-            return rx_buffer.copy_and_pop();
-        }
-
-        /**
-         * Does this module accept the given packet
-         * type?
-         *
-         * @param p
-         * @return
-         */
-        bool accepts_packet_type(const packet_type &p) const override {
-            for (const auto &packet : listen_for) {
-                if (packet == p) {
-                    return true;
-                }
-            }
-
-            return false;
         }
     };
 }

@@ -5,14 +5,14 @@
  * that help the communication system understand how to use
  * and refer to packets.
  */
-#define R2D2_INTERNAL_PACKET_HELPER(Type, EnumVal) \
+#define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal) \
     template<> \
-    struct packet_type_s<Type> { \
-        constexpr static packet_id type = packet_type::EnumVal; \
+    struct frame_type_s<Type> { \
+        constexpr static frame_id type = frame_type::EnumVal; \
     }; \
     \
     template<> \
-    struct packet_data_s<packet_type::EnumVal> { \
+    struct frame_data_s<frame_type::EnumVal> { \
         using type = Type; \
     };
 
@@ -21,7 +21,7 @@ namespace r2d2 {
      * The underlying type used for packet
      * identifiers.
      */
-    using packet_id = uint8_t;
+    using frame_id = uint8_t;
 
     /**
      * Central definition that is used to
@@ -31,7 +31,7 @@ namespace r2d2 {
      * @tparam T
      */
     template<typename T>
-    constexpr bool is_suitable_packet_v = std::is_pod_v<T>;
+    constexpr bool is_suitable_frame_v = std::is_pod_v<T>;
 
     /**
      * Is the given packet type
@@ -40,13 +40,13 @@ namespace r2d2 {
      * @tparam T
      */
     template<typename T>
-    constexpr bool is_extended_packet_v = sizeof(T) > 8;
+    constexpr bool is_extended_frame_v = sizeof(T) > 8;
 
     /**
      * This enum will contain all packet types
      * in the system.
      */
-    enum packet_type : packet_id {
+    enum frame_type : frame_id {
         NONE = 0,
 
         GET_DISTANCE,
@@ -63,30 +63,30 @@ namespace r2d2 {
      * @tparam T
      */
     template<typename T>
-    struct packet_type_s {
-        constexpr static packet_id type = packet_type::NONE;
+    struct frame_type_s {
+        constexpr static frame_id type = frame_type::NONE;
     };
 
     /**
     * Empty base packet.
     */
-    struct empty_packet {};
+    struct empty_frame {};
 
     /**
      * Packet data type accessor
      * base template.
      */
-    template<packet_type>
-    struct packet_data_s {
-        using type = empty_packet;
+    template<frame_type>
+    struct frame_data_s {
+        using type = empty_frame;
     };
 
     /**
      * Helper accessor to get the
      * datatype for the given packet type.
      */
-    template<packet_type P>
-    using packet_data_t = typename packet_data_s<P>::type;
+    template<frame_type P>
+    using frame_data_t = typename frame_data_s<P>::type;
 
     /**
      * Helper accessor to get the
@@ -95,7 +95,7 @@ namespace r2d2 {
      * @tparam T
      */
     template<typename T>
-    constexpr packet_id packet_type_v = packet_type_s<T>::type;
+    constexpr frame_id frame_type_v = frame_type_s<T>::type;
 
 
 
@@ -110,5 +110,5 @@ namespace r2d2 {
         uint16_t mm;
     };
 
-    R2D2_INTERNAL_PACKET_HELPER(packet_distance_s, GET_DISTANCE)
+    R2D2_INTERNAL_FRAME_HELPER(packet_distance_s, GET_DISTANCE)
 }

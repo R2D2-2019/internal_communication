@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <type_traits>
 
 #include "packet_types.hpp"
@@ -26,7 +27,7 @@ namespace r2d2 {
     };
 
     struct frame_s {
-        packet_type type;
+        frame_type type;
         uint8_t bytes[8];
 
         /**
@@ -40,7 +41,7 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_packet_v<T> && !is_extended_packet_v<T>
+                is_suitable_frame_v < T> && !is_extended_frame_v <T>
             >
         >
         T &as_type() {
@@ -56,9 +57,9 @@ namespace r2d2 {
          * @tparam P
          * @return
          */
-        template<packet_type P>
-        auto as_packet_type() -> packet_data_t<P> & {
-            return *(reinterpret_cast<packet_data_t<P> *>(&bytes));
+        template<frame_type P>
+        auto as_frame_type() -> frame_data_t <P> & {
+            return *(reinterpret_cast<frame_data_t<P> *>(&bytes));
         }
     };
 
@@ -71,15 +72,21 @@ namespace r2d2 {
     protected:
         ringbuffer_c<frame_s, 32> rx_buffer;
 
+        /**
+         * A list of packets that this module
+         * will listen for on the network.
+         */
+        std::array<frame_id, 8> listen_for;
+
     public:
         /**
-         * Does this module accept the given packet
-         * type?
+         * Listen for the given list of packets.
          *
-         * @param p
-         * @return
+         * @param listen_for
          */
-        virtual bool accepts_packet_type(const packet_type &p) const = 0;
+        void listen_for_frames(const std::array<frame_id, 8> listen_for) {
+            this->listen_for = listen_for;
+        }
 
         /**
          * Accept the given frame. This will
@@ -87,8 +94,53 @@ namespace r2d2 {
          *
          * @param frame
          */
-        void accept_packet(const frame_s &frame) {
+        void accept_frame(const frame_s &frame) {
             rx_buffer.push(frame);
+        }
+
+        /**
+         * Is there any data ready for processing?
+         *
+         * @return
+         */
+        bool has_data() const {
+            return !rx_buffer.empty();
+        }
+
+        /**
+        * Get data that is awaiting processing.
+        *
+        * @tparam T
+        * @return
+        */
+        frame_s get_data() {
+            return rx_buffer.copy_and_pop();
+        }
+
+        /**
+         * Get the list of packets that this module
+         * listens for.
+         * @return
+         */
+        std::array<frame_id, 8> const& get_accepted_frame_types() const {
+            return listen_for;
+        }
+
+        /**
+         * Does this module accept the given packet
+         * type?
+         *
+         * @param p
+         * @return
+         */
+        bool accepts_frame(const frame_type &p) const {
+            for (const auto &packet : get_accepted_frame_types()) {
+                if (packet == p) {
+                    return true;
+                }
+            }
+
+            return false;
         }
     };
 }
