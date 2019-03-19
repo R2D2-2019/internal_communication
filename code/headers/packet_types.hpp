@@ -51,6 +51,7 @@ namespace r2d2 {
 
         GET_DISTANCE,
         BUTTON_STATE,
+        ACTIVITY_LED_STATE,
 
         COUNT
     };
@@ -119,6 +120,15 @@ namespace r2d2 {
         bool pressed;
     };
 
+    /**
+     * Packet containing the state of
+     * an activity led.
+     */
+    struct packet_activity_led_state_s {
+        bool state;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(packet_distance_s, GET_DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(packet_button_state_s, BUTTON_STATE)
+    R2D2_INTERNAL_FRAME_HELPER(packet_activity_led_state_s, ACTIVITY_LED_STATE)
 }
