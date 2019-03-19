@@ -9,3 +9,5 @@ The following modules are present:
 ### Messages
 
 Message flow is as follows:
+
+![Flow](https://i.postimg.cc/RZz4rsFp/Untitled-Diagram-1.png)
