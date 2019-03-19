@@ -118,7 +118,7 @@ namespace r2d2 {
             }
 
             frame_s frame{};
-            frame.type = frame_type_v<T>;
+            frame.type = static_cast<frame_type>(frame_type_v<T>);
             
             memcpy(
                 (void *) frame.bytes,
