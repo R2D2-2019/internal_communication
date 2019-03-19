@@ -286,7 +286,6 @@ namespace r2d2::can_bus {
             uint8_t frame_type;
             uint8_t sequence_id;
             uint8_t sequence_total;
-            uint16_t time;
             uint8_t length;
 
             // Data
@@ -357,9 +356,6 @@ namespace r2d2::can_bus {
 
             // Data length
             frame.length = (status & CAN_MSR_MDLC_Msk) >> CAN_MSR_MDLC_Pos;
-
-            // Timestamp given by the CAN controller
-            frame.time = (status & CAN_MSR_MTIMESTAMP_Msk);
 
             // 64 bits of data
             frame.data.low = port<Bus>->CAN_MB[index].CAN_MDL;

@@ -215,7 +215,7 @@ namespace r2d2::can_bus {
             memcpy(
                 (void *) frame.bytes,
                 (const void *) can_frame.data.bytes,
-                8
+                8 // Has to be 8 bytes; frame.length is copied in a lower layer
             );
 
             using regs = comm_module_register_s;
