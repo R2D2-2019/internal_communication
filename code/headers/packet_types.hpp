@@ -50,6 +50,7 @@ namespace r2d2 {
         NONE = 0,
 
         GET_DISTANCE,
+        GET_BUTTON_STATE,
 
         COUNT
     };
@@ -110,5 +111,14 @@ namespace r2d2 {
         uint16_t mm;
     };
 
+    /**
+     * Packet containing the state of 
+     * a button.
+     */
+    struct packet_button_state_s {
+        bool pressed;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(packet_distance_s, GET_DISTANCE)
+    R2D2_INTERNAL_FRAME_HELPER(packet_button_state_s, GET_BUTTON_STATE)
 }
