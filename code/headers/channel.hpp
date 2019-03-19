@@ -42,6 +42,7 @@ namespace r2d2::can_bus {
             for (size_t i = 0; i < reg.max_size(); i++) {
                 if (reg[i] == nullptr) {
                     reg[i] = c;
+                    break;
                 }
             }
         }
