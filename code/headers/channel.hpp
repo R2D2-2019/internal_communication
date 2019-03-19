@@ -112,19 +112,41 @@ namespace r2d2::can_bus {
             detail::_init_mailbox<Bus>(ids::rx);
 
             // Set mailbox mode
-            constexpr uint32_t accept_mask = 0x7FF << 18;
+            constexpr uint32_t accept_mask = 0x07 << 26;
 
             // Tx
             detail::_set_mailbox_mode<Bus>(ids::tx, mailbox_mode::TX);
             detail::_set_mailbox_accept_mask<Bus>(ids::tx, accept_mask);
 
             // Rx
-            port<Bus>->CAN_MB[ids::rx].CAN_MID = (ids::rx << 18) | CAN_MID_MIDE;
+            port<Bus>->CAN_MB[ids::rx].CAN_MID = (ids::rx << 26) | CAN_MID_MIDE;
             detail::_set_mailbox_mode<Bus>(ids::rx, mailbox_mode::RX);
             detail::_set_mailbox_accept_mask<Bus>(ids::rx, accept_mask);
 
             // Rx interrupt
             port<Bus>->CAN_IER = 1U << ids::rx;
+        }
+
+        /**
+         * Request the given packet on
+         * the bus.
+         * 
+         * @param type 
+         */
+        static void request_frame(const frame_type &type) {
+            detail::_can_frame_s frame{};
+
+            frame.mode = detail::_can_frame_mode::READ;
+            frame.length = 0;
+            frame.frame_type = type;
+
+            tx_queue.push(frame);
+
+            // Enabling the interrupt on the CAN mailbox with the TX id
+            // will cause a interrupt when the CAN controller is ready.
+            // At that point will the frame be removed from the tx_queue
+            // and put on the bus.
+            port<Bus>->CAN_IER = (0x01 << ids::tx);
         }
 
         /**
@@ -194,7 +216,9 @@ namespace r2d2::can_bus {
             detail::_read_mailbox<Bus>(index, can_frame);
 
             frame_s frame{};
+
             frame.type = static_cast<frame_type>(can_frame.frame_type);
+            frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
             memcpy(
                 (void *) frame.bytes,

@@ -28,6 +28,7 @@ namespace r2d2 {
 
     struct frame_s {
         frame_type type;
+        bool request;
         uint8_t bytes[8];
 
         /**
@@ -79,6 +80,14 @@ namespace r2d2 {
         std::array<frame_id, 8> listen_for{};
 
     public:
+        /**
+         * Request the given packet on
+         * the bus.
+         * 
+         * @param type 
+         */
+        virtual void request(const frame_type &type, const priority prio = priority::NORMAL) = 0;
+
         /**
          * Listen for the given list of packets.
          *

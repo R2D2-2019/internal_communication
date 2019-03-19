@@ -264,6 +264,11 @@ namespace r2d2::can_bus {
     };
 
     namespace detail {
+        enum _can_frame_mode : uint8_t {
+            READ = 1,
+            WRITE = 0
+        };
+
         /**
          * Representation of a CAN frame
          * that is put on the network. The frame
@@ -277,8 +282,7 @@ namespace r2d2::can_bus {
          * @internal
          */
         struct _can_frame_s {
-            uint32_t fid; // Family id
-            uint8_t rtr; // Remote transmission request
+            uint8_t mode; // Read or write
             uint8_t frame_type;
             uint8_t sequence_id;
             uint8_t sequence_total;
@@ -340,6 +344,7 @@ namespace r2d2::can_bus {
 
             // Extended id
             if ((id & CAN_MID_MIDE) == CAN_MID_MIDE) {
+                frame.mode = (id >> 25) & 0x01;
                 frame.frame_type = (id >> 10) & 0xFF;
                 frame.sequence_id = (id >> 5) & 0x1F;
                 frame.sequence_total = (id >> 5) & 0x1F;
@@ -350,17 +355,11 @@ namespace r2d2::can_bus {
                 return retval;
             }
 
-            // Family id
-            frame.fid = port<Bus>->CAN_MB[index].CAN_MFID;
-
             // Data length
             frame.length = (status & CAN_MSR_MDLC_Msk) >> CAN_MSR_MDLC_Pos;
 
             // Timestamp given by the CAN controller
             frame.time = (status & CAN_MSR_MTIMESTAMP_Msk);
-
-            // Remote Transmission Request?
-            frame.rtr = (port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRTR) ? 1 : 0;
 
             // 64 bits of data
             frame.data.low = port<Bus>->CAN_MB[index].CAN_MDL;
@@ -395,7 +394,8 @@ namespace r2d2::can_bus {
         void _write_tx_registers(const _can_frame_s &frame, const uint8_t index) {
             // Set sequence id and total
             port<Bus>->CAN_MB[index].CAN_MID |=
-                ((index + 1) << 18) |
+                ((index + 1) << 26) |
+                ((frame.mode & 0x01) << 25) |
                 (frame.frame_type << 10) |
                 ((frame.sequence_id & 0x1F) << 5) |
                 (frame.sequence_total & 0x1F);
@@ -405,12 +405,8 @@ namespace r2d2::can_bus {
                 (port<Bus>->CAN_MB[index].CAN_MCR & ~CAN_MCR_MDLC_Msk) |
                 CAN_MCR_MDLC(frame.length);
 
-            // Remote Transmission Request
-            if (frame.rtr) {
-                port<Bus>->CAN_MB[index].CAN_MSR |= CAN_MSR_MRTR;
-            } else {
-                port<Bus>->CAN_MB[index].CAN_MSR &= ~CAN_MSR_MRTR;
-            }
+            // Remote Transmission Request            
+            port<Bus>->CAN_MB[index].CAN_MSR &= ~CAN_MSR_MRTR;
 
             // Set mailbox data
             port<Bus>->CAN_MB[index].CAN_MDL = frame.data.low;

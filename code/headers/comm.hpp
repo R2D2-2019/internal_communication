@@ -52,6 +52,24 @@ namespace r2d2 {
         }
 
         /**
+         * Request the given packet on
+         * the bus.
+         * 
+         * @param type 
+         */
+        void request(const frame_type &type, const priority prio = priority::NORMAL) override {
+            if (prio == priority::NORMAL) {
+                channel<priority::NORMAL>::request_frame(type);
+            } else if (prio == priority::HIGH) {
+                channel<priority::HIGH>::request_frame(type);
+            } else if (prio == priority::LOW) {
+                channel<priority::LOW>::request_frame(type);
+            } else {
+                channel<priority::DATA_STREAM>::request_frame(type);
+            }
+        }
+
+        /**
          * Send the given data with the given priority
          * on the bus.
          *

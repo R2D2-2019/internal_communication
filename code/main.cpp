@@ -24,11 +24,16 @@ int main() {
     for (;;) {
         hwlib::cout << "Send frame\r\n";
 
-        comm.send(distance, priority::HIGH);
+        comm.request(frame_type::GET_DISTANCE, priority::HIGH);
         comm.send(distance);
 
         while (comm.has_data()) {
             auto frame = comm.get_data();
+
+            if (frame.request) {
+                hwlib::cout << "Received a request!\r\n";
+                continue;
+            }
 
             switch (frame.type) {
                 case frame_type::GET_DISTANCE: {
