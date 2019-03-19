@@ -191,15 +191,11 @@ namespace r2d2::can_bus {
 
             // Transmit
             if (mmr == 3) {
-                if (tx_queue.empty()) {
-                    return;
-                }
-
-                // Put the data on the bus
-                const auto frame = tx_queue.copy_and_pop();
-                detail::_write_tx_registers<Bus>(frame, ids::tx);
-
-                if (tx_queue.empty()) {
+                if (!tx_queue.empty()) {
+                    // Put the data on the bus
+                    const auto frame = tx_queue.copy_and_pop();
+                    detail::_write_tx_registers<Bus>(frame, ids::tx);
+                } else {
                     // Nothing left to send, disable interrupt on the tx mailbox
                     port<Bus>->CAN_IDR = (0x01 << ids::tx);
                 }
