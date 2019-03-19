@@ -23,6 +23,7 @@ namespace r2d2::can_bus {
      * @internal
      */
     struct comm_module_register_s {
+        inline static uint8_t count = 0;
         inline static std::array<base_comm_c *, max_modules> reg;
 
         /**
@@ -39,12 +40,7 @@ namespace r2d2::can_bus {
          * @param c
          */
         static void register_module(base_comm_c *c) {
-            for (size_t i = 0; i < reg.max_size(); i++) {
-                if (reg[i] == nullptr) {
-                    reg[i] = c;
-                    break;
-                }
-            }
+            reg[count++] = c;
         }
     };
 
@@ -107,10 +103,6 @@ namespace r2d2::can_bus {
          * Initialize the channel mailboxes.
          */
         static void init() {
-            // First, clear mailboxes a to known state
-            detail::_init_mailbox<Bus>(ids::tx);
-            detail::_init_mailbox<Bus>(ids::rx);
-
             // Set mailbox mode
             constexpr uint32_t accept_mask = 0x07 << 26;
 
@@ -226,13 +218,11 @@ namespace r2d2::can_bus {
                 8
             );
 
-            for (auto *mod : comm_module_register_s::reg) {
-                if (!mod) {
-                    break;
-                }
+            using regs = comm_module_register_s;
 
-                if (mod->accepts_frame(frame.type)) {
-                    mod->accept_frame(frame);
+            for (uint8_t i = 0; i < regs::count; i++) {
+                if (regs::reg[i]->accepts_frame(frame.type)) {
+                    regs::reg[i]->accept_frame(frame);
                 }
             }
         }

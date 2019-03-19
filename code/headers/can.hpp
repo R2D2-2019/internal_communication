@@ -540,23 +540,6 @@ namespace r2d2::can_bus {
 
             return true;
         }
-
-        /**
-         * Initialize the mailbox to a default (known) state.
-         * 
-         * @internal
-         * @tparam Bus
-         * @param index
-         */
-        template<typename Bus>
-        void _init_mailbox(const uint8_t index) {
-            port<Bus>->CAN_MB[index].CAN_MMR = 0;
-            port<Bus>->CAN_MB[index].CAN_MAM = 0;
-            port<Bus>->CAN_MB[index].CAN_MID = 0;
-            port<Bus>->CAN_MB[index].CAN_MDL = 0;
-            port<Bus>->CAN_MB[index].CAN_MDH = 0;
-            port<Bus>->CAN_MB[index].CAN_MCR = 0;
-        }
     }
 
     /**
