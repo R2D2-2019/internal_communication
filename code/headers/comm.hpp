@@ -26,6 +26,23 @@ namespace r2d2 {
         template<priority Priority>
         using channel = can_bus::channel_c<bus, Priority>;
 
+        /**
+         * Make sure all other modules
+         * on this device get the given frame.
+         * 
+         * @internal
+         * @param frame 
+         */
+        void distribute_frame_internally(const frame_s &frame) const {
+            using regs = can_bus::comm_module_register_s;
+
+            for (uint8_t i = 0; i < regs::count; i++) {
+                if (regs::reg[i] != this && regs::reg[i]->accepts_frame(frame.type)) {
+                    regs::reg[i]->accept_frame(frame);
+                }
+            }
+        }
+
     public:
         /**
          * Initialize the communication link for a module.
@@ -67,6 +84,12 @@ namespace r2d2 {
             } else {
                 channel<priority::DATA_STREAM>::request_frame(type);
             }
+
+            frame_s frame;
+            frame.type = type;
+            frame.request = true;
+
+            distribute_frame_internally(frame);
         }
 
         /**
@@ -93,6 +116,17 @@ namespace r2d2 {
             } else {
                 channel<priority::DATA_STREAM>::send_frame(data);
             }
+
+            frame_s frame{};
+            frame.type = frame_type_v<T>;
+            
+            memcpy(
+                (void *) frame.bytes,
+                (const void *) &data,
+                sizeof(T)
+            );
+
+            distribute_frame_internally(frame);
         }
     };
 }

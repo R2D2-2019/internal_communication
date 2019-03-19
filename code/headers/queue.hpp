@@ -31,10 +31,6 @@ namespace r2d2 {
          * Won't do anything if the queue is already empty.
          */
         void pop() {
-            if (empty()) {
-                return;
-            }
-
             if constexpr (std::is_pod_v<T>) {
                 /*
                  * Since the destination address is before
@@ -90,7 +86,7 @@ namespace r2d2 {
         /**
          * Get the last item in the queue.
          */
-        T const& back() const{
+        T const& back() const {
             return buffer[index - 1];
         }
 

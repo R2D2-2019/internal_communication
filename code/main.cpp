@@ -12,41 +12,44 @@ int main() {
 
     r2d2::comm_c comm;
 
-    comm.listen_for_frames(
-        {
-            r2d2::frame_type::GET_DISTANCE
-        }
-    );
+    std::array<frame_id, 8> frames = {
+        r2d2::frame_type::BUTTON_STATE
+    };
 
-    packet_distance_s distance;
-    distance.mm = 404;
+    comm.listen_for_frames(frames);
+
+    auto led = hwlib::target::pin_out(hwlib::target::pins::d6);
+
+    uint32_t start = hwlib::now_us();
+    uint32_t counter = 0;
+    uint32_t ticks = 0;
 
     for (;;) {
-        hwlib::cout << "Send frame\r\n";
-
-        comm.request(frame_type::GET_DISTANCE, priority::HIGH);
-        comm.send(distance);
+        comm.request(frame_type::BUTTON_STATE);
 
         while (comm.has_data()) {
             auto frame = comm.get_data();
 
+            // This module doesn't handle requests
             if (frame.request) {
-                hwlib::cout << "Received a request!\r\n";
                 continue;
             }
 
-            switch (frame.type) {
-                case frame_type::GET_DISTANCE: {
-                    const auto received = frame.as_frame_type<frame_type::GET_DISTANCE>();
-                    hwlib::cout << "Received distance: " << received.mm << "\r\n";
-                }
-                    break;
-
-                default:
-                    break;
+            if (frame.type != frame_type::BUTTON_STATE) {
+                continue;
             }
-        }
 
-        hwlib::wait_ms(500);
+            counter += 1;
+            const auto pressed = frame.as_frame_type<frame_type::BUTTON_STATE>().pressed;
+            led.write(pressed);
+
+            ticks = hwlib::now_us() - start;
+            if (ticks >= 1'000'000) {
+                hwlib::cout << counter << "\r\n";
+                start = hwlib::now_us();
+                ticks = 0;
+                counter = 0;
+            }   
+        }
     }
 }

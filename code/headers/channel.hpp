@@ -132,6 +132,8 @@ namespace r2d2::can_bus {
             frame.length = 0;
             frame.frame_type = type;
 
+            while (tx_queue.full()) {}
+
             tx_queue.push(frame);
 
             // Enabling the interrupt on the CAN mailbox with the TX id
@@ -158,6 +160,8 @@ namespace r2d2::can_bus {
 
             frame.length = sizeof(T);
             frame.frame_type = frame_type_v<T>;
+
+            while (tx_queue.full()) {}
 
             tx_queue.push(frame);
 
