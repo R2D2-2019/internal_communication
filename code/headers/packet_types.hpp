@@ -50,7 +50,7 @@ namespace r2d2 {
         NONE = 0,
 
         GET_DISTANCE,
-        GET_BUTTON_STATE,
+        BUTTON_STATE,
 
         COUNT
     };
@@ -120,5 +120,5 @@ namespace r2d2 {
     };
 
     R2D2_INTERNAL_FRAME_HELPER(packet_distance_s, GET_DISTANCE)
-    R2D2_INTERNAL_FRAME_HELPER(packet_button_state_s, GET_BUTTON_STATE)
+    R2D2_INTERNAL_FRAME_HELPER(packet_button_state_s, BUTTON_STATE)
 }
