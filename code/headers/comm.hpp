@@ -43,6 +43,37 @@ namespace r2d2 {
             }
         }
 
+        /**
+         * Send the given data with the given priority.
+         *
+         * @internal
+         * @param type
+         * @param buffer
+         * @param prio
+         */
+        void send_impl(const frame_type &type, const uint8_t data[], const priority prio) const override {
+            if (prio == priority::NORMAL) {
+                channel<priority::NORMAL>::send_frame(data);
+            } else if (prio == priority::HIGH) {
+                channel<priority::HIGH>::send_frame(data);
+            } else if (prio == priority::LOW) {
+                channel<priority::LOW>::send_frame(data);
+            } else {
+                channel<priority::DATA_STREAM>::send_frame(data);
+            }
+
+            frame_s frame{};
+            frame.type = type;
+
+            memcpy(
+                (void *) frame.bytes,
+                (const void *) &data,
+                8
+            );
+
+            distribute_frame_internally(frame);
+        }
+
     public:
         /**
          * Initialize the communication link for a module.
@@ -88,43 +119,6 @@ namespace r2d2 {
             frame_s frame;
             frame.type = type;
             frame.request = true;
-
-            distribute_frame_internally(frame);
-        }
-
-        /**
-         * Send the given data with the given priority
-         * on the bus.
-         *
-         * @tparam T
-         * @param data
-         * @param prio
-         */
-        template<
-            typename T,
-            typename = std::enable_if_t<
-                is_suitable_frame_v<T> && !is_extended_frame_v<T>
-            >
-        >
-        void send(const T &data, const priority prio = priority::NORMAL) const {
-            if (prio == priority::NORMAL) {
-                channel<priority::NORMAL>::send_frame(data);
-            } else if (prio == priority::HIGH) {
-                channel<priority::HIGH>::send_frame(data);
-            } else if (prio == priority::LOW) {
-                channel<priority::LOW>::send_frame(data);
-            } else {
-                channel<priority::DATA_STREAM>::send_frame(data);
-            }
-
-            frame_s frame{};
-            frame.type = static_cast<frame_type>(frame_type_v<T>);
-            
-            memcpy(
-                (void *) frame.bytes,
-                (const void *) &data,
-                sizeof(T)
-            );
 
             distribute_frame_internally(frame);
         }

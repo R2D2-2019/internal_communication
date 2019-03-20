@@ -79,6 +79,15 @@ namespace r2d2 {
          */
         std::array<frame_id, 8> listen_for{};
 
+        /**
+         * Send the given data with the given priority.
+         *
+         * @internal
+         * @param buffer
+         * @param prio
+         */
+        virtual void send_impl(const frame_type &type, const uint8_t data[], const priority prio) const = 0;
+
     public:
         /**
          * Request the given packet on
@@ -87,6 +96,34 @@ namespace r2d2 {
          * @param type 
          */
         virtual void request(const frame_type &type, const priority prio = priority::NORMAL) = 0;
+
+        /**
+         * Send the given data with the given priority
+         * on the bus.
+         *
+         * @tparam T
+         * @param data
+         * @param prio
+         */
+        template<
+            typename T,
+            typename = std::enable_if_t<
+               is_suitable_frame_v<T> && !is_extended_frame_v<T>
+            >
+        >
+        void send(const T &data, const priority prio = priority::NORMAL) const {
+            uint8_t buffer[8] = {};
+
+            memcpy(
+                (void *) buffer,
+                (const void *) &data,
+                sizeof(T)
+            );
+
+            send_impl(
+                static_cast<frame_type>(frame_type_v<T>), buffer, prio
+            );
+        }
 
         /**
          * Listen for the given list of packets.
