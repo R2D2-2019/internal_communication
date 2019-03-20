@@ -51,7 +51,7 @@ namespace r2d2 {
          * @param buffer
          * @param prio
          */
-        void send_impl(const frame_type &type, const uint8_t data[], const priority prio) const override {
+        void send_impl(const frame_type &type, const uint8_t data[], const priority prio) override {
             if (prio == priority::NORMAL) {
                 channel<priority::NORMAL>::send_frame(data);
             } else if (prio == priority::HIGH) {

@@ -86,7 +86,7 @@ namespace r2d2 {
          * @param buffer
          * @param prio
          */
-        virtual void send_impl(const frame_type &type, const uint8_t data[], const priority prio) const = 0;
+        virtual void send_impl(const frame_type &type, const uint8_t data[], const priority prio) = 0;
 
     public:
         /**
@@ -111,7 +111,7 @@ namespace r2d2 {
                is_suitable_frame_v<T> && !is_extended_frame_v<T>
             >
         >
-        void send(const T &data, const priority prio = priority::NORMAL) const {
+        void send(const T &data, const priority prio = priority::NORMAL) {
             uint8_t buffer[8] = {};
 
             memcpy(
