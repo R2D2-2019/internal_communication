@@ -40,7 +40,7 @@ namespace r2d2 {
                 memcpy(
                     (void *) buffer,
                     (const void *) (buffer + 1),
-                    index - 1
+                    index
                 );
             } else {
                 for (size_t i = 1; i < index; i++) {
