@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 /*
  * This macro is used to quickly add packet helper structs
  * that help the communication system understand how to use

@@ -2,9 +2,6 @@
 
 #include "sam.h"
 
-#include "ringbuffer.hpp"
-#include "queue.hpp"
-
 namespace r2d2::can_bus {
     /**
      * PIO A helper representation.

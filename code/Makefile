@@ -15,7 +15,7 @@ SOURCES := $(wildcard src/*.cpp)
 HEADERS := $(wildcard headers/*.hpp)
 
 # other places to look for files for this project
-SEARCH  := ./headers ./src
+SEARCH  := ./headers ./srca
 
 SERIAL_PORT := /dev/ttyACM0
 

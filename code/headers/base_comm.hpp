@@ -1,7 +1,9 @@
 #pragma once
 
+#include <cstring>
 #include <array>
 #include <type_traits>
+#include <ringbuffer.hpp>
 
 #include "packet_types.hpp"
 

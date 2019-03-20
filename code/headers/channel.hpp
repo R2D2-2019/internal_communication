@@ -5,8 +5,8 @@
 #include <cstring>
 
 #include "can.hpp"
-#include "queue.hpp"
-#include "ringbuffer.hpp"
+#include <queue.hpp>
+#include <ringbuffer.hpp>
 #include "base_comm.hpp"
 
 namespace r2d2::can_bus {
