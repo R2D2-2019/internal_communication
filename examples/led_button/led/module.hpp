@@ -1,16 +1,10 @@
 #pragma once
 
-#include <base_comm.hpp>
+#include <base_module.hpp>
 
 namespace r2d2::led {
-    class module_c {
+    class module_c : public base_module_c {
     protected:
-        /**
-         * The communication module
-         * instance.
-         */
-        base_comm_c &comm;
-
         /**
          * The LED pin.
          */
@@ -22,7 +16,7 @@ namespace r2d2::led {
          * @param led
          */
         module_c(base_comm_c &comm, hwlib::pin_out &led)
-            : comm(comm), led(led) {
+            : base_module_c(comm), led(led) {
 
             // Set up listeners
             comm.listen_for_frames({
@@ -33,7 +27,7 @@ namespace r2d2::led {
         /**
          * Let the module process data.
          */
-        void process() {
+        void process() override {
             while (comm.has_data()) {
                 auto frame = comm.get_data();
 

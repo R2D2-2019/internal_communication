@@ -1,16 +1,10 @@
 #pragma once
 
-#include <base_comm.hpp>
+#include <base_module.hpp>
 
 namespace r2d2::button {
-    class module_c {
+    class module_c : public base_module_c {
     protected:
-        /**
-         * The communication module
-         * instance.
-         */
-        base_comm_c &comm;
-
         /**
          * The button pin.
          */
@@ -22,7 +16,7 @@ namespace r2d2::button {
          * @param button
          */
         module_c(base_comm_c &comm, hwlib::pin_in &button)
-            : comm(comm), button(button) {
+            : base_module_c(comm), button(button) {
 
             // Set up listeners
             comm.listen_for_frames(
@@ -35,7 +29,7 @@ namespace r2d2::button {
         /**
          * Let the module process data.
          */
-        void process() {
+        void process() override {
             while (comm.has_data()) {
                 auto frame = comm.get_data();
 

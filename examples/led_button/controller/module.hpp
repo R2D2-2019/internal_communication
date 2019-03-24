@@ -1,22 +1,15 @@
 #pragma once
 
-#include <base_comm.hpp>
+#include <base_module.hpp>
 
 namespace r2d2::controller {
-    class module_c {
-    protected:
-        /**
-         * The communication module
-         * instance.
-         */
-        base_comm_c &comm;
-
+    class module_c : public base_module_c {
     public:
         /**
          * @param comm
          */
         module_c(base_comm_c &comm)
-            : comm(comm) {
+            : base_module_c(comm) {
 
             // Set up listeners
             comm.listen_for_frames(
@@ -29,7 +22,7 @@ namespace r2d2::controller {
         /**
          * Let the module process data.
          */
-        void process() {
+        void process() override {
             // Ask the button module for the button state
             comm.request(frame_type::BUTTON_STATE);
 
