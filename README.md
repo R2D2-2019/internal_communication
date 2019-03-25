@@ -28,7 +28,6 @@ namespace r2d2::module_name {
          * Let the module process data.
          */
         void process() override {
-            // Ask the button module for the button state
             while (comm.has_data()) {
                 auto frame = comm.get_data();
 
@@ -56,24 +55,22 @@ If your module receives requests from the bus, it should process them in the `pr
 while (comm.has_data()) {
     auto frame = comm.get_data();
 
-    // Only handle requests
-    if (!frame.request) {
-        continue;
+    // Is this frame a request?
+    if (frame.request) {
+        // Process request
     }
-
-    // Process request
 }
 ```
 
 ## Send data on the bus
 Use the following code to send data on the bus:
 ```cpp
-    // Get button state, create frame and send
-    packet_button_state_s button_state;
+// Get button state, create frame and send
+packet_button_state_s button_state;
 
-    button_state.pressed = button.read();
+button_state.pressed = button.read();
 
-    comm.send(button_state);
+comm.send(button_state);
 ```
 
 ## Examples
