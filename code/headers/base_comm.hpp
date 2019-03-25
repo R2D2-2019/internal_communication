@@ -189,7 +189,7 @@ namespace r2d2 {
          * @return
          */
         bool accepts_frame(const frame_type &p) const {
-            const auto frames = get_accepted_frame_types();
+            const auto &frames = get_accepted_frame_types();
 
             return std::binary_search(
                 frames.begin(), frames.end(), p
