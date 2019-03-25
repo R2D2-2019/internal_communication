@@ -138,8 +138,8 @@ namespace r2d2 {
 
             // Sort to enable binary search
             std::sort(
-                this->listen_for.begin(),
-                this->listen_for.end()
+                std::begin(this->listen_for),
+                std::end(this->listen_for)
             );
         }
 
@@ -192,7 +192,9 @@ namespace r2d2 {
             const auto &frames = get_accepted_frame_types();
 
             return std::binary_search(
-                frames.begin(), frames.end(), p
+                std::begin(frames),
+                std::end(frames),
+                p
             );
         }
     };
