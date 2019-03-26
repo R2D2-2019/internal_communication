@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstring>
 #include <array>
 #include <type_traits>
@@ -134,6 +135,12 @@ namespace r2d2 {
          */
         void listen_for_frames(const std::array<frame_id, 8> listen_for) {
             this->listen_for = listen_for;
+
+            // Sort to enable binary search
+            std::sort(
+                std::begin(this->listen_for),
+                std::end(this->listen_for)
+            );
         }
 
         /**
@@ -182,13 +189,13 @@ namespace r2d2 {
          * @return
          */
         bool accepts_frame(const frame_type &p) const {
-            for (const auto &packet : get_accepted_frame_types()) {
-                if (packet == p) {
-                    return true;
-                }
-            }
+            const auto &frames = get_accepted_frame_types();
 
-            return false;
+            return std::binary_search(
+                std::begin(frames),
+                std::end(frames),
+                p
+            );
         }
     };
 }
