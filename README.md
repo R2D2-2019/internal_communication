@@ -79,6 +79,12 @@ button_state.pressed = button.read(); // button is a pin_in
 comm.send(button_state);
 ```
 
+#### Accepting all frames
+Sometimes, you want to accept all frame types. That can be done as follows in the constructor of your module:
+```cpp
+comm.listen_for_frames({ frame_type::ALL });
+```
+
 #### More usage examples
 Usage examples can be found in the "examples" folder. Each subfolder in an example represents a module.
 These examples are updated to represent the latest version of the library.
