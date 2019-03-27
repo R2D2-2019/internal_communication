@@ -51,7 +51,6 @@ namespace r2d2 {
     enum frame_type : frame_id {
         NONE = 0,
 
-        GET_DISTANCE,
         BUTTON_STATE,
         ACTIVITY_LED_STATE,
 
@@ -105,20 +104,12 @@ namespace r2d2 {
 
     /** USER STRUCTS */
 
-    /**
-     * Packet containing the request
-     * distance.
-     */
-    struct packet_distance_s {
-        // Distance in millimeters
-        uint16_t mm;
-    };
 
     /**
      * Packet containing the state of 
      * a button.
      */
-    struct packet_button_state_s {
+    struct frame_button_state_s {
         bool pressed;
     };
 
@@ -126,11 +117,10 @@ namespace r2d2 {
      * Packet containing the state of
      * an activity led.
      */
-    struct packet_activity_led_state_s {
+    struct frame_activity_led_state_s {
         bool state;
     };
 
-    R2D2_INTERNAL_FRAME_HELPER(packet_distance_s, GET_DISTANCE)
-    R2D2_INTERNAL_FRAME_HELPER(packet_button_state_s, BUTTON_STATE)
-    R2D2_INTERNAL_FRAME_HELPER(packet_activity_led_state_s, ACTIVITY_LED_STATE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
 }

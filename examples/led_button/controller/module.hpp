@@ -38,7 +38,7 @@ namespace r2d2::controller {
                     frame_type::BUTTON_STATE
                 >().pressed;
 
-                packet_activity_led_state_s led_state;
+                frame_activity_led_state_s led_state;
                 led_state.state = pressed;
 
                 comm.send(led_state);

@@ -39,7 +39,7 @@ namespace r2d2::button {
                 }
 
                 // Get button state, create frame and send
-                packet_button_state_s button_state;
+                frame_button_state_s button_state;
 
                 button_state.pressed = button.read();
 
