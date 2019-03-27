@@ -49,12 +49,16 @@ namespace r2d2 {
      * in the system.
      */
     enum frame_type : frame_id {
+        // Don't touch
         NONE = 0,
 
+        // Frame types
         GET_DISTANCE,
         BUTTON_STATE,
         ACTIVITY_LED_STATE,
 
+        // Don't touch
+        ALL,
         COUNT
     };
 
