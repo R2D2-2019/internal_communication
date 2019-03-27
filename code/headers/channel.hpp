@@ -98,6 +98,20 @@ namespace r2d2::can_bus {
         // send interrupt.
         inline static queue_c<detail::_can_frame_s, 32> tx_queue;
 
+        /**
+         * Volatile flag that is used to signify that there is space
+         * in the tx_queue. The tx_queue is emptied in an interrupt and the
+         * send_frame function will wait until there is space in the tx_queue before
+         * it continues execution.
+         *
+         * However; using while(tx_queue.full()) {} will cause the compiler to
+         * optimize this to a while(true); loop. This is not the desired behaviour.
+         * We can't mark the tx_queue itself als volatile, since that would require marking
+         * all its member functions as volatile as well. So a flag that is cleared each time
+         * the size of tx_queue is reduced is the best option.
+         */
+        inline volatile static bool space_in_tx_queue = true;
+
     public:
         /**
          * Initialize the channel mailboxes.
@@ -161,7 +175,12 @@ namespace r2d2::can_bus {
             frame.length = sizeof(T);
             frame.frame_type = frame_type_v<T>;
 
-            while (tx_queue.full()) {}
+            if (tx_queue.full()) {
+                space_in_tx_queue = false;
+            }
+
+            // Wait for space, space is created in the interrupt
+            while (!space_in_tx_queue);
 
             tx_queue.push(frame);
 
@@ -195,6 +214,7 @@ namespace r2d2::can_bus {
                     // Put the data on the bus
                     const auto frame = tx_queue.copy_and_pop();
                     detail::_write_tx_registers<Bus>(frame, ids::tx);
+                    space_in_tx_queue = true;
                 } else {
                     // Nothing left to send, disable interrupt on the tx mailbox
                     port<Bus>->CAN_IDR = (0x01 << ids::tx);
