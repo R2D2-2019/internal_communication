@@ -187,7 +187,7 @@ namespace r2d2::can_bus {
         >
         static void send_frame(const T &data) {
             /*
-             * If the frame is "simple" (less than 8 bytes), it will
+             * If the frame is "simple" (less than or equal to 8 bytes), it will
              * fit on the transport in one frame. Otherwise, a sequence
              * is created.
              */
