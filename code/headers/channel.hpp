@@ -99,8 +99,36 @@ namespace r2d2::can_bus {
         // send interrupt.
         inline static queue_c<detail::_can_frame_s, 32> tx_queue;
 
-        static void safe_push_frame(const detail::_can_frame_s &frame) {
+        /**
+         * Volatile flag that is used to signify that there is space
+         * in the tx_queue. The tx_queue is emptied in an interrupt and the
+         * send_frame function will wait until there is space in the tx_queue before
+         * it continues execution.
+         *
+         * However; using while(tx_queue.full()) {} will cause the compiler to
+         * optimize this to a while(true); loop. This is not the desired behaviour.
+         * We can't mark the tx_queue itself als volatile, since that would require marking
+         * all its member functions as volatile as well. So a flag that is cleared each time
+         * the size of tx_queue is reduced is the best option.
+         */
+        inline volatile static bool space_in_tx_queue = true;
 
+        /**
+         * Place a frame into the tx_queue, accounting for
+         * a full transfer queue and waiting for the interrupt
+         * to resolve.
+         *
+         * @param frame
+         */
+        static void safely_push_frame(const detail::_can_frame_s &frame) {
+            if (tx_queue.full()) {
+                space_in_tx_queue = false;
+            }
+
+            // Wait for space, space is created in the interrupt
+            while (!space_in_tx_queue);
+
+            tx_queue.push(frame);
         }
 
     public:
@@ -137,9 +165,7 @@ namespace r2d2::can_bus {
             frame.length = 0;
             frame.frame_type = type;
 
-            while (tx_queue.full()) {}
-
-            tx_queue.push(frame);
+            safely_push_frame(frame);
 
             // Enabling the interrupt on the CAN mailbox with the TX id
             // will cause a interrupt when the CAN controller is ready.
@@ -156,76 +182,68 @@ namespace r2d2::can_bus {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_frame_v<T> && !is_extended_frame_v<T>
+                is_suitable_frame_v<T>
             >
         >
         static void send_frame(const T &data) {
-            detail::_can_frame_s frame{};
-
-            memcpy(
-                (void *) frame.data.bytes,
-                (const void *) &data,
-                sizeof(T)
-            );
-
-            frame.length = sizeof(T);
-            frame.frame_type = frame_type_v<T>;
-
-            while (tx_queue.full()) {}
-
-            tx_queue.push(frame);
-
-            // Enabling the interrupt on the CAN mailbox with the TX id
-            // will cause a interrupt when the CAN controller is ready.
-            // At that point will the frame be removed from the tx_queue
-            // and put on the bus.
-            port<Bus>->CAN_IER = (0x01 << ids::tx);
-        }
-
-        /**
-         * Send a frame on this channel.
-         *
-         * @param frame
-         */
-        template<
-            typename T,
-            typename = std::enable_if_t<
-                is_suitable_frame_v<T> && is_extended_frame_v<T>
-            >
-        >
-        static void send_frame(const T &data) {
-            constexpr uint_fast8_t total = sizeof(T) / 8;
-            constexpr uint_fast8_t remainder = sizeof(T) % 8;
-
-            for (uint_fast8_t i = 0; i < total; i++) {
+            /*
+             * If the frame is "simple" (less than 8 bytes), it will
+             * fit on the transport in one frame. Otherwise, a sequence
+             * is created.
+             */
+            if constexpr (!is_extended_frame_v<T>) {
                 detail::_can_frame_s frame{};
 
                 memcpy(
                     (void *) frame.data.bytes,
-                    (const void *) (&data + i),
-                    8
+                    (const void *) &data,
+                    sizeof(T)
                 );
 
-                frame.length = 8;
+                frame.length = sizeof(T);
                 frame.frame_type = frame_type_v<T>;
-                frame.sequence_id = i;
-                frame.sequence_total = total + (remainder > 0);
 
-                tx_queue
+                safely_push_frame(frame);
+            } else {
+                constexpr uint_fast8_t total = sizeof(T) / 8;
+                constexpr uint_fast8_t remainder = sizeof(T) % 8;
+
+                // First, create the bulk of the frame.
+                for (uint_fast8_t i = 0; i < total; i++) {
+                    detail::_can_frame_s frame{};
+
+                    memcpy(
+                        (void *) frame.data.bytes,
+                        (const void *) (static_cast<uint8_t *>(&data) + i),
+                        8
+                    );
+
+                    frame.length = 8;
+                    frame.frame_type = frame_type_v<T>;
+                    frame.sequence_id = i;
+                    frame.sequence_total = total + (remainder > 0);
+
+                    safely_push_frame(frame);
+                }
+
+                // Handle any remaining bytes
+                if (remainder > 0) {
+                    detail::_can_frame_s frame{};
+
+                    memcpy(
+                        (void *) frame.data.bytes,
+                        (const void *) (static_cast<uint8_t *>(&data) + total),
+                        remainder
+                    );
+
+                    frame.length = remainder;
+                    frame.frame_type = frame_type_v<T>;
+                    frame.sequence_id = total;
+                    frame.sequence_total = total + 1;
+
+                    safely_push_frame(frame);
+                }
             }
-
-            memcpy(
-                (void *) frame.data.bytes,
-                (const void *) &data,
-                sizeof(T)
-            );
-
-            frame.length = sizeof(T);
-            frame.frame_type = frame_type_v<T>;
-
-            while (tx_queue.full()) {}
-
-            tx_queue.push(frame);
 
             // Enabling the interrupt on the CAN mailbox with the TX id
             // will cause a interrupt when the CAN controller is ready.
@@ -280,6 +298,7 @@ namespace r2d2::can_bus {
                     // Put the data on the bus
                     const auto frame = tx_queue.copy_and_pop();
                     detail::_write_tx_registers<Bus>(frame, ids::tx);
+                    space_in_tx_queue = true;
                 } else {
                     // Nothing left to send, disable interrupt on the tx mailbox
                     port<Bus>->CAN_IDR = (0x01 << ids::tx);
