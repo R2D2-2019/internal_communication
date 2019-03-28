@@ -173,6 +173,29 @@ namespace r2d2::can_bus {
         }
 
         /**
+         * Send a frame to an external system.
+         *
+         * @tparam T
+         * @param id
+         * @param data
+         */
+        template<typename T>
+        static void send_frame(const external_id_s &id, const T &data) {
+            frame_external_s frame;
+
+            memcpy(
+                (void *) frame.data,
+                (const void *) &data,
+                sizeof(T)
+            );
+
+            frame.length = sizeof(T);
+            frame.id = id;
+
+            send_frame(frame);
+        }
+
+        /**
          * Handle a interrupt meant for this channel.
          */
         static void handle_interrupt(const uint8_t index) {
