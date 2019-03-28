@@ -7,6 +7,7 @@
 #include "can.hpp"
 #include <queue.hpp>
 #include <ringbuffer.hpp>
+#include <cmath>
 #include "base_comm.hpp"
 
 namespace r2d2::can_bus {
@@ -98,6 +99,10 @@ namespace r2d2::can_bus {
         // send interrupt.
         inline static queue_c<detail::_can_frame_s, 32> tx_queue;
 
+        static void safe_push_frame(const detail::_can_frame_s &frame) {
+
+        }
+
     public:
         /**
          * Initialize the channel mailboxes.
@@ -148,9 +153,66 @@ namespace r2d2::can_bus {
          *
          * @param frame
          */
-        template<typename T>
+        template<
+            typename T,
+            typename = std::enable_if_t<
+                is_suitable_frame_v<T> && !is_extended_frame_v<T>
+            >
+        >
         static void send_frame(const T &data) {
             detail::_can_frame_s frame{};
+
+            memcpy(
+                (void *) frame.data.bytes,
+                (const void *) &data,
+                sizeof(T)
+            );
+
+            frame.length = sizeof(T);
+            frame.frame_type = frame_type_v<T>;
+
+            while (tx_queue.full()) {}
+
+            tx_queue.push(frame);
+
+            // Enabling the interrupt on the CAN mailbox with the TX id
+            // will cause a interrupt when the CAN controller is ready.
+            // At that point will the frame be removed from the tx_queue
+            // and put on the bus.
+            port<Bus>->CAN_IER = (0x01 << ids::tx);
+        }
+
+        /**
+         * Send a frame on this channel.
+         *
+         * @param frame
+         */
+        template<
+            typename T,
+            typename = std::enable_if_t<
+                is_suitable_frame_v<T> && is_extended_frame_v<T>
+            >
+        >
+        static void send_frame(const T &data) {
+            constexpr uint_fast8_t total = sizeof(T) / 8;
+            constexpr uint_fast8_t remainder = sizeof(T) % 8;
+
+            for (uint_fast8_t i = 0; i < total; i++) {
+                detail::_can_frame_s frame{};
+
+                memcpy(
+                    (void *) frame.data.bytes,
+                    (const void *) (&data + i),
+                    8
+                );
+
+                frame.length = 8;
+                frame.frame_type = frame_type_v<T>;
+                frame.sequence_id = i;
+                frame.sequence_total = total + (remainder > 0);
+
+                tx_queue
+            }
 
             memcpy(
                 (void *) frame.data.bytes,
