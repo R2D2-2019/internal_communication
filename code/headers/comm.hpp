@@ -62,6 +62,11 @@ namespace r2d2 {
                 channel<priority::DATA_STREAM>::send_frame(data);
             }
 
+            // Only internally distribute when needed
+            if (can_bus::comm_module_register_s::count <= 1) {
+                return;
+            }
+
             frame_s frame{};
             frame.type = type;
 
