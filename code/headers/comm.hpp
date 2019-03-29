@@ -51,15 +51,15 @@ namespace r2d2 {
          * @param buffer
          * @param prio
          */
-        void send_impl(const frame_type &type, const uint8_t data[], const priority prio) override {
+        void send_impl(const frame_type &type, const uint8_t data[], const size_t length, const priority prio) override {
             if (prio == priority::NORMAL) {
-                channel<priority::NORMAL>::send_frame(data);
+                channel<priority::NORMAL>::send_frame(type, data, length);
             } else if (prio == priority::HIGH) {
-                channel<priority::HIGH>::send_frame(data);
+                channel<priority::HIGH>::send_frame(type, data, length);
             } else if (prio == priority::LOW) {
-                channel<priority::LOW>::send_frame(data);
+                channel<priority::LOW>::send_frame(type, data, length);
             } else {
-                channel<priority::DATA_STREAM>::send_frame(data);
+                channel<priority::DATA_STREAM>::send_frame(type, data, length);
             }
 
             // Only internally distribute when needed
@@ -119,6 +119,11 @@ namespace r2d2 {
                 channel<priority::LOW>::request_frame(type);
             } else {
                 channel<priority::DATA_STREAM>::request_frame(type);
+            }
+
+            // Only internally distribute when needed
+            if (can_bus::comm_module_register_s::count <= 1) {
+                return;
             }
 
             frame_s frame;

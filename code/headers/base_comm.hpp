@@ -94,7 +94,7 @@ namespace r2d2 {
          * @param buffer
          * @param prio
          */
-        virtual void send_impl(const frame_type &type, const uint8_t data[], const priority prio) = 0;
+        virtual void send_impl(const frame_type &type, const uint8_t data[], const size_t length, const priority prio) = 0;
 
     public:
         /**
@@ -116,21 +116,48 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-               is_suitable_frame_v<T> && !is_extended_frame_v<T>
+               is_suitable_frame_v<T>
             >
         >
         void send(const T &data, const priority prio = priority::NORMAL) {
-            uint8_t buffer[8] = {};
+            send_impl(
+                static_cast<frame_type>(frame_type_v<T>),
+                static_cast<uint8_t *>(&data),
+                sizeof(T),
+                prio
+            );
+        }
+
+        /**
+         * Send the given data to an external system
+         * with the given priority.
+         *
+         * @tparam T
+         * @param id
+         * @param data
+         * @param prio
+         */
+        template<
+            typename T,
+            typename = std::enable_if_t<
+                is_suitable_frame_v<T>
+            >
+        >
+        void send(const external_id_s &id, const T &data, const priority prio = priority::NORMAL) {
+            // No {} needed, since all fields are filled.
+            // Adding it will cause a call to memset
+            frame_external_s frame;
 
             memcpy(
-                (void *) buffer,
+                (void *) frame.data,
                 (const void *) &data,
                 sizeof(T)
             );
 
-            send_impl(
-                static_cast<frame_type>(frame_type_v<T>), buffer, prio
-            );
+            frame.length = sizeof(T);
+            frame.id = id;
+
+            send(frame, prio);
         }
 
         /**
@@ -138,7 +165,7 @@ namespace r2d2 {
          *
          * @param listen_for
          */
-        void listen_for_frames(const std::array<frame_id, 8> listen_for) {
+        void listen_for_frames(std::array<frame_id, 8> listen_for /* Copy to allow move */) {
             this->listen_for = listen_for;
 
             // Sort to enable binary search

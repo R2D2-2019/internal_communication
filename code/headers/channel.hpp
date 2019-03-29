@@ -179,34 +179,28 @@ namespace r2d2::can_bus {
          *
          * @param frame
          */
-        template<
-            typename T,
-            typename = std::enable_if_t<
-                is_suitable_frame_v<T>
-            >
-        >
-        static void send_frame(const T &data) {
+        static void send_frame(const frame_type &type, const uint8_t *data, const size_t length) {
             /*
              * If the frame is "simple" (less than or equal to 8 bytes), it will
              * fit on the transport in one frame. Otherwise, a sequence
              * is created.
              */
-            if constexpr (!is_extended_frame_v<T>) {
+            if (length <= 8) {
                 detail::_can_frame_s frame{};
 
                 memcpy(
                     (void *) frame.data.bytes,
                     (const void *) &data,
-                    sizeof(T)
+                    length
                 );
 
-                frame.length = sizeof(T);
-                frame.frame_type = frame_type_v<T>;
+                frame.length = length;
+                frame.frame_type = type;
 
                 safely_push_frame(frame);
             } else {
-                constexpr uint_fast8_t total = sizeof(T) / 8;
-                constexpr uint_fast8_t remainder = sizeof(T) % 8;
+                const uint_fast8_t total = length / 8;
+                const uint_fast8_t remainder = length % 8;
 
                 // First, create the bulk of the frame.
                 for (uint_fast8_t i = 0; i < total; i++) {
@@ -214,12 +208,12 @@ namespace r2d2::can_bus {
 
                     memcpy(
                         (void *) frame.data.bytes,
-                        (const void *) (static_cast<uint8_t *>(&data) + i),
+                        (const void *) (&data + i),
                         8
                     );
 
                     frame.length = 8;
-                    frame.frame_type = frame_type_v<T>;
+                    frame.frame_type = type;
                     frame.sequence_id = i;
                     frame.sequence_total = total + (remainder > 0);
 
@@ -232,12 +226,12 @@ namespace r2d2::can_bus {
 
                     memcpy(
                         (void *) frame.data.bytes,
-                        (const void *) (static_cast<uint8_t *>(&data) + total),
+                        (const void *) (&data + total),
                         remainder
                     );
 
                     frame.length = remainder;
-                    frame.frame_type = frame_type_v<T>;
+                    frame.frame_type = type;
                     frame.sequence_id = total;
                     frame.sequence_total = total + 1;
 
@@ -250,29 +244,6 @@ namespace r2d2::can_bus {
             // At that point will the frame be removed from the tx_queue
             // and put on the bus.
             port<Bus>->CAN_IER = (0x01 << ids::tx);
-        }
-
-        /**
-         * Send a frame to an external system.
-         *
-         * @tparam T
-         * @param id
-         * @param data
-         */
-        template<typename T>
-        static void send_frame(const external_id_s &id, const T &data) {
-            frame_external_s frame;
-
-            memcpy(
-                (void *) frame.data,
-                (const void *) &data,
-                sizeof(T)
-            );
-
-            frame.length = sizeof(T);
-            frame.id = id;
-
-            send_frame(frame);
         }
 
         /**
