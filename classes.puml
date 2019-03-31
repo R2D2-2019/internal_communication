@@ -1,0 +1,78 @@
+@startuml
+enum priority {
+    HIGH
+    NORMAL
+    LOW
+    DATA_STREAM
+}
+
+enum frame_type {
+    NONE
+
+    // All other types
+
+    EXTERNAL
+    ALL
+    COUNT
+}
+
+class channel_c<Bus, priority> {
+
+}
+
+class comm_module_register_s {
+    +{static} uint8_t count
+    +{static} std::array<base_comm_c *, max_modules> reg
+
+    +{static} void clear_register()
+    +{static} void register_module(base_comm_c *c)
+}
+
+class frame_s {
+    +frame_type type
+    +bool request
+    +uint8_t bytes[]
+
+    +T as_type<T>()
+    +T as_frame_type<frame_type P>()
+}
+
+abstract class base_comm_c {
+    #{abstract} void send_impl(frame_type type, uint8_t data[], size_t length, priority prio)
+
+    +{abstract} void request(frame_type type, priority prio)
+    +void send<T>(T data, priority prio)
+    +void send<T>(external_id_s id, T data, priority prio)
+    +void listen_for_frames(std::array listen_for)
+    +void accept_frame(frame_s frame)
+    +bool has_data()
+    +frame_s get_data()
+    +std::array get_accepted_frame_types()
+    +bool accepts_frame(frame_type p)
+}
+
+abstract class base_module_c {
+    +base_module_c(base_comm_c comm)
+    +{abstract} void process()
+}
+
+class comm_c {
+    +comm_c()
+    +void request(frame_type type, priority prio)
+}
+
+class mock_comm_c {
+    +void request(frame_type type, priority prio)
+    +frame_s create_frame(frame_data_t<P> data)
+    +std::vector get_send_frames()
+}
+
+comm_c - comm_module_register_s : Registers in >
+comm_c - channel_c: Uses >
+base_comm_c - frame_s : Talks using >
+
+base_comm_c o-- base_module_c
+base_module_c ^-- comm_c
+base_module_c ^-- mock_comm_c
+
+@enduml
