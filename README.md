@@ -89,6 +89,93 @@ comm.listen_for_frames({ frame_type::ALL });
 Usage examples can be found in the "examples" folder. Each subfolder in an example represents a module.
 These examples are updated to represent the latest version of the library.
 
+### Testing
+### The mock bus
+To facilitate testing modules using Catch2, a mock bus was created.
+This bus is instantiated and passed to the constructor of a module.
+With this bus, you can create packages and inspect how the module responds to them.
+Please note that the mock bus is only meant for tests; it probably won't work on the microcontroller
+because it is allowed to use the heap.
+
+### Writing a test
+Let's say we have a LED module. This LED module receives a `ACTIVITY_LED_STATE` frame from the bus.
+Based on the state given in the frame, it should turn on or off a LED.
+This module could be tested as follows:
+```cpp
+TEST_CASE("LED module outputs the correct LED state", "[led_module]") {
+    // The bus itself doesn't take any constructor arguments
+    mock_comm_c mock_bus;
+
+    // hwlib pin_out_store is handy for tests, because it allows
+    // us to inspect the current state.
+    hwlib::pin_out_store out;
+
+    /*
+     * The LED module.
+     * The module constructor receives a base_comm_c& and an hwlib::pin_out&.
+     * As you can see, using the constructor to receive interfaces on your module really
+     * helps with testing and abstraction!
+     */
+    led::module_c module(mock_bus, out);
+
+    // Create a frame
+    auto frame = mock_bus.create_frame<
+        frame_type::ACTIVITY_LED_STATE
+    >();
+
+    // LED should go to "on"
+    // "as_frame_type" interprets the frame as the struct that corresponds
+    // to the given enumeration value.
+    // 
+    // E.g. frame_type::ACTIVITY_LED_STATE is matched to frame_activity_led_state_s,
+    // so calling as_frame_type with this enumartion value will yield a frame_activity_led_state_s instance.
+    // 
+    // Please note that this data is not copied, it is a non-owning reference to the frame
+    // created earlier. 
+    frame.as_frame_type<frame_type::ACTIVITY_LED_STATE>().state = true;
+    
+    // Actually place the frame on the bus, so the module
+    // can see and process it.
+    mock_bus.accept_frame(frame);
+
+    // Sanity check
+    REQUIRE(out.value == false);
+
+    // Manually call the process function on the module
+    // to allow it to process everything.
+    module.process();
+
+    REQUIRE(out.value == true);
+}
+```
+
+In the code snippet above, roughly the following is happening:
+ - Initialize dependencies: the mock bus and the pin out
+ - Create the module
+ - Use the mock bus to create a frame with the given type
+ - Set a state to a testable value
+ - Place the frame on the bus
+ - Let the module process
+ - Check the result; did the pin_out turn on?
+ 
+Let's look at another module type; a controller.
+The controller receives frames on the bus, and places frames in response.
+The mock bus has the `get_send_frames` function. This function returns all frames that have
+been send and allows you to inspect them.
+
+It would look somewhat like this:
+```cpp
+/* initialization omitted */
+
+mock_bus.accept_frame(frame);
+
+module.process();
+
+auto frames = mock_bus.get_send_frames();
+
+// Compare the values in frames with the expected result
+```
+
 ### Frames
 Sending, requesting or receiving on the bus is done using frames. A frame is a ordered collection of bytes that can be sent or received. Frames are defined in [packet_types.hpp](https://github.com/R2D2-2019/internal_communication/blob/master/code/headers/packet_types.hpp).
 Frames are derived from a struct; the struct describes what data the frame contains. A struct is only valid for use as a frame when it is POD type (e.g. [std::is_pod](https://duckduckgo.com/?q=c%2B%2B+pod+types&t=canonical&ia=web) is true for the struct).
