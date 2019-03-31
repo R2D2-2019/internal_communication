@@ -44,7 +44,7 @@ In the constructor, the `listen_for_frames` method of the communication instance
 You **need** to specify frames you want to receive. This is also the case for requests. Please look at the examples folder for more usage examples.
 
 ### UML
-![Class diagram](https://raw.githubusercontent.com/R2D2-2019/internal_communication/feature-puml_diagram/classes.puml)
+![Class diagram](http://www.plantuml.com/plantuml/proxy?https://raw.githubusercontent.com/R2D2-2019/internal_communication/feature-puml_diagram/classes.puml)
 
 ## Usage (C++)
 
