@@ -15,7 +15,7 @@ namespace r2d2 {
         /**
          * @param comm
          */
-        explicit module_c(base_comm_c &comm)
+        explicit base_module_c(base_comm_c &comm)
             : comm(comm) { }
 
         /**
