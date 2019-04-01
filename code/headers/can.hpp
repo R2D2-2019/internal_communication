@@ -343,7 +343,7 @@ namespace r2d2::can_bus {
                 frame.mode = (id >> 25) & 0x01;
                 frame.frame_type = (id >> 10) & 0xFF;
                 frame.sequence_id = (id >> 5) & 0x1F;
-                frame.sequence_total = (id >> 5) & 0x1F;
+                frame.sequence_total = id & 0x1F;
             }
                 // Standard ID, this is an error.
             else {
