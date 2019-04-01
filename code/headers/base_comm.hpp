@@ -122,7 +122,7 @@ namespace r2d2 {
         void send(const T &data, const priority prio = priority::NORMAL) {
             send_impl(
                 static_cast<frame_type>(frame_type_v<T>),
-                static_cast<uint8_t *>(&data),
+                reinterpret_cast<const uint8_t *>(&data),
                 sizeof(T),
                 prio
             );
