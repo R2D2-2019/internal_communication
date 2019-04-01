@@ -148,11 +148,9 @@ namespace r2d2 {
             // Adding it will cause a call to memset
             frame_external_s frame;
 
-            memcpy(
-                (void *) frame.data,
-                (const void *) &data,
-                sizeof(T)
-            );
+            for(uint_fast8_t i = 0; i < sizeof(T); i++){
+                frame.data[i] = data[i];
+            }
 
             frame.length = sizeof(T);
             frame.id = id;
