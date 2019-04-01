@@ -148,7 +148,7 @@ namespace r2d2 {
             // Adding it will cause a call to memset
             frame_external_s frame;
 
-            for(uint_fast8_t i = 0; i < sizeof(T); i++){
+            for(size_t i = 0; i < sizeof(T); i++){
                 frame.data[i] = data[i];
             }
 

@@ -70,12 +70,6 @@ namespace r2d2 {
             frame_s frame{};
             frame.type = type;
 
-            // memcpy(
-            //     (void *) frame.bytes,
-            //     (const void *) &data,
-            //     8
-            // );
-
             for(uint_fast8_t i = 0; i < 8; i++){
                 frame.bytes[i] = data[i];
             }

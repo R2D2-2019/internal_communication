@@ -345,7 +345,7 @@ namespace r2d2::can_bus {
                 frame.sequence_id = (id >> 5) & 0x1F;
                 frame.sequence_total = id & 0x1F;
             }
-                // Standard ID, this is an error.
+            // Standard ID, this is an error.
             else {
                 retval = mailbox_status::RX_FAILURE_STD_RECEIVED;
                 return retval;
