@@ -41,10 +41,10 @@ namespace r2d2::button {
                 // Get button state, create frame and send
                 frame_button_state_s button_state;
 
-                button_state.pressed = button.read();
+                button_state.pressed = !button.read();
 
                 comm.send(button_state);
             }
         }
-    }
+    };
 }
