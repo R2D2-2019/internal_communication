@@ -172,7 +172,7 @@ Directly connecting the Due to these types of components will likely damage or d
 
 ### Frame structure
 A CAN frame within the project has the following structure:
-[![CAN-frame-1.png](https://i.postimg.cc/RFgPWWKV/CAN-frame-1.png)](https://postimg.cc/njQK5c36)
+[![CAN-frame-1-1.png](https://i.postimg.cc/9fMyyFJb/CAN-frame-1-1.png)](https://postimg.cc/18kgQPxV)
 
 Explanation:
  - ID: the priority (channel) of the frame. Lower value = higher priority.
