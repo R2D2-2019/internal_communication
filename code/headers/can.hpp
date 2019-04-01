@@ -386,12 +386,13 @@ namespace r2d2::can_bus {
         template<typename Bus>
         void _write_tx_registers(const _can_frame_s &frame, const uint8_t index) {
             // Set sequence id and total
-            port<Bus>->CAN_MB[index].CAN_MID |=
+            port<Bus>->CAN_MB[index].CAN_MID =
                 ((index + 1) << 26) |
                 ((frame.mode & 0x01) << 25) |
                 (frame.frame_type << 10) |
                 ((frame.sequence_id & 0x1F) << 5) |
-                (frame.sequence_total & 0x1F);
+                (frame.sequence_total & 0x1F) |
+                CAN_MID_MIDE;
 
             // Set the data length on the mailbox.
             port<Bus>->CAN_MB[index].CAN_MCR =
