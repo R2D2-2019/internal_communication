@@ -44,5 +44,5 @@ namespace r2d2::controller {
                 comm.send(led_state);
             }
         }
-    }
+    };
 }

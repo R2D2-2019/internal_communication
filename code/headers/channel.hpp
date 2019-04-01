@@ -188,11 +188,15 @@ namespace r2d2::can_bus {
             if (length <= 8) {
                 detail::_can_frame_s frame{};
 
-                memcpy(
-                    (void *) frame.data.bytes,
-                    (const void *) &data,
-                    length
-                );
+                // memcpy(
+                //     (void *) frame.data.bytes,
+                //     (const void *) &data,
+                //     length
+                // );
+
+                for(size_t i = 0; i < length; i++){
+                    frame.data.bytes[i] = data[i];
+                }
 
                 frame.length = length;
                 frame.frame_type = type;
@@ -287,11 +291,15 @@ namespace r2d2::can_bus {
             frame.type = static_cast<frame_type>(can_frame.frame_type);
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
-            memcpy(
-                (void *) frame.bytes,
-                (const void *) can_frame.data.bytes,
-                8 // Has to be 8 bytes; frame.length is copied in a lower layer
-            );
+            // memcpy(
+            //     (void *) frame.bytes,
+            //     (const void *) can_frame.data.bytes,
+            //     8 // Has to be 8 bytes; frame.length is copied in a lower layer
+            // );
+
+            for(uint_fast8_t i = 0; i < 8; i++){
+                frame.bytes[i] = can_frame.data.bytes[i];
+            }
 
             using regs = comm_module_register_s;
 
