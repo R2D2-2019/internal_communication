@@ -17,7 +17,8 @@ namespace r2d2 {
           * @param buffer
           * @param prio
           */
-        void send_impl(const frame_type &type, const uint8_t data[], const priority prio) override {
+        void send_impl(const frame_type &type, const uint8_t data[], const size_t length, const priority prio) override {
+            // TODO: large frame support
             frame_s frame{};
             frame.type = type;
 

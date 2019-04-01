@@ -57,6 +57,7 @@ namespace r2d2 {
         ACTIVITY_LED_STATE,
 
         // Don't touch
+        EXTERNAL,
         ALL,
         COUNT
     };
@@ -104,7 +105,31 @@ namespace r2d2 {
     template<typename T>
     constexpr frame_id frame_type_v = frame_type_s<T>::type;
 
+    /**
+    * A struct that helps to describe
+    * an external system address.
+    * Might change, depending on the external
+    * communication module.
+    */
+    struct external_id_s {
+        // 3th and 4th octet
+        uint8_t octets[2];
+    };
 
+    /**
+     * This frame describes a frame meant for external
+     * systems. Tparam T describes the actual frame being send;
+     * this structs wraps the internal frame.
+     *
+     * @tparam T
+     */
+    struct frame_external_s {
+        uint8_t data[256];
+        uint8_t length;
+        external_id_s id;
+    };
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_external_s, EXTERNAL)
 
     /** USER STRUCTS */
 

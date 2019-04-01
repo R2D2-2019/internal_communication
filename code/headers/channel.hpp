@@ -7,6 +7,7 @@
 #include "can.hpp"
 #include <queue.hpp>
 #include <ringbuffer.hpp>
+#include <cmath>
 #include "base_comm.hpp"
 
 namespace r2d2::can_bus {
@@ -98,6 +99,38 @@ namespace r2d2::can_bus {
         // send interrupt.
         inline static queue_c<detail::_can_frame_s, 32> tx_queue;
 
+        /**
+         * Volatile flag that is used to signify that there is space
+         * in the tx_queue. The tx_queue is emptied in an interrupt and the
+         * send_frame function will wait until there is space in the tx_queue before
+         * it continues execution.
+         *
+         * However "using while(tx_queue.full()) {}" will cause the compiler to
+         * optimize this to a while(true); loop. This is not the desired behaviour.
+         * We can't mark the tx_queue itself als volatile, since that would require marking
+         * all its member functions as volatile as well. So a flag that is cleared each time
+         * the size of tx_queue is reduced is the best option.
+         */
+        inline volatile static bool space_in_tx_queue = true;
+
+        /**
+         * Place a frame into the tx_queue, accounting for
+         * a full transfer queue and waiting for the interrupt
+         * to resolve.
+         *
+         * @param frame
+         */
+        static void safely_push_frame(const detail::_can_frame_s &frame) {
+            if (tx_queue.full()) {
+                space_in_tx_queue = false;
+            }
+
+            // Wait for space, space is created in the interrupt
+            while (!space_in_tx_queue);
+
+            tx_queue.push(frame);
+        }
+
     public:
         /**
          * Initialize the channel mailboxes.
@@ -132,9 +165,7 @@ namespace r2d2::can_bus {
             frame.length = 0;
             frame.frame_type = type;
 
-            while (tx_queue.full()) {}
-
-            tx_queue.push(frame);
+            safely_push_frame(frame);
 
             // Enabling the interrupt on the CAN mailbox with the TX id
             // will cause a interrupt when the CAN controller is ready.
@@ -148,22 +179,60 @@ namespace r2d2::can_bus {
          *
          * @param frame
          */
-        template<typename T>
-        static void send_frame(const T &data) {
-            detail::_can_frame_s frame{};
+        static void send_frame(const frame_type &type, const uint8_t *data, const size_t length) {
+            /*
+             * If the frame is "simple" (less than or equal to 8 bytes), it will
+             * fit on the transport in one frame. Otherwise, a sequence
+             * is created.
+             */
+            if (length <= 8) {
+                detail::_can_frame_s frame{};
 
-            memcpy(
-                (void *) frame.data.bytes,
-                (const void *) &data,
-                sizeof(T)
-            );
+                for(size_t i = 0; i < length; i++){
+                    frame.data.bytes[i] = data[i];
+                }
 
-            frame.length = sizeof(T);
-            frame.frame_type = frame_type_v<T>;
+                frame.length = length;
+                frame.frame_type = type;
 
-            while (tx_queue.full()) {}
+                safely_push_frame(frame);
+            } else {
+                const uint_fast8_t total = length / 8;
+                const uint_fast8_t remainder = length % 8;
 
-            tx_queue.push(frame);
+                // First, create the bulk of the frame.
+                for (uint_fast8_t i = 0; i < total; i++) {
+                    detail::_can_frame_s frame{};
+
+                    // Has to be 8 bytes; frame.length is copied in a lower layer
+                    for(uint_fast8_t j = 0; j < 8; j++){
+                        frame.data.bytes[j] = data[j + i];
+                    }
+
+                    frame.length = 8;
+                    frame.frame_type = type;
+                    frame.sequence_id = i;
+                    frame.sequence_total = total + (remainder > 0);
+
+                    safely_push_frame(frame);
+                }
+
+                // Handle any remaining bytes
+                if (remainder > 0) {
+                    detail::_can_frame_s frame{};
+
+                    for(uint_fast8_t i = 0; i < remainder; i++){
+                        frame.data.bytes[i] = data[i + total];
+                    }
+
+                    frame.length = remainder;
+                    frame.frame_type = type;
+                    frame.sequence_id = total;
+                    frame.sequence_total = total + 1;
+
+                    safely_push_frame(frame);
+                }
+            }
 
             // Enabling the interrupt on the CAN mailbox with the TX id
             // will cause a interrupt when the CAN controller is ready.
@@ -195,6 +264,7 @@ namespace r2d2::can_bus {
                     // Put the data on the bus
                     const auto frame = tx_queue.copy_and_pop();
                     detail::_write_tx_registers<Bus>(frame, ids::tx);
+                    space_in_tx_queue = true;
                 } else {
                     // Nothing left to send, disable interrupt on the tx mailbox
                     port<Bus>->CAN_IDR = (0x01 << ids::tx);
@@ -212,11 +282,9 @@ namespace r2d2::can_bus {
             frame.type = static_cast<frame_type>(can_frame.frame_type);
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
-            memcpy(
-                (void *) frame.bytes,
-                (const void *) can_frame.data.bytes,
-                8 // Has to be 8 bytes; frame.length is copied in a lower layer
-            );
+            for(uint_fast8_t i = 0; i < 8; i++){
+                frame.bytes[i] = can_frame.data.bytes[i];
+            }
 
             using regs = comm_module_register_s;
 
