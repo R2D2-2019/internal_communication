@@ -105,7 +105,7 @@ namespace r2d2::can_bus {
          * send_frame function will wait until there is space in the tx_queue before
          * it continues execution.
          *
-         * However, using while(tx_queue.full()) {} will cause the compiler to
+         * However "using while(tx_queue.full()) {}" will cause the compiler to
          * optimize this to a while(true); loop. This is not the desired behaviour.
          * We can't mark the tx_queue itself als volatile, since that would require marking
          * all its member functions as volatile as well. So a flag that is cleared each time
@@ -204,6 +204,7 @@ namespace r2d2::can_bus {
                 for (uint_fast8_t i = 0; i < total; i++) {
                     detail::_can_frame_s frame{};
 
+                    // Has to be 8 bytes; frame.length is copied in a lower layer
                     for(uint_fast8_t j = 0; j < 8; j++){
                         frame.data.bytes[j] = data[j + i];
                     }
