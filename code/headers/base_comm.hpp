@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <ringbuffer.hpp>
 
-#include "packet_types.hpp"
+#include "frame_types.hpp"
 
 namespace r2d2 {
     /**

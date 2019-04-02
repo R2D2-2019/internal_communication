@@ -90,7 +90,7 @@ Usage examples can be found in the "examples" folder. Each subfolder in an examp
 These examples are updated to represent the latest version of the library.
 
 ### Frames
-Sending, requesting or receiving on the bus is done using frames. A frame is a ordered collection of bytes that can be sent or received. Frames are defined in [packet_types.hpp](https://github.com/R2D2-2019/internal_communication/blob/master/code/headers/packet_types.hpp).
+Sending, requesting or receiving on the bus is done using frames. A frame is a ordered collection of bytes that can be sent or received. Frames are defined in [frame_types.hpp](https://github.com/R2D2-2019/internal_communication/blob/master/code/headers/frame_types.hpp).
 Frames are derived from a struct; the struct describes what data the frame contains. A struct is only valid for use as a frame when it is POD type (e.g. [std::is_pod](https://duckduckgo.com/?q=c%2B%2B+pod+types&t=canonical&ia=web) is true for the struct).
 Using non-POD structs is not possible; the code won't compile. 
 
@@ -99,14 +99,14 @@ At the moment of writing, sending frames that are larger than 8 bytes is still i
 This will be functional and documented in the future.
 
 #### What does a frame look like in code?
-A frame consists of three parts, all in [packet_types.hpp](https://github.com/R2D2-2019/internal_communication/blob/master/code/headers/packet_types.hpp).
+A frame consists of three parts, all in [frame_types.hpp](https://github.com/R2D2-2019/internal_communication/blob/master/code/headers/frame_types.hpp).
 The first is the enumeration value that refers to the frame:
 ```cpp
 enum frame_type : frame_id {
     // Don't touch
     NONE = 0,
 
-    // The different packet types
+    // The different frame types
     BUTTON_STATE,
     ACTIVITY_LED_STATE,
 
@@ -138,12 +138,12 @@ R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
 You should create a Pull Request containing the frame definition you want to add.
 It has to follow the structure you can see under the previous heading.
 In short, your PR should contain:
- - The enumeration value for your packet
+ - The enumeration value for your frame
  - The struct containing its definition
  - The macro connection the enumeration value to the struct
  
  The leads will need to approve and merge the PR.
- Once merged, the build system will be updated and everyone can pull in the new packet type.
+ Once merged, the build system will be updated and everyone can pull in the new frame type.
 
 
 ## CAN
@@ -178,10 +178,10 @@ Explanation:
  - ID: the priority (channel) of the frame. Lower value = higher priority.
  - R/W: whether the frame is a read (request) of write. Write is the default.
  - Free: bits not yet assigned.
- - Reserved: possibly required to support more than 256 packet types in the future.
+ - Reserved: possibly required to support more than 256 frame types in the future.
  - Frame type: the type of the frame (enumeration value) 
  - Sequence id: the id of this frame in the sequence (e.g. frame id is 27 of 30 frames total)
  - Sequence total: the total amount of frames in the sequence
  - Length (protocol defined): the length of the data segment
  - Data (protocol defined): maximum of 8 bytes
- - CRC (protocol defined): the CRC of the packet
+ - CRC (protocol defined): the CRC of the frame

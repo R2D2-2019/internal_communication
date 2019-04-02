@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-#include "packet_types.hpp"
+#include "frame_types.hpp"
 #include "channel.hpp"
 
 namespace r2d2 {
