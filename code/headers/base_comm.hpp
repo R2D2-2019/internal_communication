@@ -155,7 +155,15 @@ namespace r2d2 {
             frame.length = sizeof(T);
             frame.id = id;
 
-            send(frame, prio);
+            send_impl(
+                frame_type::EXTERNAL,
+                reinterpret_cast<const uint8_t *>(&frame),
+
+                // NOTE: we rely on the fact that data is the last member
+                // in the struct here!
+                offsetof(frame_external_s, data) + sizeof(T),
+                prio
+            );
         }
 
         /**

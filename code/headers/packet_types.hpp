@@ -124,9 +124,12 @@ namespace r2d2 {
      * @tparam T
      */
     struct frame_external_s {
-        uint8_t data[256];
         uint8_t length;
         external_id_s id;
+
+        // NOTE: data should come last; ordering is important
+        // for this specific struct!
+        uint8_t data[256];
     };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_external_s, EXTERNAL)
