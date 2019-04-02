@@ -153,6 +153,9 @@ namespace r2d2 {
 
     /**
      * Distance in milimeter
+     * 
+     * Distance sensor wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Measuring-distance
      */
     struct frame_distance_s {
         uint16_t mm;
