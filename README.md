@@ -229,6 +229,8 @@ In short, your PR should contain:
  - The struct containing its definition
  - The macro connection the enumeration value to the struct
  
+You should add these values **beside** the other values/definitions. So the enum value should be inserted into the already existing enumeration. Don't redefine existing structures.
+ 
  The leads will need to approve and merge the PR.
  Once merged, the build system will be updated and everyone can pull in the new packet type.
 
