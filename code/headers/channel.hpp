@@ -133,9 +133,7 @@ namespace r2d2::can_bus {
                 // Are we in error mode?
                 if (errp) {
                     tx_queue.pop();
-                    tx_queue.push(frame);
-
-                    return;
+                    break;
                 }
             }
 
