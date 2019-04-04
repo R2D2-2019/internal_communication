@@ -126,7 +126,18 @@ namespace r2d2::can_bus {
             }
 
             // Wait for space, space is created in the interrupt
-            while (!space_in_tx_queue);
+            while (!space_in_tx_queue) {
+                // ERRP = Error Passive Mode
+                bool errp = (port<Bus>->CAN_SR >> 18) & 1;
+
+                // Are we in error mode?
+                if (errp) {
+                    tx_queue.pop();
+                    tx_queue.push(frame);
+
+                    return;
+                }
+            }
 
             tx_queue.push(frame);
         }
@@ -188,7 +199,7 @@ namespace r2d2::can_bus {
             if (length <= 8) {
                 detail::_can_frame_s frame{};
 
-                for(size_t i = 0; i < length; i++){
+                for (size_t i = 0; i < length; i++) {
                     frame.data.bytes[i] = data[i];
                 }
 
@@ -205,7 +216,7 @@ namespace r2d2::can_bus {
                     detail::_can_frame_s frame{};
 
                     // Has to be 8 bytes; frame.length is copied in a lower layer
-                    for(uint_fast8_t j = 0; j < 8; j++){
+                    for (uint_fast8_t j = 0; j < 8; j++) {
                         frame.data.bytes[j] = data[j + i];
                     }
 
@@ -221,7 +232,7 @@ namespace r2d2::can_bus {
                 if (remainder > 0) {
                     detail::_can_frame_s frame{};
 
-                    for(uint_fast8_t i = 0; i < remainder; i++){
+                    for (uint_fast8_t i = 0; i < remainder; i++) {
                         frame.data.bytes[i] = data[i + total];
                     }
 
@@ -282,7 +293,7 @@ namespace r2d2::can_bus {
             frame.type = static_cast<frame_type>(can_frame.frame_type);
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
-            for(uint_fast8_t i = 0; i < 8; i++){
+            for (uint_fast8_t i = 0; i < 8; i++) {
                 frame.bytes[i] = can_frame.data.bytes[i];
             }
 
