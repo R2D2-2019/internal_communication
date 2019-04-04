@@ -159,7 +159,7 @@ namespace r2d2 {
      */
     struct frame_distance_s {
         uint16_t mm;
-    }
+    };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
