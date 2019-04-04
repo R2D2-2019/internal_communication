@@ -55,6 +55,7 @@ namespace r2d2 {
         // Frame types
         BUTTON_STATE,
         ACTIVITY_LED_STATE,
+        DISTANCE
 
         // Don't touch
         EXTERNAL,
@@ -153,6 +154,17 @@ namespace r2d2 {
         bool state;
     };
 
+    /**
+     * Distance in milimeter
+     * 
+     * Distance sensor wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Measuring-distance
+     */
+    struct frame_distance_s {
+        uint16_t mm;
+    }
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
 }
