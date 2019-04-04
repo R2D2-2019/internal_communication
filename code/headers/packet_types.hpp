@@ -55,7 +55,7 @@ namespace r2d2 {
         // Frame types
         BUTTON_STATE,
         ACTIVITY_LED_STATE,
-        DISTANCE
+        DISTANCE,
 
         // Don't touch
         EXTERNAL,
