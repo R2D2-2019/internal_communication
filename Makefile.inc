@@ -19,4 +19,4 @@ SOURCES += $(wildcard $(internal_comm)/code/src/*.cpp)
 HEADERS += $(wildcard $(internal_comm)/code/headers/*.hpp)
 
 # include datastructures
-SEARCH += (internal_comm)/../datastructures/code/headers
+SEARCH += $(internal_comm)/../datastructures/code/headers
