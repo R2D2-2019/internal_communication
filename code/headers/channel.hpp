@@ -132,6 +132,9 @@ namespace r2d2::can_bus {
 
                 // Are we in error mode?
                 if (errp) {
+                    // We are in error mode, so we'll want to update the tx_queue
+                    // with more recent information. In the event that we are connected
+                    // again (e.g. this is a temporary problem), we'll send recent information.
                     tx_queue.pop();
                     break;
                 }
