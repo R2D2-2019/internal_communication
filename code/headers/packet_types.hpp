@@ -56,6 +56,7 @@ namespace r2d2 {
         BUTTON_STATE,
         ACTIVITY_LED_STATE,
         DISTANCE,
+        DISPLAY_RECTANGLE,
 
         // Don't touch
         EXTERNAL,
@@ -160,8 +161,28 @@ namespace r2d2 {
     struct frame_distance_s {
         uint16_t mm;
     };
+    
+    /**
+     * Struct to set a rectangle on a display
+     * 
+     * Display wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
+     */
+    struct display_rectangle_s {
+        // position of rectangle
+        uint16_t x;
+        uint16_t y;
+
+        // dimensions of the rectangle
+        uint8_t width;
+        uint8_t height;
+
+        // color of pixels rgb(5,6,5) format
+        uint16_t color;
+    };    
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
+    R2D2_INTERNAL_FRAME_HELPER(display_rectangle_s, DISPLAY_RECTANGLE)
 }
