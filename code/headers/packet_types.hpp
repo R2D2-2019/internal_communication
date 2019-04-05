@@ -184,5 +184,5 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
-    R2D2_INTERNAL_FRAME_HELPER(display_rectangle_s, DISPLAY_RECTANGLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_rectangle_s, DISPLAY_RECTANGLE)
 }
