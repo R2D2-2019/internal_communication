@@ -168,7 +168,7 @@ namespace r2d2 {
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
-    struct display_rectangle_s {
+    struct frame_display_rectangle_s {
         // position of rectangle
         uint16_t x;
         uint16_t y;
