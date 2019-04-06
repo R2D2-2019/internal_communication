@@ -97,7 +97,7 @@ namespace r2d2::can_bus {
 
         // Transfer queue for this channel, is processed in the
         // send interrupt.
-        inline static queue_c<detail::_can_frame_s, 32> tx_queue;
+        inline static queue_c<detail::_can_frame_s, 32, queue_optimization::READ> tx_queue;
 
         /**
          * Volatile flag that is used to signify that there is space
