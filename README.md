@@ -87,7 +87,7 @@ comm.listen_for_frames({ frame_type::ALL });
 
 #### A note on module instantiation
 When using multiple modules on a single microcontroller, each module needs to have its own instance of the communication bus.
-You can't reuse the same instance, as that will create conflicts with the `listen_for` method.
+You can't reuse the same instance, as that will create conflicts with the `listen_for_frames` method.
 
 ```cpp
 // Wrong
