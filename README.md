@@ -85,6 +85,25 @@ Sometimes, you want to accept all frame types. That can be done as follows in th
 comm.listen_for_frames({ frame_type::ALL });
 ```
 
+#### A note on module instantiation
+When using multiple modules on a single microcontroller, each module needs to have its own instance of the communication bus.
+You can't reuse the same instance, as that will create conflicts with the `listen_for` method.
+
+```cpp
+// Wrong
+r2d2::comm_c comm;
+
+ns1::module_c mod1(comm);
+ns2::module_c mod2(comm);
+
+// Right
+r2d2::comm_c comm1;
+r2d2::comm_c comm2;
+
+ns1::module_c mod1(comm1);
+ns2::module_c mod2(comm2);
+```
+
 #### More usage examples
 Usage examples can be found in the "examples" folder. Each subfolder in an example represents a module.
 These examples are updated to represent the latest version of the library.
@@ -246,7 +265,7 @@ CAN was chosen because it has the following properties:
  - It's a proven industry standard for use in machines and devices (cars, medical, escalators, etc.)
  - Relatively high throughput (1 mbit/s, .5 mbit/s of pure data)
  
- Additionally, other modules within the project probably will use the SPI and I2C interfaces. 
+Additionally, other modules within the project probably will use the SPI and I2C interfaces. 
    
 ### The protocol
 While the communication system doesn't depend directly on a specific protocol, the Controller Area Network (CAN) bus is used for intra-microcontroller communication.
