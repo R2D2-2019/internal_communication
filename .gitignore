@@ -1,11 +1,14 @@
-/.idea
 *.o
 *.elf
 *.bin
 *.c
 *.map
 *.ld
+*.cbp
 *.lss
+*.exe
 *.lst
-settings.json
+.idea/
+cmake*/
 CMakeLists.txt
+settings.json
