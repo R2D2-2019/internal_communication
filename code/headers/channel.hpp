@@ -337,11 +337,11 @@ namespace r2d2::can_bus {
             }
 
             if ((status & (1 << 6)) != 0) {
-                channel_c<Bus, priority::NORMAL>::handle_interrupt(6);
+                channel_c<Bus, priority::DATA_STREAM>::handle_interrupt(6);
             }
 
             if ((status & (1 << 7)) != 0) {
-                channel_c<Bus, priority::NORMAL>::handle_interrupt(7);
+                channel_c<Bus, priority::DATA_STREAM>::handle_interrupt(7);
             }
         }
     }
