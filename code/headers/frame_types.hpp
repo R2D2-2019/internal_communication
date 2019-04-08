@@ -128,10 +128,11 @@ namespace r2d2 {
     struct frame_external_s {
         uint8_t length;
         external_id_s id;
+        frame_type type;
 
         // NOTE: data should come last; ordering is important
         // for this specific struct!
-        uint8_t data[256];
+        uint8_t data[256 - sizeof(uint8_t) - sizeof(external_id_s) - sizeof(frame_type)];
     };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_external_s, EXTERNAL)
