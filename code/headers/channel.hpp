@@ -211,36 +211,46 @@ namespace r2d2::can_bus {
             } else {
                 const uint_fast8_t total = length / 8;
                 const uint_fast8_t remainder = length % 8;
+                const int rem = remainder > 0;
+                const uint16_t timer = port<Bus>->CAN_TIM & 0xF; // get the current timer register
+
+                const uint8_t *ptr = data;
 
                 // First, create the bulk of the frame.
                 for (uint_fast8_t i = 0; i < total; i++) {
-                    detail::_can_frame_s frame{};
+                    detail::_can_frame_s frame;
 
                     // Has to be 8 bytes; frame.length is copied in a lower layer
                     for (uint_fast8_t j = 0; j < 8; j++) {
-                        frame.data.bytes[j] = data[j + i];
+                        frame.data.bytes[j] = *(ptr++);
                     }
 
                     frame.length = 8;
                     frame.frame_type = type;
                     frame.sequence_id = i;
-                    frame.sequence_total = total + (remainder > 0);
+                    frame.sequence_total = total + rem - 1;
+
+                    // set uid for current transfer
+                    frame.sequence_uid = timer;
 
                     safely_push_frame(frame);
                 }
 
                 // Handle any remaining bytes
                 if (remainder > 0) {
-                    detail::_can_frame_s frame{};
+                    detail::_can_frame_s frame;
 
                     for (uint_fast8_t i = 0; i < remainder; i++) {
-                        frame.data.bytes[i] = data[i + total];
+                        frame.data.bytes[i] = *(ptr++);
                     }
 
                     frame.length = remainder;
                     frame.frame_type = type;
                     frame.sequence_id = total;
-                    frame.sequence_total = total + 1;
+                    frame.sequence_total = total; // -1 and rem cancel each other out
+
+                    // set uid for current transfer
+                    frame.sequence_uid = timer;
 
                     safely_push_frame(frame);
                 }
@@ -294,7 +304,7 @@ namespace r2d2::can_bus {
             frame.type = static_cast<frame_type>(can_frame.frame_type);
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
-            for (uint_fast8_t i = 0; i < 8; i++) {
+            for(uint_fast8_t i = 0; i < can_frame.length; i++){
                 frame.bytes[i] = can_frame.data.bytes[i];
             }
 

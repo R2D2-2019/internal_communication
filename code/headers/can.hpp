@@ -281,6 +281,7 @@ namespace r2d2::can_bus {
         struct _can_frame_s {
             uint8_t mode; // Read or write
             uint8_t frame_type;
+            uint8_t sequence_uid;
             uint8_t sequence_id;
             uint8_t sequence_total;
             uint8_t length;

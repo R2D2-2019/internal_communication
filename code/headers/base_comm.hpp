@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <ringbuffer.hpp>
 
-#include "packet_types.hpp"
+#include "frame_types.hpp"
 
 namespace r2d2 {
     /**
@@ -143,19 +143,28 @@ namespace r2d2 {
                 is_suitable_frame_v<T>
             >
         >
-        void send(const external_id_s &id, const T &data, const priority prio = priority::NORMAL) {
+        void send_external(const external_id_s &id, const T &data, const priority prio = priority::NORMAL) {
             // No {} needed, since all fields are filled.
             // Adding it will cause a call to memset
             frame_external_s frame;
 
-            for(uint_fast8_t i = 0; i < sizeof(T); i++){
-                frame.data[i] = data[i];
+            for(size_t i = 0; i < sizeof(T); i++){
+                frame.data[i] = reinterpret_cast<const uint8_t *>(&data)[i];
             }
 
+            frame.type = static_cast<frame_type>(frame_type_v<T>);
             frame.length = sizeof(T);
             frame.id = id;
 
-            send(frame, prio);
+            send_impl(
+                frame_type::EXTERNAL,
+                reinterpret_cast<const uint8_t *>(&frame),
+
+                // NOTE: we rely on the fact that data is the last member
+                // in the struct here!
+                offsetof(frame_external_s, data) + sizeof(T),
+                prio
+            );
         }
 
         /**
