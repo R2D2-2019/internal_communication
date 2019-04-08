@@ -97,7 +97,7 @@ namespace r2d2::can_bus {
 
         // Transfer queue for this channel, is processed in the
         // send interrupt.
-        inline static queue_c<detail::_can_frame_s, 32> tx_queue;
+        inline static queue_c<detail::_can_frame_s, 32, queue_optimization::READ> tx_queue;
 
         /**
          * Volatile flag that is used to signify that there is space
@@ -126,7 +126,19 @@ namespace r2d2::can_bus {
             }
 
             // Wait for space, space is created in the interrupt
-            while (!space_in_tx_queue);
+            while (!space_in_tx_queue) {
+                // ERRP = Error Passive Mode
+                bool errp = (port<Bus>->CAN_SR >> 18) & 1;
+
+                // Are we in error mode?
+                if (errp) {
+                    // We are in error mode, so we'll want to update the tx_queue
+                    // with more recent information. In the event that we are connected
+                    // again (e.g. this is a temporary problem), we'll send recent information.
+                    tx_queue.pop();
+                    break;
+                }
+            }
 
             tx_queue.push(frame);
         }
@@ -188,7 +200,7 @@ namespace r2d2::can_bus {
             if (length <= 8) {
                 detail::_can_frame_s frame{};
 
-                for(size_t i = 0; i < length; i++){
+                for (size_t i = 0; i < length; i++) {
                     frame.data.bytes[i] = data[i];
                 }
 
@@ -199,36 +211,46 @@ namespace r2d2::can_bus {
             } else {
                 const uint_fast8_t total = length / 8;
                 const uint_fast8_t remainder = length % 8;
+                const int rem = remainder > 0;
+                const uint16_t timer = port<Bus>->CAN_TIM & 0xF; // get the current timer register
+
+                const uint8_t *ptr = data;
 
                 // First, create the bulk of the frame.
                 for (uint_fast8_t i = 0; i < total; i++) {
-                    detail::_can_frame_s frame{};
+                    detail::_can_frame_s frame;
 
                     // Has to be 8 bytes; frame.length is copied in a lower layer
-                    for(uint_fast8_t j = 0; j < 8; j++){
-                        frame.data.bytes[j] = data[j + i];
+                    for (uint_fast8_t j = 0; j < 8; j++) {
+                        frame.data.bytes[j] = *(ptr++);
                     }
 
                     frame.length = 8;
                     frame.frame_type = type;
                     frame.sequence_id = i;
-                    frame.sequence_total = total + (remainder > 0);
+                    frame.sequence_total = total + rem - 1;
+
+                    // set uid for current transfer
+                    frame.sequence_uid = timer;
 
                     safely_push_frame(frame);
                 }
 
                 // Handle any remaining bytes
                 if (remainder > 0) {
-                    detail::_can_frame_s frame{};
+                    detail::_can_frame_s frame;
 
-                    for(uint_fast8_t i = 0; i < remainder; i++){
-                        frame.data.bytes[i] = data[i + total];
+                    for (uint_fast8_t i = 0; i < remainder; i++) {
+                        frame.data.bytes[i] = *(ptr++);
                     }
 
                     frame.length = remainder;
                     frame.frame_type = type;
                     frame.sequence_id = total;
-                    frame.sequence_total = total + 1;
+                    frame.sequence_total = total; // -1 and rem cancel each other out
+
+                    // set uid for current transfer
+                    frame.sequence_uid = timer;
 
                     safely_push_frame(frame);
                 }
@@ -337,11 +359,11 @@ namespace r2d2::can_bus {
             }
 
             if ((status & (1 << 6)) != 0) {
-                channel_c<Bus, priority::NORMAL>::handle_interrupt(6);
+                channel_c<Bus, priority::DATA_STREAM>::handle_interrupt(6);
             }
 
             if ((status & (1 << 7)) != 0) {
-                channel_c<Bus, priority::NORMAL>::handle_interrupt(7);
+                channel_c<Bus, priority::DATA_STREAM>::handle_interrupt(7);
             }
         }
     }

@@ -143,15 +143,16 @@ namespace r2d2 {
                 is_suitable_frame_v<T>
             >
         >
-        void send(const external_id_s &id, const T &data, const priority prio = priority::NORMAL) {
+        void send_external(const external_id_s &id, const T &data, const priority prio = priority::NORMAL) {
             // No {} needed, since all fields are filled.
             // Adding it will cause a call to memset
             frame_external_s frame;
 
             for(size_t i = 0; i < sizeof(T); i++){
-                frame.data[i] = data[i];
+                frame.data[i] = reinterpret_cast<const uint8_t *>(&data)[i];
             }
 
+            frame.type = static_cast<frame_type>(frame_type_v<T>);
             frame.length = sizeof(T);
             frame.id = id;
 

@@ -281,6 +281,7 @@ namespace r2d2::can_bus {
         struct _can_frame_s {
             uint8_t mode; // Read or write
             uint8_t frame_type;
+            uint8_t sequence_uid;
             uint8_t sequence_id;
             uint8_t sequence_total;
             uint8_t length;
@@ -587,6 +588,18 @@ namespace r2d2::can_bus {
             } while (!(flag & CAN_SR_WAKEUP) && (tick < can_timeout));
 
             return tick != can_timeout;
+        }
+
+        /**
+         * Guess whether we are connected to the outside world,
+         * by checking if we are in the Error Passive Mode. When
+         * no physical cable is attached, the error mode will activate.
+         *
+         * This will also return true on a high/abnormal rate of errors on the bus.
+         * @return
+         */
+        static bool has_physical_connection() {
+            return (port<Bus>->CAN_SR >> 18) & 1;
         }
     };
 }

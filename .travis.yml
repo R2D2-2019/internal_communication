@@ -1,0 +1,62 @@
+language: cpp
+
+notifications:
+  email: false
+  
+branches:
+    only:
+        - master
+        - release
+
+addons:
+    apt_packages:
+        - lib32bz2-1.0
+        - lib32ncurses5
+        - lib32z1 
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise 
+        packages:
+            - gcc-7
+            - g++-7
+        
+     
+
+before_script:
+    - wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2018q4/gcc-arm-none-eabi-8-2018-q4-major-linux.tar.bz2? -O /tmp/gcc-arm-none-eabi.tar.bz2
+    - tar -xjf /tmp/gcc-arm-none-eabi.tar.bz2
+    - export PATH=$PATH:$PWD/gcc-arm-none-eabi-8-2018-q4-major/bin/ 
+    - g++ -v
+    - gcc -v
+    - arm-none-eabi-g++ -v
+
+install:
+    - cd ..
+    - git clone https://github.com/R2D2-2019/R2D2-build.git 
+    - cd R2D2-build
+    - git submodule update --init --recursive
+    - cd ..
+    - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-7 /usr/bin/gcc # Change symlinks of gcc to gcc-7
+    - sudo unlink /usr/bin/g++ && sudo ln -s /usr/bin/g++-7 /usr/bin/g++
+    - export PATH=$PATH:/usr/bin/g++:/usr/bin/gcc
+    - sudo cp -r /usr/bin/gcc /bin/gcc
+    - sudo cp -r /usr/bin/g++ /bin/g++
+    
+    
+jobs:
+    include:
+        - script:
+            - cd R2D2-build/modules
+            - cp -r $TRAVIS_BUILD_DIR $PWD/test_module
+            - cd test_module/test
+            - make build 
+            - make run
+            - make clean
+        - script:
+            - cd R2D2-build/modules
+            - cp -r $TRAVIS_BUILD_DIR $PWD/test_module
+            - cd test_module/code
+            - make build
+            - make clean
+        

@@ -55,7 +55,8 @@ namespace r2d2 {
         // Frame types
         BUTTON_STATE,
         ACTIVITY_LED_STATE,
-        DISTANCE
+        DISTANCE,
+        DISPLAY_FILLED_RECTANGLE,
 
         // Don't touch
         EXTERNAL,
@@ -127,10 +128,11 @@ namespace r2d2 {
     struct frame_external_s {
         uint8_t length;
         external_id_s id;
+        frame_type type;
 
         // NOTE: data should come last; ordering is important
         // for this specific struct!
-        uint8_t data[256];
+        uint8_t data[256 - sizeof(uint8_t) - sizeof(external_id_s) - sizeof(frame_type)];
     };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_external_s, EXTERNAL)
@@ -162,9 +164,36 @@ namespace r2d2 {
      */
     struct frame_distance_s {
         uint16_t mm;
-    }
+    };
+    
+    /**
+     * Struct to set a rectangle on a display. This fills a 
+     * rectangle with the color specified.
+     * 
+     * Currently we can't fill the bigger screens. When the
+     * extended frames are here the position and width/height
+     * will change to a uint16_t to support the bigger screens.
+     * 
+     * Display wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
+     */
+    struct frame_display_filled_rectangle_s {
+        // position of rectangle
+        uint8_t x;
+        uint8_t y;
+
+        // dimensions of the rectangle
+        uint8_t width;
+        uint8_t height;
+
+        // color of pixels
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
+    };    
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
 }
