@@ -214,13 +214,15 @@ namespace r2d2::can_bus {
                 const int rem = remainder > 0;
                 const uint16_t timer = port<Bus>->CAN_TIM & 0xF; // get the current timer register
 
+                const uint8_t *ptr = data;
+
                 // First, create the bulk of the frame.
                 for (uint_fast8_t i = 0; i < total; i++) {
                     detail::_can_frame_s frame;
 
                     // Has to be 8 bytes; frame.length is copied in a lower layer
                     for (uint_fast8_t j = 0; j < 8; j++) {
-                        frame.data.bytes[j] = data[j + i];
+                        frame.data.bytes[j] = *(ptr++);
                     }
 
                     frame.length = 8;
@@ -239,12 +241,12 @@ namespace r2d2::can_bus {
                     detail::_can_frame_s frame;
 
                     for (uint_fast8_t i = 0; i < remainder; i++) {
-                        frame.data.bytes[i] = data[i + total];
+                        frame.data.bytes[i] = *(ptr++);
                     }
 
                     frame.length = remainder;
                     frame.frame_type = type;
-                    frame.sequence_id = total + 1;
+                    frame.sequence_id = total;
                     frame.sequence_total = total; // -1 and rem cancel each other out
 
                     // set uid for current transfer
