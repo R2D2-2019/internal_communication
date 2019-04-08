@@ -47,6 +47,81 @@ namespace r2d2::can_bus {
 
     namespace detail {
         /**
+         * NFC memory area layout.
+         *
+         * @internal
+         */
+        struct _nfc_memory_area_s {
+            using queue_type = queue_c<detail::_can_frame_s, 16, queue_optimization::READ>;
+
+            queue_type tx_queues[4];
+        };
+
+        /**
+         * Helper to get the array index of a given
+         * priority.
+         *
+         * @internal
+         * @tparam P
+         */
+        template<priority P>
+        constexpr auto _priority_index = static_cast<uint8_t>(P);
+
+        /**
+         * Pointer to the NFC memory area.
+         *
+         * @internal
+         */
+        _nfc_memory_area_s *const _nfc_mem = ((_nfc_memory_area_s *) NFC_RAM_ADDR);
+
+        /**
+         * Helper function to cleanly get the queue for the channel
+         * with the given priority.
+         *
+         * @internal
+         * @tparam P
+         * @return
+         */
+        template<priority P>
+        constexpr _nfc_memory_area_s::queue_type &_get_tx_queue_for_channel() {
+            return _nfc_mem->tx_queues[
+                _priority_index<P>
+            ];
+        }
+
+        /**
+         * Initialize the memory area that is normally reserved
+         * for NFC. This area is used to store send and receive
+         * buffers.
+         *
+         * @internal
+         */
+        void _init_nfc_memory_area() {
+            // The NFC memory area cannot exceed 4224 bytes
+            static_assert(sizeof(_nfc_memory_area_s) <= 4224);
+
+            static bool initialized = false;
+
+            if (initialized) {
+                return;
+            }
+
+            // Set ram size to maximum (4096 + 128 bytes)
+            SMC->SMC_CFG = SMC_CFG_PAGESIZE_PS4096;
+
+            // Disable nand flash controller
+            SMC->SMC_CTRL = SMC_CTRL_NFCDIS;
+
+            // Enable peripheral clock
+            PMC->PMC_PCER0 |= 1U << ID_SMC;
+
+            // Clear all memory for first use
+            memset((void *)_nfc_mem, 0, 4224);
+
+            initialized = true;
+        }
+
+        /**
          * Base class for compile time priority
          * assignments. Specializations of this class
          * will offer tx and rx compile time constants
@@ -95,10 +170,6 @@ namespace r2d2::can_bus {
     protected:
         using ids = detail::_mailbox_assignment_s<Priority>;
 
-        // Transfer queue for this channel, is processed in the
-        // send interrupt.
-        inline static queue_c<detail::_can_frame_s, 32, queue_optimization::READ> tx_queue;
-
         /**
          * Volatile flag that is used to signify that there is space
          * in the tx_queue. The tx_queue is emptied in an interrupt and the
@@ -121,6 +192,9 @@ namespace r2d2::can_bus {
          * @param frame
          */
         static void safely_push_frame(const detail::_can_frame_s &frame) {
+            // For convenience; get a ref to the tx_queue
+            auto &tx_queue = detail::_get_tx_queue_for_channel<Priority>();
+
             if (tx_queue.full()) {
                 space_in_tx_queue = false;
             }
@@ -148,6 +222,16 @@ namespace r2d2::can_bus {
          * Initialize the channel mailboxes.
          */
         static void init() {
+            /*
+             * On the Due, there is a separate memory area of just over 4 bytes
+             * that is normally used for NFC. If NFC is not used, the core is free
+             * to repurpose this memory.
+             *
+             * In this case, this memory area is used to store send and
+             * receive buffers for the different channels.
+             */
+            detail::_init_nfc_memory_area();
+
             // Set mailbox mode
             constexpr uint32_t accept_mask = 0x07 << 26;
 
@@ -279,6 +363,9 @@ namespace r2d2::can_bus {
             if (mmr > 4) {
                 return;
             }
+
+            // For convenience; get a ref to the tx_queue
+            auto &tx_queue = detail::_get_tx_queue_for_channel<Priority>();
 
             // Transmit
             if (mmr == 3) {
