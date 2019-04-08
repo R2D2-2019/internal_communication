@@ -589,5 +589,17 @@ namespace r2d2::can_bus {
 
             return tick != can_timeout;
         }
+
+        /**
+         * Guess whether we are connected to the outside world,
+         * by checking if we are in the Error Passive Mode. When
+         * no physical cable is attached, the error mode will activate.
+         *
+         * This will also return true on a high/abnormal rate of errors on the bus.
+         * @return
+         */
+        static bool has_physical_connection() {
+            return (port<Bus>->CAN_SR >> 18) & 1;
+        }
     };
 }
