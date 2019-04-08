@@ -223,7 +223,7 @@ namespace r2d2::can_bus {
          */
         static void init() {
             /*
-             * On the Due, there is a separate memory area of just over 4 bytes
+             * On the Due, there is a separate memory area of just over 4 kilobytes
              * that is normally used for NFC. If NFC is not used, the core is free
              * to repurpose this memory.
              *
