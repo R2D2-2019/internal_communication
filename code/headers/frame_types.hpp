@@ -139,6 +139,10 @@ namespace r2d2 {
 
     /** USER STRUCTS */
 
+		
+	/** DO NOT REMOVE */
+	/** #PythonAnchor# */
+
 
     /**
      * Packet containing the state of 
