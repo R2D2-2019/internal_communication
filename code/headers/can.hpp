@@ -390,6 +390,7 @@ namespace r2d2::can_bus {
             port<Bus>->CAN_MB[index].CAN_MID =
                 ((index + 1) << 26) |
                 ((frame.mode & 0x01) << 25) |
+                ((frame.sequence_uid & 0xF) << 21) |
                 (frame.frame_type << 10) |
                 ((frame.sequence_id & 0x1F) << 5) |
                 (frame.sequence_total & 0x1F) |
