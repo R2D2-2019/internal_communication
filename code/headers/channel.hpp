@@ -159,7 +159,7 @@ namespace r2d2::can_bus {
                     return;
                 }
 
-                // remove pointer from active uit_indices
+                // remove pointer from active uid_indices
                 for (auto &index : _nfc_mem->uid_indices) {
                     if (index.data == ptr) {
                         index.uid = 0;
@@ -226,17 +226,17 @@ namespace r2d2::can_bus {
              */
             static uint8_t *alloc(const size_t size) {
                 if (size <= 64) {
-                    for (size_t i = 0; i < sizeof(_nfc_mem->small_buffers_in_use); i++) {
+                    for (size_t i = 0; i < _small_buffer_size; i++) {
                         if (!(_nfc_mem->small_buffers_in_use[i])) {
                             _nfc_mem->small_buffers_in_use[i] = true;
-                            return reinterpret_cast<uint8_t*>(_nfc_mem->small_buffers) + (i * _small_buffer_size);
+                            return reinterpret_cast<uint8_t*>((_nfc_mem->small_buffers) + (i * _small_buffer_size));
                         }
                     }
                 } else {
-                    for (size_t i = 0; i < sizeof(_nfc_mem->large_buffers_in_use); i++) {
+                    for (size_t i = 0; i < _large_buffer_size; i++) {
                         if (!(_nfc_mem->large_buffers_in_use[i])) {
                             _nfc_mem->large_buffers_in_use[i] = true;
-                            return reinterpret_cast<uint8_t*>(_nfc_mem->large_buffers) + (i * _large_buffer_size);
+                            return reinterpret_cast<uint8_t*>((_nfc_mem->large_buffers) + (i * _large_buffer_size));
                         }
                     }
                 }
