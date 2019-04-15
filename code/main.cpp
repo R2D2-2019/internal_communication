@@ -11,20 +11,26 @@ int main() {
     hwlib::wait_ms(1000);
 
     r2d2::comm_c comm;
-    r2d2::comm_c comm2;
 
-    comm2.listen_for_frames({r2d2::frame_type::BUTTON_STATE});
+    comm.listen_for_frames({frame_type::ALL});
 
     for (;;) {
-        frame_button_state_s state;
-        state.pressed = true;
+        frame_display_filled_rectangle_s state;
+        state.x = 0xAA;
+        state.y = 0xBA;
+        state.red = 0xFF;
 
-        comm.send(state);
+        // comm.send_external({0xAA, 0xFA}, state);
 
-        while (comm2.has_data()) {
-            const auto frame = comm2.get_data();
+        // hwlib::wait_ms(10);
 
-            hwlib::cout << "rec fr\n";
+        while(comm.has_data()){
+            auto t = comm.get_data();
+
+            const auto data = t.as_frame_type<
+                frame_type::DISPLAY_FILLED_RECTANGLE>();
+
+            hwlib::cout << "Got frame: " << int(data.x) << '\n';
         }
     }
 }
