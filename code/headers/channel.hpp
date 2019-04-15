@@ -162,6 +162,8 @@ namespace r2d2::can_bus {
                 // remove pointer from active uit_indices
                 for (auto &index : _nfc_mem->uid_indices) {
                     if (index.data == ptr) {
+                        index.uid = 0;
+                        index.frame_type = 0;
                         index.data = nullptr;
                         break;
                     }
