@@ -159,6 +159,14 @@ namespace r2d2::can_bus {
                     return;
                 }
 
+                // remove pointer from active uit_indices
+                for (auto &index : _nfc_mem->uid_indices) {
+                    if (index.data == ptr) {
+                        index.data = nullptr;
+                        break;
+                    }
+                } 
+
                 size_t offset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(_nfc_mem);
 
                 if (offset < offsetof(_nfc_memory_area_s, large_buffers)) {
@@ -169,7 +177,7 @@ namespace r2d2::can_bus {
                     // Large buffers
                     const size_t array_offset = (offset - offsetof(_nfc_memory_area_s, large_buffers)) / _large_buffer_size;
                     _nfc_mem->large_buffers_in_use[array_offset] = false;
-                }
+                }               
             }
 
             static uint8_t *_get_data_for_uid(const uint8_t uid, const uint8_t type) {
@@ -188,15 +196,6 @@ namespace r2d2::can_bus {
                         index.uid = uid;
                         index.frame_type = type;
                         index.data = ptr;
-                        return;
-                    }
-                }
-            }
-
-            static void _clear_data_for_uid(const uint8_t uid, const uint8_t type){
-                for (auto &index : _nfc_mem->uid_indices) {
-                    if (index.uid == uid && index.frame_type == type) {
-                        index.data = nullptr;
                         return;
                     }
                 }
@@ -556,12 +555,7 @@ namespace r2d2::can_bus {
                 if (regs::reg[i]->accepts_frame(frame.type)) {
                     regs::reg[i]->accept_frame(frame);
                 }
-            }
-
-            // clear uid from list if we have a sequence_total
-            if (can_frame.sequence_total) {
-                detail::_memory_manager_s::_clear_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
-            }            
+            }          
         }
     };
 
