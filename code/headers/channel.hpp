@@ -563,7 +563,7 @@ namespace r2d2::can_bus {
                 }
 
                 // set the amount of bytes the frame uses
-                frame.length = ((can_frame.sequence_total + 1) * 8);
+                frame.length = ((can_frame.sequence_total * 8) + can_frame.length - 1);
 
             } else {
 
