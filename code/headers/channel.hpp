@@ -46,20 +46,16 @@ namespace r2d2::can_bus {
     };
 
     namespace detail {
-        /**
-         * Helper struct for buffers.
-         * 
-         * @tparam Size 
-         */
-        template<size_t Size>
-        struct _buffer {
-            uint8_t data[Size];
-        };
-
-        constexpr uint8_t _small_buffer_size = 64;
+        constexpr uint16_t _small_buffer_size = 64;
         constexpr uint8_t _small_buffer_count = 8;
-        constexpr uint8_t _large_buffer_size = 256;
+        constexpr uint16_t _large_buffer_size = 256;
         constexpr uint8_t _large_buffer_count = 4;
+
+        struct _uid_index {
+            uint8_t uid;
+            uint8_t frame_type;
+            uint8_t *data;
+        };
 
         /**
          * NFC memory area layout.
@@ -71,11 +67,13 @@ namespace r2d2::can_bus {
 
             queue_type tx_queues[4]; // 912 bytes
 
-            _buffer<_small_buffer_size> small_buffers[_small_buffer_count]; // 512 bytes
+            uint8_t small_buffers[_small_buffer_count]; // 512 bytes
             bool small_buffers_in_use[_small_buffer_count]; // 8 bytes
 
-            _buffer<_large_buffer_size> large_buffers[_large_buffer_count]; // 1024 bytes
+            uint8_t large_buffers[_large_buffer_count]; // 1024 bytes
             bool large_buffers_in_use[_large_buffer_count]; // 4 bytes
+
+            _uid_index uid_indices[_small_buffer_count + _large_buffer_count];
         };
 
         /**
@@ -154,16 +152,51 @@ namespace r2d2::can_bus {
              * @param ptr 
              */
             static void dealloc(uint8_t *ptr) {
-                uint32_t offset = static_cast<uint32_t>(ptr) - static_cast<uint32_t>(_nfc_mem);
+                // nullptr check
+                if (!ptr) {
+                    return;
+                }
+
+                size_t offset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(_nfc_mem);
 
                 if (offset < offsetof(_nfc_memory_area_s, large_buffers)) {
                     // Small buffers
-                    const uint8_t array_offset = offset - offsetof(_nfc_memory_area_s, small_buffers) / _small_buffer_size;
+                    const size_t array_offset = (offset - offsetof(_nfc_memory_area_s, small_buffers)) / _small_buffer_size;
                     _nfc_mem->small_buffers_in_use[array_offset] = false;
                 } else {
                     // Large buffers
-                    const uint8_t array_offset = offset - offsetof(_nfc_memory_area_s, large_buffers) / _large_buffer_size;
+                    const size_t array_offset = (offset - offsetof(_nfc_memory_area_s, large_buffers)) / _large_buffer_size;
                     _nfc_mem->large_buffers_in_use[array_offset] = false;
+                }
+            }
+
+            static uint8_t *_get_data_for_uid(const uint8_t uid, const uint8_t type) {
+                for (const auto &index : _nfc_mem->uid_indices) {
+                    if (index.uid == uid && index.frame_type == type) {
+                        return index.data;
+                    }
+                }
+
+                return nullptr;
+            }      
+
+            static void _set_data_for_uid(uint8_t *ptr, const uint8_t uid, const uint8_t type){
+                for(auto &index : _nfc_mem->uid_indices) {
+                    if(index.data == nullptr){
+                        index.uid = uid;
+                        index.frame_type = type;
+                        index.data = ptr;
+                        return;
+                    }
+                }
+            }
+
+            static void _clear_data_for_uid(const uint8_t uid, const uint8_t type){
+                for (auto &index : _nfc_mem->uid_indices) {
+                    if (index.uid == uid && index.frame_type == type) {
+                        index.data = nullptr;
+                        return;
+                    }
                 }
             }
 
@@ -177,23 +210,23 @@ namespace r2d2::can_bus {
             static uint8_t *alloc(const size_t size) {
                 if (size <= 64) {
                     for (size_t i = 0; i < sizeof(_nfc_mem->small_buffers_in_use); i++) {
-                        if (!_nfc_mem->small_buffers_in_use[i])) {
+                        if (!(_nfc_mem->small_buffers_in_use[i])) {
                             _nfc_mem->small_buffers_in_use[i] = true;
-                            return &_nfc_mem->small_buffers[i];
+                            return reinterpret_cast<uint8_t*>(_nfc_mem->small_buffers) + (i * _small_buffer_size);
                         }
                     }
                 } else {
                     for (size_t i = 0; i < sizeof(_nfc_mem->large_buffers_in_use); i++) {
-                        if (!_nfc_mem->large_buffers_in_use[i]) {
+                        if (!(_nfc_mem->large_buffers_in_use[i])) {
                             _nfc_mem->large_buffers_in_use[i] = true;
-                            return &_nfc_mem->large_buffers[i];
+                            return reinterpret_cast<uint8_t*>(_nfc_mem->large_buffers) + (i * _large_buffer_size);
                         }
                     }
                 }
 
                 return nullptr;
             }
-        }
+        };
 
         /**
          * Base class for compile time priority
@@ -465,8 +498,48 @@ namespace r2d2::can_bus {
             frame.type = static_cast<frame_type>(can_frame.frame_type);
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
-            for(uint_fast8_t i = 0; i < can_frame.length; i++) {
-                frame.bytes[i] = can_frame.data.bytes[i];
+            if (can_frame.sequence_total > 0) {
+                if (!(can_frame.sequence_id)) {
+                    // allocate memory for the frame
+                    auto * t = detail::_memory_manager_s::alloc(can_frame.sequence_total * 8);
+
+                    if (!t) {
+                        // panic with location if we can't handle the data 
+                        HWLIB_PANIC_WITH_LOCATION;
+                    }
+
+                    // set the data pointer to the new data location
+                    frame.data = t;
+
+                    // save the pointer for the rest of the data
+                    detail::_memory_manager_s::_set_data_for_uid(t, can_frame.sequence_uid, can_frame.frame_type);
+
+                } else {
+                    // get ptr for data
+                    auto * t = detail::_memory_manager_s::_get_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
+
+                    if (!t) {
+                        // no valid pointer in uid set so return
+                        HWLIB_PANIC_WITH_LOCATION;
+                    }
+
+                    frame.data = t;
+                }
+
+                // copy can frame to frame.data
+                for(uint_fast8_t i = 0; i < can_frame.length; i++) {
+                    frame.data[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
+                }
+
+                if (can_frame.sequence_id != can_frame.sequence_total - 1) {
+                    return;
+                }
+            } else {
+
+                // copy can frame to frame.data
+                for(uint_fast8_t i = 0; i < can_frame.length; i++) {
+                    frame.data[i] = can_frame.data.bytes[i];
+                }
             }
 
             using regs = comm_module_register_s;
@@ -476,6 +549,12 @@ namespace r2d2::can_bus {
                     regs::reg[i]->accept_frame(frame);
                 }
             }
+
+            // clear uid from list if last item
+            if (can_frame.sequence_id >= can_frame.sequence_total - 1) {
+                detail::_memory_manager_s::_clear_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
+            }            
+
         }
     };
 
