@@ -51,7 +51,7 @@ namespace r2d2 {
             >
         >
         T &as_type() {
-            return *(reinterpret_cast<T *>(&bytes));
+            return *(reinterpret_cast<T *>(data));
         }
 
         /**
@@ -65,7 +65,7 @@ namespace r2d2 {
          */
         template<frame_type P>
         auto as_frame_type() -> frame_data_t <P> & {
-            return *(reinterpret_cast<frame_data_t<P> *>(&bytes));
+            return *(reinterpret_cast<frame_data_t<P> *>(data));
         }
     };
 
