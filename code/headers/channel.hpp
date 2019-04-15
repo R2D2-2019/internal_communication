@@ -502,7 +502,7 @@ namespace r2d2::can_bus {
             if (can_frame.sequence_total > 0) {
                 if (!(can_frame.sequence_id)) {                   
                     // allocate memory for the frame
-                    auto * t = detail::_memory_manager_s::alloc(can_frame.sequence_total * 8);
+                    auto * t = detail::_memory_manager_s::alloc((can_frame.sequence_total + 1) * 8);
 
                     if (!t) {
                         // panic with location if we can't handle the data 
