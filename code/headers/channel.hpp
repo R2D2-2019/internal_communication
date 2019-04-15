@@ -501,13 +501,14 @@ namespace r2d2::can_bus {
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
             if (can_frame.sequence_total > 0) {
-                if (!(can_frame.sequence_id)) {
+                if (!(can_frame.sequence_id)) {                   
                     // allocate memory for the frame
                     auto * t = detail::_memory_manager_s::alloc(can_frame.sequence_total * 8);
 
                     if (!t) {
                         // panic with location if we can't handle the data 
-                        HWLIB_PANIC_WITH_LOCATION;
+                        hwlib::cout << "Error with data(didn't get a memory location)\n";
+                        return;
                     }
 
                     // set the data pointer to the new data location
@@ -522,7 +523,8 @@ namespace r2d2::can_bus {
 
                     if (!t) {
                         // no valid pointer in uid set so return
-                        HWLIB_PANIC_WITH_LOCATION;
+                        hwlib::cout << "Error with data(nowhere to put the data)\n";
+                        return;
                     }
 
                     frame.data = t;
@@ -533,9 +535,13 @@ namespace r2d2::can_bus {
                     frame.data[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
                 }
 
-                if (can_frame.sequence_id != can_frame.sequence_total - 1) {
+                if (can_frame.sequence_id != can_frame.sequence_total) {
                     return;
                 }
+
+                // set the amount of bytes the frame uses
+                frame.length = ((can_frame.sequence_total + 1) * 8);
+
             } else {
 
                 // copy can frame to frame.data
@@ -552,11 +558,10 @@ namespace r2d2::can_bus {
                 }
             }
 
-            // clear uid from list if last item
-            if (can_frame.sequence_id >= can_frame.sequence_total - 1) {
+            // clear uid from list if we have a sequence_total
+            if (can_frame.sequence_total) {
                 detail::_memory_manager_s::_clear_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
             }            
-
         }
     };
 
