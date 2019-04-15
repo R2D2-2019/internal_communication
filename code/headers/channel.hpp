@@ -159,16 +159,6 @@ namespace r2d2::can_bus {
                     return;
                 }
 
-                // remove pointer from active uid_indices
-                for (auto &index : _nfc_mem->uid_indices) {
-                    if (index.data == ptr) {
-                        index.uid = 0;
-                        index.frame_type = 0;
-                        index.data = nullptr;
-                        break;
-                    }
-                } 
-
                 size_t offset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(_nfc_mem);
 
                 if (offset < offsetof(_nfc_memory_area_s, large_buffers)) {
@@ -215,6 +205,24 @@ namespace r2d2::can_bus {
                         return;
                     }
                 }
+            }
+
+            /**
+             * @brief tries clears the data for a specific uid and type
+             * 
+             * @param uid 
+             * @param type 
+             */
+            static void _clear_data_for_uid(const uint8_t uid, const uint8_t type){
+                // remove pointer from active uid_indices
+                for (auto &index : _nfc_mem->uid_indices) {
+                    if (index.uid == uid && index.frame_type == type) {
+                        index.uid = 0;
+                        index.frame_type = 0;
+                        index.data = nullptr;
+                        break;
+                    }
+                } 
             }
 
             /**
@@ -575,7 +583,12 @@ namespace r2d2::can_bus {
                 if (regs::reg[i]->accepts_frame(frame.type)) {
                     regs::reg[i]->accept_frame(frame);
                 }
-            }          
+            }    
+
+            // mark the uid as not available anymore. (stops data from being written in the data)
+            if(can_frame.sequence_total){
+                detail::_memory_manager_s::_clear_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
+            }      
         }
     };
 
