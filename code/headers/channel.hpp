@@ -10,6 +10,8 @@
 #include <cmath>
 #include "base_comm.hpp"
 
+#include <hwlib.hpp>
+
 namespace r2d2::can_bus {
     /**
      * The maximum amount of modules allowed
