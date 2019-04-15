@@ -1,6 +1,6 @@
+#include <comm.hpp>
 #include "hwlib.hpp"
 
-#include <comm.hpp>
 
 int main() {
     using namespace r2d2;

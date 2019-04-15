@@ -30,9 +30,11 @@ namespace r2d2 {
     };
 
     struct frame_s {
+        uint8_t *data;
+        size_t length;
+        
         frame_type type;
         bool request;
-        uint8_t bytes[8];
 
         /**
          * Consider the data in the frame as
