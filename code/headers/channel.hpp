@@ -10,8 +10,6 @@
 #include <cmath>
 #include "base_comm.hpp"
 
-#include <hwlib.hpp>
-
 namespace r2d2::can_bus {
     /**
      * The maximum amount of modules allowed
@@ -531,7 +529,6 @@ namespace r2d2::can_bus {
 
                     if (!t) {
                         // return becouse we don't have enough memory available for the current sequence
-                        hwlib::cout << "Error with data(didn't get a memory location)\n";
                         return;
                     }
 
@@ -547,7 +544,6 @@ namespace r2d2::can_bus {
 
                     if (!t) {
                         // no valid pointer in uid set so return
-                        hwlib::cout << "Error with data(nowhere to put the data)\n";
                         return;
                     }
 
