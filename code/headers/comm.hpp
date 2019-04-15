@@ -73,7 +73,7 @@ namespace r2d2 {
             frame.type = type;
 
             for(uint_fast8_t i = 0; i < 8; i++){
-                frame.bytes[i] = data[i];
+                // frame.bytes[i] = data[i];
             }
 
             distribute_frame_internally(frame);
