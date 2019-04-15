@@ -342,6 +342,7 @@ namespace r2d2::can_bus {
             // Extended id
             if ((id & CAN_MID_MIDE) == CAN_MID_MIDE) {
                 frame.mode = (id >> 25) & 0x01;
+                frame.sequence_uid = (id >> 21) & 0xF;
                 frame.frame_type = (id >> 10) & 0xFF;
                 frame.sequence_id = (id >> 5) & 0x1F;
                 frame.sequence_total = id & 0x1F;
