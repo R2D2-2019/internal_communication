@@ -1,5 +1,7 @@
 #pragma once
 
+#define register
+
 #include <type_traits>
 
 #include "frame_types.hpp"
