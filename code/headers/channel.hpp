@@ -69,10 +69,10 @@ namespace r2d2::can_bus {
 
             queue_type tx_queues[4]; // 912 bytes
 
-            uint8_t small_buffers[_small_buffer_count]; // 512 bytes
+            uint8_t small_buffers[_small_buffer_count][_small_buffer_size]; // 512 bytes
             bool small_buffers_in_use[_small_buffer_count]; // 8 bytes
 
-            uint8_t large_buffers[_large_buffer_count]; // 1024 bytes
+            uint8_t large_buffers[_large_buffer_count][_large_buffer_size]; // 1024 bytes
             bool large_buffers_in_use[_large_buffer_count]; // 4 bytes
 
             _uid_index uid_indices[_small_buffer_count + _large_buffer_count];
@@ -233,18 +233,18 @@ namespace r2d2::can_bus {
              * @return uint8_t* 
              */
             static uint8_t *alloc(const size_t size) {
-                if (size <= 64) {
+                if (size <= _small_buffer_size) {
                     for (size_t i = 0; i < _small_buffer_size; i++) {
                         if (!(_nfc_mem->small_buffers_in_use[i])) {
                             _nfc_mem->small_buffers_in_use[i] = true;
-                            return reinterpret_cast<uint8_t*>((_nfc_mem->small_buffers) + (i * _small_buffer_size));
+                            return reinterpret_cast<uint8_t*>(&_nfc_mem->small_buffers[i]);
                         }
                     }
                 } else {
                     for (size_t i = 0; i < _large_buffer_size; i++) {
                         if (!(_nfc_mem->large_buffers_in_use[i])) {
                             _nfc_mem->large_buffers_in_use[i] = true;
-                            return reinterpret_cast<uint8_t*>((_nfc_mem->large_buffers) + (i * _large_buffer_size));
+                            return reinterpret_cast<uint8_t*>(&_nfc_mem->large_buffers[i]);
                         }
                     }
                 }
