@@ -182,6 +182,13 @@ namespace r2d2::can_bus {
                 }               
             }
 
+            /**
+             * @brief gets the pointer for the data for the current type and uid
+             * 
+             * @param uid 
+             * @param type 
+             * @return uint8_t* 
+             */
             static uint8_t *_get_data_for_uid(const uint8_t uid, const uint8_t type) {
                 for (const auto &index : _nfc_mem->uid_indices) {
                     if (index.uid == uid && index.frame_type == type) {
@@ -192,6 +199,13 @@ namespace r2d2::can_bus {
                 return nullptr;
             }      
 
+            /**
+             * @brief tries to set the data for a specific uid and type
+             * 
+             * @param ptr 
+             * @param uid 
+             * @param type 
+             */
             static void _set_data_for_uid(uint8_t *ptr, const uint8_t uid, const uint8_t type){
                 for(auto &index : _nfc_mem->uid_indices) {
                     if(index.data == nullptr){
@@ -501,13 +515,14 @@ namespace r2d2::can_bus {
             frame.type = static_cast<frame_type>(can_frame.frame_type);
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
+            // check if we have a frame that is larger than 8 bytes
             if (can_frame.sequence_total > 0) {
                 if (!(can_frame.sequence_id)) {                   
                     // allocate memory for the frame
                     auto * t = detail::_memory_manager_s::alloc((can_frame.sequence_total + 1) * 8);
 
                     if (!t) {
-                        // panic with location if we can't handle the data 
+                        // return becouse we don't have enough memory available for the current sequence
                         hwlib::cout << "Error with data(didn't get a memory location)\n";
                         return;
                     }
@@ -528,6 +543,7 @@ namespace r2d2::can_bus {
                         return;
                     }
 
+                    // set the data pointer to the previous location the frame had
                     frame.data = t;
                 }
 
@@ -536,6 +552,8 @@ namespace r2d2::can_bus {
                     frame.data[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
                 }
 
+                // check if the frame is complete. Otherwise return becouse we don't want
+                // to notify the receiving end yet
                 if (can_frame.sequence_id != can_frame.sequence_total) {
                     return;
                 }
