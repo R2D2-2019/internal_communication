@@ -20,14 +20,4 @@ namespace r2d2 {
         // from clogging up the bus.
         DATA_STREAM = 3
     };
-
-    /**
-     * Helper to get the array index of a given
-     * priority.
-     *
-     * @internal
-     * @tparam P
-     */
-    template<priority P>
-    constexpr auto _priority_index = static_cast<uint8_t>(P);
 }

@@ -11,7 +11,7 @@
 
 namespace r2d2 {
     struct frame_s {
-        uint8_t *data;
+        shared_nfc_ptr_c data;
         size_t length;
         
         frame_type type;
@@ -28,11 +28,13 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_frame_v < T> && !is_extended_frame_v <T>
+                is_suitable_frame_v <T> && !is_extended_frame_v <T>
             >
         >
-        T &as_type() {
-            return *(reinterpret_cast<T *>(data));
+        T as_type() const {
+            return *(
+                reinterpret_cast<const T *>(*data)
+            );
         }
 
         /**
@@ -45,8 +47,10 @@ namespace r2d2 {
          * @return
          */
         template<frame_type P>
-        auto as_frame_type() -> frame_data_t <P> & {
-            return *(reinterpret_cast<frame_data_t<P> *>(data));
+        auto as_frame_type() const -> frame_data_t <P> {
+            return *(
+                reinterpret_cast<const frame_data_t<P> *>(*data)
+            );
         }
     };
 

@@ -329,7 +329,7 @@ namespace r2d2::can_bus {
                     }
 
                     // set the data pointer to the new data location
-                    frame.data = t;
+                    frame.data = shared_nfc_ptr_c(t);
 
                     // save the pointer for the rest of the data
                     detail::_memory_manager_s::_set_data_for_uid(t, can_frame.sequence_uid, can_frame.frame_type);
@@ -344,12 +344,12 @@ namespace r2d2::can_bus {
                     }
 
                     // set the data pointer to the previous location the frame had
-                    frame.data = t;
+                    frame.data = shared_nfc_ptr_c(t);
                 }
 
                 // copy can frame to frame.data
                 for(uint_fast8_t i = 0; i < can_frame.length; i++) {
-                    frame.data[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
+                    frame.data.get()[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
                 }
 
                 // check if the frame is complete. Otherwise return becouse we don't want
@@ -362,10 +362,11 @@ namespace r2d2::can_bus {
                 frame.length = ((can_frame.sequence_total * 8) + can_frame.length - 1);
 
             } else {
+                auto *ptr = frame.data.get();
 
                 // copy can frame to frame.data
                 for(uint_fast8_t i = 0; i < can_frame.length; i++) {
-                    frame.data[i] = can_frame.data.bytes[i];
+                    ptr[i] = can_frame.data.bytes[i];
                 }
             }
 
@@ -378,7 +379,7 @@ namespace r2d2::can_bus {
             }    
 
             // mark the uid as not available anymore. (stops data from being written in the data)
-            if(can_frame.sequence_total){
+            if (can_frame.sequence_total) {
                 detail::_memory_manager_s::_clear_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
             }      
         }
