@@ -43,6 +43,8 @@ In the constructor, the `listen_for_frames` method of the communication instance
 
 You **need** to specify frames you want to receive. This is also the case for requests. Please look at the examples folder for more usage examples.
 
+**On naming:** the module class should simply be called `module_c`. The differentiating factor between multiple modules is the namespace in this case. This makes it quite easy to combine multiple modules without knowning class names.
+
 ## Connecting the hardware
 ### What do I need to solder on the board?
 All header locations on the board should be soldered. You can choose if you want male headers, female headers or a combination. We recommend a combination of headers.
