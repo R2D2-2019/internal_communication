@@ -345,6 +345,8 @@ namespace r2d2::can_bus {
 
                 frame.data = shared_nfc_ptr_c(ptr);
 
+                hwlib::cout << "Counter after creation: " << frame.data.get_counter() << "\r\n";
+
                 // copy can frame to frame.data
                 for(uint_fast8_t i = 0; i < can_frame.length; i++) {
                     (*frame.data)[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];

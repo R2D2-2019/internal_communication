@@ -23,7 +23,7 @@ int main() {
         //comm.send(state);
         comm.send_external({0xAA, 0xFA}, state);
 
-        // hwlib::wait_ms(10);
+        hwlib::wait_ms(25);
 
         while(comm.has_data()){
             auto t = comm.get_data();
@@ -31,7 +31,8 @@ int main() {
             const auto data = t.as_frame_type<
                 frame_type::DISPLAY_FILLED_RECTANGLE>();
 
-            hwlib::cout << "Got frame: " << int(data.x) << '\n';
+            can_bus::detail::_memory_manager_s::print_memory_statistics();
+//            hwlib::cout << "Got frame: " << int(data.x) << '\n';
         }
     }
 }

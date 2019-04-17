@@ -99,15 +99,15 @@ namespace r2d2 {
          */
         struct _memory_manager_s {
             static size_t *get_counter(const uint8_t *ptr) {
-                size_t offset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(_nfc_mem);
+                const size_t offset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(_nfc_mem);
 
-                if (offset < offsetof(_nfc_memory_area_s, large_buffer_counters)) {
+                if (offset < offsetof(_nfc_memory_area_s, large_buffers)) {
                     // Small buffers
-                    const size_t array_offset = (offset - offsetof(_nfc_memory_area_s, small_buffer_counters)) / sizeof(size_t);
+                    const size_t array_offset = (offset - offsetof(_nfc_memory_area_s, small_buffers)) / _small_buffer_size;
                     return &_nfc_mem->small_buffer_counters[array_offset];
                 } else {
                     // Large buffers
-                    const size_t array_offset = (offset - offsetof(_nfc_memory_area_s, large_buffer_counters)) / sizeof(size_t);
+                    const size_t array_offset = (offset - offsetof(_nfc_memory_area_s, large_buffers)) / _large_buffer_size;
                     return &_nfc_mem->large_buffer_counters[array_offset];
                 }
             }
@@ -214,6 +214,22 @@ namespace r2d2 {
 
                 return nullptr;
             }
+
+            static void print_memory_statistics() {
+                hwlib::cout << "Counters: \r\n\tSmall buffers:\r\n\t\t";
+
+                for (size_t i = 0; i < _small_buffer_count; i++) {
+                    hwlib::cout << _nfc_mem->small_buffer_counters[i] << ' ';
+                }
+
+                hwlib::cout << "\r\n\r\n\tLarge buffers:\r\n\t\t";
+
+                for (size_t i = 0; i < _large_buffer_count; i++) {
+                    hwlib::cout << _nfc_mem->large_buffer_counters[i] << ' ';
+                }
+
+                hwlib::cout << "\r\n";
+            }
         };
     }
 
@@ -238,9 +254,10 @@ namespace r2d2 {
     public:
         shared_nfc_ptr_c() = default;
 
-        shared_nfc_ptr_c(uint8_t *ptr)
-            : ptr(ptr) {
+        explicit shared_nfc_ptr_c(uint8_t *ptr) : ptr(ptr) {
            counter = can_bus::detail::_memory_manager_s::get_counter(ptr);
+
+           hwlib::cout << "Got " << (*counter) << " at " << int(counter) << "\r\n";
 
            increment();
         }
@@ -285,6 +302,10 @@ namespace r2d2 {
 
         uint8_t *get() {
             return ptr;
+        }
+
+        size_t get_counter() const {
+            return *counter;
         }
 
         uint8_t *operator*() {
