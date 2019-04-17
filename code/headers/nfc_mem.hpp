@@ -31,10 +31,10 @@ namespace r2d2 {
             queue_type tx_queues[4]; // 912 bytes
 
             uint8_t small_buffers[_small_buffer_count][_small_buffer_size]; // 512 bytes
-            bool small_buffers_in_use[_small_buffer_count]; // 8 bytes
+            size_t small_buffer_counters[_small_buffer_count]; // 32 bytes
 
             uint8_t large_buffers[_large_buffer_count][_large_buffer_size]; // 1024 bytes
-            bool large_buffers_in_use[_large_buffer_count]; // 4 bytes
+            size_t large_buffer_counters[_large_buffer_count]; // 16 bytes
 
             _uid_index uid_indices[_small_buffer_count + _large_buffer_count];
         };
@@ -98,13 +98,27 @@ namespace r2d2 {
          * of the NFC memory area.
          */
         struct _memory_manager_s {
+            static size_t *get_counter(const uint8_t *ptr) {
+                size_t offset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(_nfc_mem);
+
+                if (offset < offsetof(_nfc_memory_area_s, large_buffer_counters)) {
+                    // Small buffers
+                    const size_t array_offset = (offset - offsetof(_nfc_memory_area_s, small_buffer_counters)) / sizeof(size_t);
+                    return &_nfc_mem->small_buffer_counters[array_offset];
+                } else {
+                    // Large buffers
+                    const size_t array_offset = (offset - offsetof(_nfc_memory_area_s, large_buffer_counters)) / sizeof(size_t);
+                    return &_nfc_mem->large_buffer_counters[array_offset];
+                }
+            }
+
             /**
              * Deallocate the block, starting at the given pointer.
              * This won't zero the memory, but simply mark it as free.
              * 
              * @param ptr 
              */
-            static void dealloc(uint8_t *ptr) {
+            static void dealloc(const uint8_t *ptr) {
                 // nullptr check
                 if (!ptr) {
                     return;
@@ -115,12 +129,12 @@ namespace r2d2 {
                 if (offset < offsetof(_nfc_memory_area_s, large_buffers)) {
                     // Small buffers
                     const size_t array_offset = (offset - offsetof(_nfc_memory_area_s, small_buffers)) / _small_buffer_size;
-                    _nfc_mem->small_buffers_in_use[array_offset] = false;
+                    _nfc_mem->small_buffer_counters[array_offset] = 0;
                 } else {
                     // Large buffers
                     const size_t array_offset = (offset - offsetof(_nfc_memory_area_s, large_buffers)) / _large_buffer_size;
-                    _nfc_mem->large_buffers_in_use[array_offset] = false;
-                }               
+                    _nfc_mem->large_buffer_counters[array_offset] = 0;
+                }
             }
 
             /**
@@ -186,15 +200,13 @@ namespace r2d2 {
             static uint8_t *alloc(const size_t size) {
                 if (size <= _small_buffer_size) {
                     for (size_t i = 0; i < _small_buffer_count; i++) {
-                        if (!(_nfc_mem->small_buffers_in_use[i])) {
-                            _nfc_mem->small_buffers_in_use[i] = true;
+                        if (!(_nfc_mem->small_buffer_counters[i])) {
                             return reinterpret_cast<uint8_t*>(&_nfc_mem->small_buffers[i]);
                         }
                     }
                 } else {
                     for (size_t i = 0; i < _large_buffer_count; i++) {
-                        if (!(_nfc_mem->large_buffers_in_use[i])) {
-                            _nfc_mem->large_buffers_in_use[i] = true;
+                        if (!(_nfc_mem->large_buffer_counters[i])) {
                             return reinterpret_cast<uint8_t*>(&_nfc_mem->large_buffers[i]);
                         }
                     }
@@ -212,19 +224,31 @@ namespace r2d2 {
 #else 
     class shared_nfc_ptr_c {
     protected:
-        size_t counter = 0;
-        uint8_t *ptr = nullptr;        
+        uint8_t *ptr = nullptr;
+        size_t *counter = nullptr;
+
+        void increment() {
+            (*counter) += 1;
+        }
+
+        void decrement() {
+            (*counter) -= 1;
+        }
 
     public:
-        shared_nfc_ptr_c(){
-            hwlib::cout << "Creating empty ptr\r\n";
-        };
+        shared_nfc_ptr_c() = default;
 
         shared_nfc_ptr_c(uint8_t *ptr)
-            : ptr(ptr) { }
+            : ptr(ptr) {
+           counter = can_bus::detail::_memory_manager_s::get_counter(ptr);
+
+           increment();
+        }
 
         ~shared_nfc_ptr_c() {
-            if ((--counter) == 0) {
+            decrement();
+
+            if ((*counter) == 0) {
                 hwlib::cout << "Deallocating!\r\n";
                 hwlib::cout << "Pointer: " << int(ptr) << "!\r\n\r\n";
 
@@ -232,22 +256,22 @@ namespace r2d2 {
             }
         }
 
-        shared_nfc_ptr_c(const shared_nfc_ptr_c &other) {
-            counter += 1;
-            ptr = other.ptr;
+        shared_nfc_ptr_c(const shared_nfc_ptr_c &other)
+            : ptr(other.ptr), counter(other.counter) {
+            increment();
 
-            hwlib::cout << "Counter incremented to " << counter << "!\r\n";
+            hwlib::cout << "Copy: Counter incremented to " << counter << "!\r\n";
             hwlib::cout << "Pointer: " << int(ptr) << "!\r\n";
         }
 
-        shared_nfc_ptr_c(shared_nfc_ptr_c &&other) {
-            counter = other.counter;
-            ptr = other.ptr;
-        }
+        shared_nfc_ptr_c(shared_nfc_ptr_c &&other)
+            : ptr(other.ptr), counter(other.counter) { }
 
         shared_nfc_ptr_c &operator=(const shared_nfc_ptr_c &other) {
-            counter += 1;
+            counter = other.counter;
             ptr = other.ptr;
+
+            increment();
 
             hwlib::cout << "= Counter incremented to " << counter << "!\r\n";
             hwlib::cout << "Pointer: " << int(ptr) << "!\r\n";

@@ -20,7 +20,8 @@ int main() {
         state.y = 0xBA;
         state.red = 0xFF;
 
-        // comm.send_external({0xAA, 0xFA}, state);
+        //comm.send(state);
+        comm.send_external({0xAA, 0xFA}, state);
 
         // hwlib::wait_ms(10);
 
