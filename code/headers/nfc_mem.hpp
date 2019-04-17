@@ -216,7 +216,9 @@ namespace r2d2 {
         uint8_t *ptr = nullptr;        
 
     public:
-        shared_nfc_ptr_c() = default;
+        shared_nfc_ptr_c(){
+            hwlib::cout << "Creating empty ptr\r\n";
+        };
 
         shared_nfc_ptr_c(uint8_t *ptr)
             : ptr(ptr) { }
@@ -247,7 +249,7 @@ namespace r2d2 {
             counter += 1;
             ptr = other.ptr;
 
-            hwlib::cout << "Counter incremented to " << counter << "!\r\n";
+            hwlib::cout << "= Counter incremented to " << counter << "!\r\n";
             hwlib::cout << "Pointer: " << int(ptr) << "!\r\n";
 
             return *this;

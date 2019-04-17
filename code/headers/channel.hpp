@@ -319,37 +319,35 @@ namespace r2d2::can_bus {
 
             // check if we have a frame that is larger than 8 bytes
             if (can_frame.sequence_total > 0) {
+                uint8_t *ptr = nullptr;
+
                 if (!(can_frame.sequence_id)) {                   
                     // allocate memory for the frame
-                    auto * t = detail::_memory_manager_s::alloc((can_frame.sequence_total + 1) * 8);
+                    ptr = detail::_memory_manager_s::alloc((can_frame.sequence_total + 1) * 8);
 
-                    if (!t) {
+                    if (!ptr) {
                         // return becouse we don't have enough memory available for the current sequence
                         return;
                     }
 
-                    // set the data pointer to the new data location
-                    frame.data = shared_nfc_ptr_c(t);
-
                     // save the pointer for the rest of the data
-                    detail::_memory_manager_s::_set_data_for_uid(t, can_frame.sequence_uid, can_frame.frame_type);
+                    detail::_memory_manager_s::_set_data_for_uid(ptr, can_frame.sequence_uid, can_frame.frame_type);
 
                 } else {
                     // get ptr for data
-                    auto * t = detail::_memory_manager_s::_get_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
+                    ptr = detail::_memory_manager_s::_get_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
 
-                    if (!t) {
+                    if (!ptr) {
                         // no valid pointer in uid set so return
                         return;
                     }
-
-                    // set the data pointer to the previous location the frame had
-                    frame.data = shared_nfc_ptr_c(t);
                 }
+
+                frame.data = shared_nfc_ptr_c(ptr);
 
                 // copy can frame to frame.data
                 for(uint_fast8_t i = 0; i < can_frame.length; i++) {
-                    frame.data.get()[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
+                    (*frame.data)[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
                 }
 
                 // check if the frame is complete. Otherwise return becouse we don't want
@@ -362,11 +360,9 @@ namespace r2d2::can_bus {
                 frame.length = ((can_frame.sequence_total * 8) + can_frame.length - 1);
 
             } else {
-                auto *ptr = frame.data.get();
-
                 // copy can frame to frame.data
                 for(uint_fast8_t i = 0; i < can_frame.length; i++) {
-                    ptr[i] = can_frame.data.bytes[i];
+                    (*frame.data)[i] = can_frame.data.bytes[i];
                 }
             }
 
