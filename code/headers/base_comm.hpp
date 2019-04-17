@@ -6,33 +6,16 @@
 #include <type_traits>
 #include <ringbuffer.hpp>
 
+#include "priority.hpp"
 #include "frame_types.hpp"
 
 namespace r2d2 {
-    /**
-     * All priority levels that can be assigned
-     * to packets.
-     */
-    enum class priority {
-        // High priority packet
-            HIGH = 0,
-
-        // Normal priority packet, default
-            NORMAL = 1,
-
-        // Low priority packet, used when there is no hard time constraint on the delivery of the data
-            LOW = 2,
-
-        // Data stream packet. Used when a stream of packets (e.g. video data) is put on the bus.
-        // Assigning this will given these packets the lowest priority, preventing the large data stream
-        // from clogging up the bus.
-            DATA_STREAM = 3
-    };
-
     struct frame_s {
+        shared_nfc_ptr_c data;
+        size_t length;
+        
         frame_type type;
         bool request;
-        uint8_t bytes[8];
 
         /**
          * Consider the data in the frame as
@@ -45,11 +28,13 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_frame_v < T> && !is_extended_frame_v <T>
+                is_suitable_frame_v <T> && !is_extended_frame_v <T>
             >
         >
-        T &as_type() {
-            return *(reinterpret_cast<T *>(&bytes));
+        T as_type() const {
+            return *(
+                reinterpret_cast<const T *>(*data)
+            );
         }
 
         /**
@@ -62,8 +47,10 @@ namespace r2d2 {
          * @return
          */
         template<frame_type P>
-        auto as_frame_type() -> frame_data_t <P> & {
-            return *(reinterpret_cast<frame_data_t<P> *>(&bytes));
+        auto as_frame_type() const -> frame_data_t <P> {
+            return *(
+                reinterpret_cast<const frame_data_t<P> *>(*data)
+            );
         }
     };
 

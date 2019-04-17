@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "can.hpp"
+#include "nfc_mem.hpp" 
 #include <queue.hpp>
 #include <ringbuffer.hpp>
 #include <cmath>
@@ -95,10 +96,6 @@ namespace r2d2::can_bus {
     protected:
         using ids = detail::_mailbox_assignment_s<Priority>;
 
-        // Transfer queue for this channel, is processed in the
-        // send interrupt.
-        inline static queue_c<detail::_can_frame_s, 32, queue_optimization::READ> tx_queue;
-
         /**
          * Volatile flag that is used to signify that there is space
          * in the tx_queue. The tx_queue is emptied in an interrupt and the
@@ -121,6 +118,9 @@ namespace r2d2::can_bus {
          * @param frame
          */
         static void safely_push_frame(const detail::_can_frame_s &frame) {
+            // For convenience; get a ref to the tx_queue
+            auto &tx_queue = detail::_get_tx_queue_for_channel<Priority>();
+
             if (tx_queue.full()) {
                 space_in_tx_queue = false;
             }
@@ -148,6 +148,16 @@ namespace r2d2::can_bus {
          * Initialize the channel mailboxes.
          */
         static void init() {
+            /*
+             * On the Due, there is a separate memory area of just over 4 kilobytes
+             * that is normally used for NFC. If NFC is not used, the core is free
+             * to repurpose this memory.
+             *
+             * In this case, this memory area is used to store send and
+             * receive buffers for the different channels.
+             */
+            detail::_init_nfc_memory_area();
+
             // Set mailbox mode
             constexpr uint32_t accept_mask = 0x07 << 26;
 
@@ -280,6 +290,9 @@ namespace r2d2::can_bus {
                 return;
             }
 
+            // For convenience; get a ref to the tx_queue
+            auto &tx_queue = detail::_get_tx_queue_for_channel<Priority>();
+
             // Transmit
             if (mmr == 3) {
                 if (!tx_queue.empty()) {
@@ -304,8 +317,57 @@ namespace r2d2::can_bus {
             frame.type = static_cast<frame_type>(can_frame.frame_type);
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
-            for(uint_fast8_t i = 0; i < can_frame.length; i++){
-                frame.bytes[i] = can_frame.data.bytes[i];
+            // check if we have a frame that is larger than 8 bytes
+            if (can_frame.sequence_total > 0) {
+                if (!(can_frame.sequence_id)) {                   
+                    // allocate memory for the frame
+                    auto * t = detail::_memory_manager_s::alloc((can_frame.sequence_total + 1) * 8);
+
+                    if (!t) {
+                        // return becouse we don't have enough memory available for the current sequence
+                        return;
+                    }
+
+                    // set the data pointer to the new data location
+                    frame.data = shared_nfc_ptr_c(t);
+
+                    // save the pointer for the rest of the data
+                    detail::_memory_manager_s::_set_data_for_uid(t, can_frame.sequence_uid, can_frame.frame_type);
+
+                } else {
+                    // get ptr for data
+                    auto * t = detail::_memory_manager_s::_get_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
+
+                    if (!t) {
+                        // no valid pointer in uid set so return
+                        return;
+                    }
+
+                    // set the data pointer to the previous location the frame had
+                    frame.data = shared_nfc_ptr_c(t);
+                }
+
+                // copy can frame to frame.data
+                for(uint_fast8_t i = 0; i < can_frame.length; i++) {
+                    frame.data.get()[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
+                }
+
+                // check if the frame is complete. Otherwise return becouse we don't want
+                // to notify the receiving end yet
+                if (can_frame.sequence_id != can_frame.sequence_total) {
+                    return;
+                }
+
+                // set the amount of bytes the frame uses
+                frame.length = ((can_frame.sequence_total * 8) + can_frame.length - 1);
+
+            } else {
+                auto *ptr = frame.data.get();
+
+                // copy can frame to frame.data
+                for(uint_fast8_t i = 0; i < can_frame.length; i++) {
+                    ptr[i] = can_frame.data.bytes[i];
+                }
             }
 
             using regs = comm_module_register_s;
@@ -314,7 +376,12 @@ namespace r2d2::can_bus {
                 if (regs::reg[i]->accepts_frame(frame.type)) {
                     regs::reg[i]->accept_frame(frame);
                 }
-            }
+            }    
+
+            // mark the uid as not available anymore. (stops data from being written in the data)
+            if (can_frame.sequence_total) {
+                detail::_memory_manager_s::_clear_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
+            }      
         }
     };
 
