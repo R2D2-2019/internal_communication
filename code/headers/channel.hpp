@@ -321,24 +321,27 @@ namespace r2d2::can_bus {
             if (can_frame.sequence_total > 0) {
                 uint8_t *ptr = nullptr;
 
-                if (!(can_frame.sequence_id)) {                   
-                    // allocate memory for the frame
+                if (can_frame.sequence_id == 0) {
+                    hwlib::cout << "Seq: 0, allocating\n";
+                    // Allocate memory for the frame
                     ptr = detail::_memory_manager_s::alloc((can_frame.sequence_total + 1) * 8);
 
                     if (!ptr) {
-                        // return becouse we don't have enough memory available for the current sequence
+                        // Return because we don't have enough memory available for the current sequence
                         return;
                     }
 
-                    // save the pointer for the rest of the data
+                    // Save the pointer for the rest of the data
                     detail::_memory_manager_s::_set_data_for_uid(ptr, can_frame.sequence_uid, can_frame.frame_type);
 
                 } else {
-                    // get ptr for data
+                    hwlib::cout << "Seq: " << can_frame.sequence_id << '\n';
+
+                    // Get ptr to data
                     ptr = detail::_memory_manager_s::_get_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
 
                     if (!ptr) {
-                        // no valid pointer in uid set so return
+                        // No valid pointer in uid set so return
                         return;
                     }
                 }
@@ -347,18 +350,18 @@ namespace r2d2::can_bus {
 
                 hwlib::cout << "Counter after creation: " << frame.data.get_counter() << "\r\n";
 
-                // copy can frame to frame.data
+                // Copy CAN frame to frame.data
                 for(uint_fast8_t i = 0; i < can_frame.length; i++) {
                     (*frame.data)[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
                 }
 
-                // check if the frame is complete. Otherwise return becouse we don't want
-                // to notify the receiving end yet
+                // Check if the frame is complete. Otherwise return because we don't want
+                // to notify the receiving end yet.
                 if (can_frame.sequence_id != can_frame.sequence_total) {
                     return;
                 }
 
-                // set the amount of bytes the frame uses
+                // Set the amount of bytes the frame uses.
                 frame.length = ((can_frame.sequence_total * 8) + can_frame.length - 1);
 
             } else {
@@ -376,7 +379,7 @@ namespace r2d2::can_bus {
                 }
             }    
 
-            // mark the uid as not available anymore. (stops data from being written in the data)
+            // Mark the uid as not available anymore. (stops data from being written in the data)
             if (can_frame.sequence_total) {
                 detail::_memory_manager_s::_clear_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
             }      
