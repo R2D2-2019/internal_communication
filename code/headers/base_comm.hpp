@@ -1,9 +1,6 @@
 #pragma once
 
-#include <algorithm>
-#include <cstring>
 #include <array>
-#include <type_traits>
 #include <ringbuffer.hpp>
 
 #include "priority.hpp"
@@ -171,13 +168,18 @@ namespace r2d2 {
          * @param listen_for
          */
         void listen_for_frames(std::array<frame_id, 8> listen_for /* Copy to allow move */) {
-            this->listen_for = listen_for;
-
             // Sort to enable binary search
-            std::sort(
-                std::begin(this->listen_for),
-                std::end(this->listen_for)
-            );
+            int i = 1;
+            while (i != listen_for.size()) {
+                if (i > 0 && listen_for[i] < listen_for[i - 1]) {
+                    std::swap(listen_for[i], listen_for[i - 1]);
+                    i -= 1;
+                } else {
+                    i += 1;
+                }
+            }
+
+            this->listen_for = listen_for;
 
             if (accepts_frame(frame_type::ALL)) {
                 accept_all = true;
@@ -238,11 +240,28 @@ namespace r2d2 {
 
             const auto &frames = get_accepted_frame_types();
 
-            return std::binary_search(
-                std::begin(frames),
-                std::end(frames),
-                p
-            );
+            // Binary search
+            int lower = 0;
+            int upper = frames.size();
+
+            while (lower < upper) {
+                int x = lower + (upper - lower) / 2;
+                int val = frames[x];
+
+                if (p == val) {
+                    return true;
+                } else if (p > val) {
+                    if (lower == x) {
+                        break;
+                    }
+
+                    lower = x;
+                } else if (p < val) {
+                    upper = x;
+                }
+            }
+
+            return false;
         }
     };
 }
