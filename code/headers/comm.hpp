@@ -84,7 +84,7 @@ namespace r2d2 {
          * 
          * @param mask 
          */
-        void update_all_channels(r2d2::frame_id mask){
+        void update_all_channels(r2d2::frame_id mask) {
             // Set the acceptance mask of all the channels to use the mask
             uint32_t normal_mask = channel<priority::NORMAL>::get_mask();
             channel<priority::NORMAL>::set_mask((normal_mask & ~0xFF << 10) | mask << 10);

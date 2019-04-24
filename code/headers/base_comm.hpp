@@ -13,7 +13,7 @@ namespace r2d2 {
     struct frame_s {
         shared_nfc_ptr_c data;
         size_t length;
-        
+
         frame_type type;
         bool request;
 
@@ -28,9 +28,10 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_frame_v <T> && !is_extended_frame_v <T>
-            >
+            is_suitable_frame_v < T> && !is_extended_frame_v <T>
         >
+        >
+
         T as_type() const {
             return *(
                 reinterpret_cast<const T *>(*data)
@@ -81,13 +82,15 @@ namespace r2d2 {
          * @param buffer
          * @param prio
          */
-        virtual void send_impl(const frame_type &type, const uint8_t data[], const size_t length, const priority prio) = 0;
+        virtual void send_impl(
+            const frame_type &type, const uint8_t data[], size_t length, priority prio
+        ) = 0;
 
         /**
          * Update the acceptance filter for some of the buses
          * 
          */
-        virtual void update_filter(){}
+        virtual void update_filter() {}
 
     public:
         /**
@@ -109,9 +112,10 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-               is_suitable_frame_v<T>
-            >
+                is_suitable_frame_v < T>
         >
+        >
+
         void send(const T &data, const priority prio = priority::NORMAL) {
             send_impl(
                 static_cast<frame_type>(frame_type_v<T>),
@@ -133,15 +137,16 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_frame_v<T>
-            >
+                is_suitable_frame_v < T>
         >
+        >
+
         void send_external(const external_id_s &id, const T &data, const priority prio = priority::NORMAL) {
             // No {} needed, since all fields are filled.
             // Adding it will cause a call to memset
             frame_external_s frame;
 
-            for(size_t i = 0; i < sizeof(T); i++){
+            for (size_t i = 0; i < sizeof(T); i++) {
                 frame.data[i] = reinterpret_cast<const uint8_t *>(&data)[i];
             }
 
@@ -215,7 +220,7 @@ namespace r2d2 {
          * listens for.
          * @return
          */
-        std::array<frame_id, 8> const& get_accepted_frame_types() const {
+        std::array<frame_id, 8> const &get_accepted_frame_types() const {
             return listen_for;
         }
 
