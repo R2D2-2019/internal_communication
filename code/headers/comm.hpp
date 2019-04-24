@@ -79,6 +79,53 @@ namespace r2d2 {
             distribute_frame_internally(frame);
         }
 
+        /**
+         * Update all the acceptance masks to use the mask
+         * 
+         * @param mask 
+         */
+        void update_all_channels(r2d2::frame_id mask){
+            // Set the acceptance mask of all the channels to use the mask
+            uint32_t normal_mask = channel<priority::NORMAL>::get_mask();
+            channel<priority::NORMAL>::set_mask((normal_mask & ~0xFF << 10) | mask << 10);
+
+            uint32_t high_mask = channel<priority::HIGH>::get_mask();
+            channel<priority::HIGH>::set_mask((high_mask & ~0xFF << 10) | mask << 10);
+
+            uint32_t low_mask = channel<priority::LOW>::get_mask();
+            channel<priority::LOW>::set_mask((low_mask & ~0xFF << 10) | mask << 10);
+
+            uint32_t data_stream_mask = channel<priority::DATA_STREAM>::get_mask();
+            channel<priority::DATA_STREAM>::set_mask((data_stream_mask & ~0xFF << 10) | mask << 10);                        
+        }
+
+        /**
+         * Calculate a acceptance mask depending on the modules on the comm
+         * 
+         */
+        void update_filter() override{
+            using regs = can_bus::comm_module_register_s;
+
+            // Start with a full mask.
+            r2d2::frame_id mask = ~0x00;
+
+            for (uint8_t i = 0; i < regs::count; i++) {
+                // Check for all available frames
+                for (r2d2::frame_id type = 0; type < r2d2::frame_type::COUNT; type++) {
+                    if (regs::reg[i]->accepts_frame(r2d2::frame_type(type))) {
+                        if(r2d2::frame_type(type) == r2d2::frame_type::ALL){
+                            // Accept all frames and return
+                            update_all_channels(0x00);
+                            return;
+                        }
+                        // Calculate the new acceptance mask
+                        mask = mask & ~(type);
+                    }
+                }
+            }
+        	update_all_channels(mask);
+        }
+
     public:
         /**
          * Initialize the communication link for a module.

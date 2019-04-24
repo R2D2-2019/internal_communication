@@ -309,6 +309,18 @@ namespace r2d2::can_bus {
             port<Bus>->CAN_MB[index].CAN_MMR =
                 (port<Bus>->CAN_MB[index].CAN_MMR & ~CAN_MMR_MOT_Msk) | (mode << CAN_MMR_MOT_Pos);
         }
+        /**
+         * Get mask for rx on the given mailbox.
+         *  
+         * @tparam Bus 
+         * @param index 
+         * @param mask 
+         * @param extended 
+         */
+        template<typename Bus>
+        uint32_t _get_mailbox_accept_mask(const uint8_t index) {
+            return port<Bus>->CAN_MB[index].CAN_MAM;
+        }
 
         /**
          * Set mask for rx on the given mailbox.

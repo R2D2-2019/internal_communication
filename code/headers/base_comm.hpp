@@ -83,6 +83,12 @@ namespace r2d2 {
          */
         virtual void send_impl(const frame_type &type, const uint8_t data[], const size_t length, const priority prio) = 0;
 
+        /**
+         * Update the acceptance filter for some of the buses
+         * 
+         */
+        virtual void update_filter(){}
+
     public:
         /**
          * Request the given packet on
@@ -171,6 +177,8 @@ namespace r2d2 {
             if (accepts_frame(frame_type::ALL)) {
                 accept_all = true;
             }
+
+            update_filter();
         }
 
         /**
