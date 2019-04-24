@@ -326,8 +326,6 @@ namespace r2d2::can_bus {
                 return;
             }
 
-            hwlib::cout << "Receive Interrupt triggered\n";
-
             // Receive
             detail::_can_frame_s can_frame;
             detail::_read_mailbox<Bus>(index, can_frame);
@@ -342,7 +340,6 @@ namespace r2d2::can_bus {
                 uint8_t *ptr = nullptr;
 
                 if (can_frame.sequence_id == 0) {
-                    // hwlib::cout << "Seq: 0, allocating\n";
                     // Allocate memory for the frame
                     ptr = detail::_memory_manager_s::alloc((can_frame.sequence_total + 1) * 8);
 
@@ -355,8 +352,6 @@ namespace r2d2::can_bus {
                     detail::_memory_manager_s::_set_data_for_uid(ptr, can_frame.sequence_uid, can_frame.frame_type);
 
                 } else {
-                    // hwlib::cout << "Seq: " << can_frame.sequence_id << '\n';
-
                     // Get ptr to data
                     ptr = detail::_memory_manager_s::_get_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
 
@@ -367,8 +362,6 @@ namespace r2d2::can_bus {
                 }
 
                 frame.data = shared_nfc_ptr_c(ptr);
-
-                // hwlib::cout << "Counter after creation: " << frame.data.get_counter() << "\r\n";
 
                 // Copy CAN frame to frame.data
                 for(uint_fast8_t i = 0; i < can_frame.length; i++) {

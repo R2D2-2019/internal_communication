@@ -271,8 +271,6 @@ namespace r2d2 {
             decrement();
 
             if ((*counter) == 0) {
-                hwlib::cout << "Deallocating!\r\n";
-
                 can_bus::detail::_memory_manager_s::dealloc(ptr);
             }
         }
