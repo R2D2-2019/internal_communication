@@ -100,29 +100,26 @@ namespace r2d2 {
         }
 
         /**
-         * Calculate a acceptance mask depending on the modules on the comm
-         * 
+         * Calculate a acceptance mask depending on the modules on the comm.
          */
-        void update_filter() override{
+        void update_filter() override {
             using regs = can_bus::comm_module_register_s;
 
             // Start with a full mask.
             r2d2::frame_id mask = ~0x00;
 
-            for (uint8_t i = 0; i < regs::count; i++) {
-                // Check for all available frames
-                for (r2d2::frame_id type = 0; type < r2d2::frame_type::COUNT; type++) {
-                    if (regs::reg[i]->accepts_frame(r2d2::frame_type(type))) {
-                        if(r2d2::frame_type(type) == r2d2::frame_type::ALL){
-                            // Accept all frames and return
-                            update_all_channels(0x00);
-                            return;
-                        }
-                        // Calculate the new acceptance mask
-                        mask = mask & ~(type);
+            for (const auto &reg : regs::reg) {
+                for (const auto type : reg->get_accepted_frame_types()) {
+                    if (type == r2d2::frame_type::ALL) {
+                        // Accept all frames and return
+                        update_all_channels(0x00);
+                        return;
                     }
+
+                    mask &= ~(type);
                 }
             }
+
         	update_all_channels(mask);
         }
 
