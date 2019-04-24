@@ -330,9 +330,32 @@ namespace r2d2::can_bus {
             detail::_can_frame_s can_frame;
             detail::_read_mailbox<Bus>(index, can_frame);
 
+            using regs = comm_module_register_s;
+
+            /*
+             * First, whe want to make sure that we actually
+             * want to receive this message. It has already passed the
+             * dynamic acceptance mask, but it's possible that it just
+             * happens to pass that mask.
+             */
+            bool reject = true;
+            const auto frame_type = static_cast<enum frame_type>(can_frame.frame_type);
+
+            for (uint8_t i = 0; i < regs::count; i++) {
+                if (regs::reg[i]->accepts_frame(frame_type)) {
+                    reject = false;
+                    break;
+                }
+            }
+
+            if (reject) {
+                return;
+            }
+
+            // Actually start reading the can_frame
             frame_s frame{};
 
-            frame.type = static_cast<frame_type>(can_frame.frame_type);
+            frame.type = frame_type;
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
             // check if we have a frame that is larger than 8 bytes
@@ -384,8 +407,8 @@ namespace r2d2::can_bus {
                 }
             }
 
-            using regs = comm_module_register_s;
-
+            // Distribute the frame to all registered modules
+            // that will accept it.
             for (uint8_t i = 0; i < regs::count; i++) {
                 if (regs::reg[i]->accepts_frame(frame.type)) {
                     regs::reg[i]->accept_frame(frame);
