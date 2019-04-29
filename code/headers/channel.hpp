@@ -405,6 +405,8 @@ namespace r2d2::can_bus {
                 for(uint_fast8_t i = 0; i < can_frame.length; i++) {
                     (*frame.data)[i] = can_frame.data.bytes[i];
                 }
+                
+                frame.length = can_frame.length;
             }
 
             // Distribute the frame to all registered modules
