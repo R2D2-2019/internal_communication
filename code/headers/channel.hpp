@@ -402,11 +402,19 @@ namespace r2d2::can_bus {
 
             } else {
                 // copy can frame to frame.data
+                uint8_t *ptr = detail::_memory_manager_s::alloc(can_frame.length);;
+
+                if(!ptr){
+                    return;
+                }
+
+                frame.data = shared_nfc_ptr_c(ptr);
+
                 for(uint_fast8_t i = 0; i < can_frame.length; i++) {
                     (*frame.data)[i] = can_frame.data.bytes[i];
                 }
-                
-                frame.length = can_frame.length;
+
+                frame.length = can_frame.length;            
             }
 
             // Distribute the frame to all registered modules
