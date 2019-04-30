@@ -9,8 +9,12 @@
 
 namespace r2d2 {
     namespace can_bus::detail {
+        constexpr uint16_t _extra_small_buffer_size = 8;
+        constexpr uint8_t _extra_small_buffer_count = 64;
+        
         constexpr uint16_t _small_buffer_size = 64;
         constexpr uint8_t _small_buffer_count = 16;
+        
         constexpr uint16_t _large_buffer_size = 256;
         constexpr uint8_t _large_buffer_count = 4;
 
@@ -29,10 +33,14 @@ namespace r2d2 {
         struct _nfc_memory_area_s {
             using queue_type = queue_c<detail::_can_frame_s, 16, queue_optimization::READ>;
 
+            using extra_small_buffer = uint8_t[_extra_small_buffer_size];
             using small_buffer = uint8_t[_small_buffer_size];
             using large_buffer = uint8_t[_large_buffer_size];
 
             queue_type tx_queues[4]; // 912 bytes
+
+            extra_small_buffer extra_small_buffers[_extra_small_buffer_count]; // 512 bytes
+            size_t extra_small_buffer_counters[_extra_small_buffer_count]; // 256 bytes
 
             small_buffer small_buffers[_small_buffer_count]; // 1024 bytes
             size_t small_buffer_counters[_small_buffer_count]; // 32 bytes
@@ -105,7 +113,12 @@ namespace r2d2 {
             static size_t *get_counter(const uint8_t *ptr) {
                 const size_t offset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(_nfc_mem);
 
-                if (offset < offsetof(_nfc_memory_area_s, large_buffers)) {
+                if (offset < offsetof(_nfc_memory_area_s, small_buffers)){
+                    // extra small buffers
+                    const size_t array_offset =
+                        (offset - offsetof(_nfc_memory_area_s, extra_small_buffers)) / _extra_small_buffer_size;
+                    return &_nfc_mem->extra_small_buffer_counters[array_offset];                    
+                } else if (offset < offsetof(_nfc_memory_area_s, large_buffers)) {
                     // Small buffers
                     const size_t array_offset =
                         (offset - offsetof(_nfc_memory_area_s, small_buffers)) / _small_buffer_size;
@@ -131,7 +144,12 @@ namespace r2d2 {
 
                 size_t offset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(_nfc_mem);
 
-                if (offset < offsetof(_nfc_memory_area_s, large_buffers)) {
+                if (offset < offsetof(_nfc_memory_area_s, small_buffers)) {
+                    // Small buffers
+                    const size_t array_offset =
+                        (offset - offsetof(_nfc_memory_area_s, extra_small_buffers)) / _extra_small_buffer_size;
+                    _nfc_mem->extra_small_buffer_counters[array_offset] = 0;
+                } else if (offset < offsetof(_nfc_memory_area_s, large_buffers)) {
                     // Small buffers
                     const size_t array_offset =
                         (offset - offsetof(_nfc_memory_area_s, small_buffers)) / _small_buffer_size;
@@ -205,7 +223,13 @@ namespace r2d2 {
              * @return uint8_t* 
              */
             static uint8_t *alloc(const size_t size) {
-                if (size <= _small_buffer_size) {
+                if (size <= _extra_small_buffer_size) {
+                    for (size_t i = 0; i < _extra_small_buffer_count; i++) {
+                        if (!(_nfc_mem->extra_small_buffer_counters[i])) {
+                            return reinterpret_cast<uint8_t *>(&_nfc_mem->extra_small_buffers[i]);
+                        }
+                    }
+                } else if (size <= _small_buffer_size) {
                     for (size_t i = 0; i < _small_buffer_count; i++) {
                         if (!(_nfc_mem->small_buffer_counters[i])) {
                             return reinterpret_cast<uint8_t *>(&_nfc_mem->small_buffers[i]);
