@@ -19,6 +19,9 @@ include           $(HWLIB)/Makefile.inc
 # add datastructures
 SEARCH			  += ../../../libraries/datastructures/code/headers
 
+# add trng_library
+SEARCH			  += ../../../libraries/trng_library/code/headers
+
 # set BMPTK to the bmptk subdirectory
 BMPTK := ../../../programs/bmptk
 

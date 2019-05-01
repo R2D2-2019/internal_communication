@@ -5,6 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/../../libraries/hwlib/library",
+                "${workspaceFolder}/../../libraries/trng_library/code/headers",
+                "${workspaceFolder}/../../libraries/datastructures/code/headers",
                 "${workspaceFolder}/../../programs/bmptk/targets/cortex/atmel"
             ],
             "defines": [
