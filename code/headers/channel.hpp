@@ -10,6 +10,7 @@
 #include <ringbuffer.hpp>
 #include <cmath>
 #include "base_comm.hpp"
+#include <trng.hpp>
 
 namespace r2d2::can_bus {
     /**
@@ -158,6 +159,12 @@ namespace r2d2::can_bus {
              */
             detail::_init_nfc_memory_area();
 
+            /**
+             * init the hardware true random number generator (trng) 
+             * for the unique identifier (uid)
+             */
+            trng_c::init();
+
             // Set mailbox mode
             constexpr uint32_t accept_mask = 0x07 << 26;
 
@@ -240,7 +247,13 @@ namespace r2d2::can_bus {
                 const uint_fast8_t total = length / 8;
                 const uint_fast8_t remainder = length % 8;
                 const int rem = remainder > 0;
-                const uint16_t timer = port<Bus>->CAN_TIM & 0xF; // get the current timer register
+                
+                /**
+                 * get a random number for the uid. The send frame is more than 84 clock cycles
+                 * so there is no need to check if there is a new value available when sending
+                 * a large packet
+                 */
+                const uint16_t curr_uid = trng_c::get();
 
                 const uint8_t *ptr = data;
 
@@ -259,7 +272,7 @@ namespace r2d2::can_bus {
                     frame.sequence_total = total + rem - 1;
 
                     // set uid for current transfer
-                    frame.sequence_uid = timer;
+                    frame.sequence_uid = curr_uid;
 
                     safely_push_frame(frame);
                 }
@@ -278,7 +291,7 @@ namespace r2d2::can_bus {
                     frame.sequence_total = total; // -1 and rem cancel each other out
 
                     // set uid for current transfer
-                    frame.sequence_uid = timer;
+                    frame.sequence_uid = curr_uid;
 
                     safely_push_frame(frame);
                 }
