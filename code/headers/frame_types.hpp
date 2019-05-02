@@ -194,14 +194,22 @@ namespace r2d2 {
         uint8_t red;
         uint8_t green;
         uint8_t blue;
-    };    
+    };
 
     /**
-
-
+     *ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
+     *This is a hack that uses the python frame generator to create a frame with strings instead of chars.
+     *This conversion does not work in c++
+     *
+     *Params:
+     *	module is the name of the targeted module
+     *	command is the command 
     */
-    struct frame_char_array{
-        char string;
+    struct frame_ui_command_s{
+        char module;
+        char command;
+        char destination;
+        char parameters;
     };
 
 
