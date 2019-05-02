@@ -200,9 +200,8 @@ namespace r2d2 {
 
 
     */
-    template<size_t N>
     struct frame_char_array{
-        char string[N];
+        char string;
     };
 
 
