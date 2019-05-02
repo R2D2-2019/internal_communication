@@ -200,10 +200,13 @@ namespace r2d2 {
      *ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
      *This is a hack that uses the python frame generator to create a frame with strings instead of chars.
      *This conversion does not work in c++
+     *These frames will be sent to swarm management, they could then fill the required frame with parameters and send it to the destined robot
      *
      *Params:
-     *	module is the name of the targeted module
-     *	command is the command 
+     *	module is the name of the targeted module, mostly used to prevent nameclash
+     *	command is the command that needs to be executed
+     *	destination is used to tell what robot to send the command to
+     *	all parameters needed for the command serialised
     */
     struct frame_ui_command_s{
         char module;
