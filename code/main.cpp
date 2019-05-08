@@ -31,7 +31,6 @@ int main() {
             const auto data = t.as_frame_type<
                 frame_type::DISPLAY_FILLED_RECTANGLE>();
 
-            can_bus::detail::_memory_manager_s::print_memory_statistics();
             hwlib::cout << "Got frame: " << int(data.x) << '\n';
         }
     }
