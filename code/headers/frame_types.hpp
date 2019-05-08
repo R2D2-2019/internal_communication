@@ -203,7 +203,7 @@ namespace r2d2 {
      * 
      * Power wiki: https://github.com/R2D2-2019/R2D2-2019/wiki/Power
      */ 
-    struct frame_battery_level {
+    struct frame_battery_level_s {
         // Battery percentage. Between 0 - 100
         uint8_t percentage;
 
