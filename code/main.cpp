@@ -18,12 +18,17 @@ int main() {
         frame_display_filled_rectangle_s state;
         state.x = 0xAA;
         state.y = 0xBA;
+        state.width = 10;
+        state.height = 20;
         state.red = 0xFF;
+        state.green = 0xEE;
+        state.blue = 0xCC;
 
-        //comm.send(state);
-        comm.send_external({0xAA, 0xFA}, state);
 
-        //hwlib::wait_ms(50);
+        comm.send(state);
+        // comm.send_external({0xAA, 0xFA}, state);
+
+        hwlib::wait_ms(50);
 
         while(comm.has_data()){
             auto t = comm.get_data();
