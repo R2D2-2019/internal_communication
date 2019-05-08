@@ -1,8 +1,10 @@
 #pragma once
 
+#include <ringbuffer.hpp>
 #include <queue.hpp>
 #include <sam3.h>
 #include <hwlib.hpp>
+#include <array>
 
 #include "priority.hpp"
 #include "can.hpp"
@@ -18,10 +20,11 @@ namespace r2d2 {
         constexpr uint16_t _large_buffer_size = 256;
         constexpr uint8_t _large_buffer_count = 4;
 
+        #pragma pack(1)
         struct _uid_index {
-            uint8_t uid;
             uint8_t frame_type;
             uint8_t *data;
+            uint8_t uid:5;
         };
 
         /**
@@ -33,22 +36,44 @@ namespace r2d2 {
         struct _nfc_memory_area_s {
             using queue_type = queue_c<detail::_can_frame_s, 16, queue_optimization::READ>;
 
-            using extra_small_buffer = uint8_t[_extra_small_buffer_size];
-            using small_buffer = uint8_t[_small_buffer_size];
-            using large_buffer = uint8_t[_large_buffer_size];
-
             queue_type tx_queues[4]; // 912 bytes
 
-            extra_small_buffer extra_small_buffers[_extra_small_buffer_count]; // 512 bytes
-            size_t extra_small_buffer_counters[_extra_small_buffer_count]; // 256 bytes
+            template<size_t Packets, size_t Amount>
+            using buffer_type = ringbuffer_c<
+                std::array<uint8_t, Packets * 8>,
+                Amount
+            >;
 
-            small_buffer small_buffers[_small_buffer_count]; // 1024 bytes
-            size_t small_buffer_counters[_small_buffer_count]; // 32 bytes
+            constexpr static size_t p1_buffers_count = 96;
+            constexpr static size_t p4_buffers_count = 18;
+            constexpr static size_t p16_buffers_count = 4;
+            constexpr static size_t p32_buffers_count = 2;
 
-            large_buffer large_buffers[_large_buffer_count]; // 1024 bytes
-            size_t large_buffer_counters[_large_buffer_count]; // 16 bytes
+            buffer_type<1, p1_buffers_count>    p1_buffers;
+            buffer_type<4, p4_buffers_count>    p4_buffers;
+            buffer_type<16, p16_buffers_count>  p16_buffers;
+            buffer_type<32, p32_buffers_count>  p32_buffers;
 
-            _uid_index uid_indices[_small_buffer_count + _large_buffer_count];
+            _uid_index uid_indices[
+                p1_buffers_count + 
+                p4_buffers_count +
+                p16_buffers_count +
+                p32_buffers_count
+            ];
+
+            uint8_t *allocate(uint8_t size) {
+                if (size <= 1 * 8) {
+                    return &(p1_buffers.emplace()[0]); 
+                } else if (size <= 4 * 8) {
+                    return &(p4_buffers.emplace()[0]); 
+                } else if (size <= 16 * 8) {
+                    return &(p16_buffers.emplace()[0]); 
+                } else if (size <= 32 * 8) {
+                    return &(p32_buffers.emplace()[0]); 
+                } else {
+                    return nullptr;
+                }
+            }
         };
 
         /**
@@ -246,21 +271,21 @@ namespace r2d2 {
                 return nullptr;
             }
 
-            static void print_memory_statistics() {
-                hwlib::cout << "Counters: \r\n\tSmall buffers:\r\n\t\t";
+            // static void print_memory_statistics() {
+            //     hwlib::cout << "Counters: \r\n\tSmall buffers:\r\n\t\t";
 
-                for (size_t i = 0; i < _small_buffer_count; i++) {
-                    hwlib::cout << _nfc_mem->small_buffer_counters[i] << ' ';
-                }
+            //     for (size_t i = 0; i < _small_buffer_count; i++) {
+            //         hwlib::cout << _nfc_mem->p1_buffers.size() << ' ';
+            //     }
 
-                hwlib::cout << "\r\n\r\n\tLarge buffers:\r\n\t\t";
+            //     hwlib::cout << "\r\n\r\n\tLarge buffers:\r\n\t\t";
 
-                for (size_t i = 0; i < _large_buffer_count; i++) {
-                    hwlib::cout << _nfc_mem->large_buffer_counters[i] << ' ';
-                }
+            //     for (size_t i = 0; i < _large_buffer_count; i++) {
+            //         hwlib::cout << _nfc_mem->large_buffer_counters[i] << ' ';
+            //     }
 
-                hwlib::cout << "\r\n";
-            }
+            //     hwlib::cout << "\r\n";
+            // }
         };
     }
 
