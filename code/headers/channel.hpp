@@ -427,7 +427,7 @@ namespace r2d2::can_bus {
                     frame.data[i] = can_frame.data.bytes[i];
                 }
 
-                frame.length = can_frame.length;            
+                frame.length = can_frame.length;
             }
 
             // Distribute the frame to all registered modules
