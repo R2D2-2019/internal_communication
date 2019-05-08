@@ -8,7 +8,7 @@
 
 namespace r2d2 {
     struct frame_s {
-        shared_nfc_ptr_c data;
+        uint8_t* data;
         size_t length;
 
         frame_type type;
