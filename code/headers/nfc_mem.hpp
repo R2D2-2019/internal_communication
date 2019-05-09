@@ -59,10 +59,8 @@ namespace r2d2 {
                     return &(p4_buffers.emplace()[0]); 
                 } else if (size <= 16 * 8) {
                     return &(p16_buffers.emplace()[0]); 
-                } else if (size <= 32 * 8) {
-                    return &(p32_buffers.emplace()[0]); 
                 } else {
-                    return nullptr;
+                    return &(p32_buffers.emplace()[0]); 
                 }
             }
         };
