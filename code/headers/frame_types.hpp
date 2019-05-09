@@ -59,7 +59,7 @@ namespace r2d2 {
         DISTANCE,
         DISPLAY_FILLED_RECTANGLE,
         BATTERY_LEVEL,
-	      UI_COMMAND,
+        UI_COMMAND,
 
         // Don't touch
         EXTERNAL,
