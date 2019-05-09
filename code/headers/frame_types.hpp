@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <cstdint>
@@ -58,6 +59,7 @@ namespace r2d2 {
         DISTANCE,
         DISPLAY_FILLED_RECTANGLE,
         BATTERY_LEVEL,
+	      UI_COMMAND,
 
         // Don't touch
         EXTERNAL,
@@ -195,7 +197,27 @@ namespace r2d2 {
         uint8_t red;
         uint8_t green;
         uint8_t blue;
-    };    
+    };
+
+    /**
+     *ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
+     *This is a hack that uses the python frame generator to create a frame with strings instead of chars.
+     *This conversion does not work in c++.
+     *These frames will be sent to swarm management, they only have to call the command with given parameters and send it to the destined robot.
+     *
+     *Params:
+     *	module is the name of the targeted module, mostly used to prevent nameclash
+     *	command is the command that needs to be executed, with parameters
+     *	destination is used to tell what robot to send the command to
+     *
+     * SwarmUI wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI    
+     */
+    struct frame_ui_command_s {
+        char module;
+        char command;
+        char destination;
+    };
 
     /**
      * Struct that represents the level of 
@@ -223,4 +245,5 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
 }
