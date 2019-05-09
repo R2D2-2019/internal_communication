@@ -201,7 +201,8 @@ namespace r2d2 {
      * Struct that represents the level of 
      * the battery on the robot. 
      * 
-     * Power wiki: https://github.com/R2D2-2019/R2D2-2019/wiki/Power
+     * Power wiki: 
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Power
      */ 
     struct frame_battery_level_s {
         // Battery percentage. Between 0 - 100
@@ -215,11 +216,11 @@ namespace r2d2 {
         // A scale of x1000 is used, because thas is the maximum precision
         // the sensor can read.
         uint32_t voltage;
-    }
+    };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
-    R2D2_INTERNAL_FRAME_HELPER(frame_battery_level, BATTERY_LEVEL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
 }
