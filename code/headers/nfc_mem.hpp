@@ -11,15 +11,6 @@
 
 namespace r2d2 {
     namespace can_bus::detail {
-        constexpr uint16_t _extra_small_buffer_size = 8;
-        constexpr uint8_t _extra_small_buffer_count = 64;
-        
-        constexpr uint16_t _small_buffer_size = 64;
-        constexpr uint8_t _small_buffer_count = 16;
-        
-        constexpr uint16_t _large_buffer_size = 256;
-        constexpr uint8_t _large_buffer_count = 4;
-
         #pragma pack(1)
         struct _uid_index {
             uint8_t frame_type;
