@@ -173,6 +173,7 @@ namespace r2d2 {
     };
     
     /**
+     *CLI COMMAND
      * Struct to set a rectangle on a display. This fills a 
      * rectangle with the color specified.
      * 
