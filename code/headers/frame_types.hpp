@@ -58,7 +58,8 @@ namespace r2d2 {
         ACTIVITY_LED_STATE,
         DISTANCE,
         DISPLAY_FILLED_RECTANGLE,
-	UI_COMMAND,
+        BATTERY_LEVEL,
+        UI_COMMAND,
 
         // Don't touch
         EXTERNAL,
@@ -218,9 +219,31 @@ namespace r2d2 {
         char destination;
     };
 
+    /**
+     * Struct that represents the level of 
+     * the battery on the robot. 
+     * 
+     * Power wiki: 
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Power
+     */ 
+    struct frame_battery_level_s {
+        // Battery percentage. Between 0 - 100
+        uint8_t percentage;
+
+        // Battery voltage.
+        // The voltage is multiplied by 1000 in this
+        // representation. That means that a value of
+        // 12.1V will be 12100. This larger value is 
+        // used to alleviate the need for floating point numbers.
+        // A scale of x1000 is used, because thas is the maximum precision
+        // the sensor can read.
+        uint32_t voltage;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
 }
