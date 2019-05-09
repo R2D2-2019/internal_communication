@@ -172,8 +172,7 @@ namespace r2d2 {
         uint16_t mm;
     };
     
-    /**
-     *CLI COMMAND
+    /** @cond CLI COMMAND @endcond
      * Struct to set a rectangle on a display. This fills a 
      * rectangle with the color specified.
      * 
