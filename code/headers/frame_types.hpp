@@ -58,6 +58,7 @@ namespace r2d2 {
         ACTIVITY_LED_STATE,
         DISTANCE,
         DISPLAY_FILLED_RECTANGLE,
+	UI_COMMAND,
 
         // Don't touch
         EXTERNAL,
@@ -217,9 +218,9 @@ namespace r2d2 {
         char destination;
     };
 
-
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
 }
