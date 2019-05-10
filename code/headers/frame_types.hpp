@@ -58,6 +58,7 @@ namespace r2d2 {
         ACTIVITY_LED_STATE,
         DISTANCE,
         DISPLAY_FILLED_RECTANGLE,
+        DISPLAY_CHARACTER,
         BATTERY_LEVEL,
         UI_COMMAND,
 
@@ -200,6 +201,35 @@ namespace r2d2 {
     };
 
     /**
+     * Struct to set a character on a display. This shows
+     * a colored character at given location. The character
+     * can be any character from the un-extended
+     * ascii table (characters 0-127)
+     * 
+     * Currently only the 8x8 font from hwlib is supported,
+     * When extended frames are realised, 16x16 may be 
+     * implemented.
+     * 
+     * Display wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
+     */
+    struct frame_display_character_s {
+        // position of rectangle
+        uint8_t x;
+        uint8_t y;
+
+        // character
+        uint8_t character;
+
+        // color of pixels
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
+    };
+
+
+
+    /**
      *ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
      *This is a hack that uses the python frame generator to create a frame with strings instead of chars.
      *This conversion does not work in c++.
@@ -244,6 +274,7 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_character_s, DISPLAY_CHARACTER)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
 }
