@@ -60,6 +60,7 @@ namespace r2d2 {
         DISPLAY_FILLED_RECTANGLE,
         BATTERY_LEVEL,
         UI_COMMAND,
+        COORDINATE,
 
         // Don't touch
         EXTERNAL,
@@ -240,10 +241,28 @@ namespace r2d2 {
         uint32_t voltage;
     };
 
+    /**
+     * Struct that represents a coordinate on the planet.
+     * 
+     * Location Detector wiki: 
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Location-Detector
+     */ 
+    struct frame_coordinate_s {
+        // This is the latitude of the coordinate. This value is always positive.
+        uint32_t latitude;
+        // This is the longitude of the coordinate. This value is always positive.
+        uint32_t longtitude;
+        // This variable describes if the latitude value is towards north or south and if the longitude value is towards east or west.
+        uint8_t north_east;
+        // This is the altitude of the coordinate.
+        int16_t altitude;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
+    R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE)
 }
