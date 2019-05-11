@@ -12,3 +12,4 @@
 cmake*/
 CMakeLists.txt
 settings.json
+.vscode/ipch/*
