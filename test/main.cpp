@@ -8,8 +8,6 @@
 
 using namespace r2d2;
 
-/** RINGBUFFER **/
-
 TEST_CASE("Mock bus accepts packet", "[mock_bus]") {
     mock_comm_c comm;
 

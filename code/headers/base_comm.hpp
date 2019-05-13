@@ -8,7 +8,7 @@
 
 namespace r2d2 {
     struct frame_s {
-        shared_nfc_ptr_c data;
+        uint8_t* data;
         size_t length;
 
         frame_type type;
@@ -47,7 +47,7 @@ namespace r2d2 {
         template<frame_type P>
         auto as_frame_type() const -> frame_data_t <P> {
             return *(
-                reinterpret_cast<const frame_data_t<P> *>(*data)
+                reinterpret_cast<const frame_data_t<P> *>(data)
             );
         }
     };

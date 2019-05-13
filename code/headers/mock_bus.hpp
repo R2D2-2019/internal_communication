@@ -23,7 +23,7 @@ namespace r2d2 {
             frame.type = type;
 
             memcpy(
-                (void *) frame.bytes,
+                (void *) frame.data,
                 (const void *) &data,
                 8
             );
@@ -61,7 +61,7 @@ namespace r2d2 {
             frame.type = P;
 
             memcpy(
-                (void *) &frame.bytes,
+                (void *) &frame.data,
                 (const void *) &data,
                 sizeof(frame_data_t<P>)
             );

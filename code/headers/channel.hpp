@@ -377,7 +377,7 @@ namespace r2d2::can_bus {
 
                 if (can_frame.sequence_id == 0) {
                     // Allocate memory for the frame
-                    ptr = detail::_memory_manager_s::alloc((can_frame.sequence_total + 1) * 8);
+                    ptr = detail::_nfc_mem->allocate((can_frame.sequence_total + 1) * 8);
 
                     if (!ptr) {
                         // Return because we don't have enough memory available for the current sequence
@@ -397,11 +397,11 @@ namespace r2d2::can_bus {
                     }
                 }
 
-                frame.data = shared_nfc_ptr_c(ptr);
+                frame.data = ptr;
 
                 // Copy CAN frame to frame.data
                 for(uint_fast8_t i = 0; i < can_frame.length; i++) {
-                    (*frame.data)[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
+                    frame.data[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
                 }
 
                 // Check if the frame is complete. Otherwise return because we don't want
@@ -415,19 +415,19 @@ namespace r2d2::can_bus {
 
             } else {
                 // copy can frame to frame.data
-                uint8_t *ptr = detail::_memory_manager_s::alloc(can_frame.length);;
+                uint8_t *ptr = detail::_nfc_mem->allocate(can_frame.length);;
 
                 if(!ptr){
                     return;
                 }
 
-                frame.data = shared_nfc_ptr_c(ptr);
+                frame.data = ptr;
 
                 for(uint_fast8_t i = 0; i < can_frame.length; i++) {
-                    (*frame.data)[i] = can_frame.data.bytes[i];
+                    frame.data[i] = can_frame.data.bytes[i];
                 }
 
-                frame.length = can_frame.length;            
+                frame.length = can_frame.length;
             }
 
             // Distribute the frame to all registered modules

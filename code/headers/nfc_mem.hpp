@@ -1,27 +1,21 @@
 #pragma once
 
+#include <ringbuffer.hpp>
 #include <queue.hpp>
 #include <sam3.h>
 #include <hwlib.hpp>
+#include <array>
 
 #include "priority.hpp"
 #include "can.hpp"
 
 namespace r2d2 {
     namespace can_bus::detail {
-        constexpr uint16_t _extra_small_buffer_size = 8;
-        constexpr uint8_t _extra_small_buffer_count = 64;
-        
-        constexpr uint16_t _small_buffer_size = 64;
-        constexpr uint8_t _small_buffer_count = 16;
-        
-        constexpr uint16_t _large_buffer_size = 256;
-        constexpr uint8_t _large_buffer_count = 4;
-
+        #pragma pack(1)
         struct _uid_index {
-            uint8_t uid;
             uint8_t frame_type;
             uint8_t *data;
+            uint8_t uid:5;
         };
 
         /**
@@ -33,22 +27,42 @@ namespace r2d2 {
         struct _nfc_memory_area_s {
             using queue_type = queue_c<detail::_can_frame_s, 16, queue_optimization::READ>;
 
-            using extra_small_buffer = uint8_t[_extra_small_buffer_size];
-            using small_buffer = uint8_t[_small_buffer_size];
-            using large_buffer = uint8_t[_large_buffer_size];
-
             queue_type tx_queues[4]; // 912 bytes
 
-            extra_small_buffer extra_small_buffers[_extra_small_buffer_count]; // 512 bytes
-            size_t extra_small_buffer_counters[_extra_small_buffer_count]; // 256 bytes
+            template<size_t Packets, size_t Amount>
+            using buffer_type = ringbuffer_c<
+                std::array<uint8_t, Packets * 8>,
+                Amount
+            >;
 
-            small_buffer small_buffers[_small_buffer_count]; // 1024 bytes
-            size_t small_buffer_counters[_small_buffer_count]; // 32 bytes
+            constexpr static size_t p1_buffers_count = 96;
+            constexpr static size_t p4_buffers_count = 18;
+            constexpr static size_t p16_buffers_count = 4;
+            constexpr static size_t p32_buffers_count = 2;
 
-            large_buffer large_buffers[_large_buffer_count]; // 1024 bytes
-            size_t large_buffer_counters[_large_buffer_count]; // 16 bytes
+            buffer_type<1, p1_buffers_count>    p1_buffers;
+            buffer_type<4, p4_buffers_count>    p4_buffers;
+            buffer_type<16, p16_buffers_count>  p16_buffers;
+            buffer_type<32, p32_buffers_count>  p32_buffers;
 
-            _uid_index uid_indices[_small_buffer_count + _large_buffer_count];
+            _uid_index uid_indices[
+                p1_buffers_count + 
+                p4_buffers_count +
+                p16_buffers_count +
+                p32_buffers_count
+            ];
+
+            uint8_t *allocate(uint8_t size) {
+                if (size <= 1 * 8) {
+                    return &(p1_buffers.emplace()[0]); 
+                } else if (size <= 4 * 8) {
+                    return &(p4_buffers.emplace()[0]); 
+                } else if (size <= 16 * 8) {
+                    return &(p16_buffers.emplace()[0]); 
+                } else {
+                    return &(p32_buffers.emplace()[0]); 
+                }
+            }
         };
 
         /**
@@ -110,58 +124,6 @@ namespace r2d2 {
          * of the NFC memory area.
          */
         struct _memory_manager_s {
-            static size_t *get_counter(const uint8_t *ptr) {
-                const size_t offset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(_nfc_mem);
-
-                if (offset < offsetof(_nfc_memory_area_s, small_buffers)){
-                    // extra small buffers
-                    const size_t array_offset =
-                        (offset - offsetof(_nfc_memory_area_s, extra_small_buffers)) / _extra_small_buffer_size;
-                    return &_nfc_mem->extra_small_buffer_counters[array_offset];                    
-                } else if (offset < offsetof(_nfc_memory_area_s, large_buffers)) {
-                    // Small buffers
-                    const size_t array_offset =
-                        (offset - offsetof(_nfc_memory_area_s, small_buffers)) / _small_buffer_size;
-                    return &_nfc_mem->small_buffer_counters[array_offset];
-                } else {
-                    // Large buffers
-                    const size_t array_offset =
-                        (offset - offsetof(_nfc_memory_area_s, large_buffers)) / _large_buffer_size;
-                    return &_nfc_mem->large_buffer_counters[array_offset];
-                }
-            }
-
-            /**
-             * Deallocate the block, starting at the given pointer.
-             * This won't zero the memory, but simply mark it as free.
-             * 
-             * @param ptr 
-             */
-            static void dealloc(const uint8_t *ptr) {
-                if (!ptr) {
-                    return;
-                }
-
-                size_t offset = reinterpret_cast<size_t>(ptr) - reinterpret_cast<size_t>(_nfc_mem);
-
-                if (offset < offsetof(_nfc_memory_area_s, small_buffers)) {
-                    // Small buffers
-                    const size_t array_offset =
-                        (offset - offsetof(_nfc_memory_area_s, extra_small_buffers)) / _extra_small_buffer_size;
-                    _nfc_mem->extra_small_buffer_counters[array_offset] = 0;
-                } else if (offset < offsetof(_nfc_memory_area_s, large_buffers)) {
-                    // Small buffers
-                    const size_t array_offset =
-                        (offset - offsetof(_nfc_memory_area_s, small_buffers)) / _small_buffer_size;
-                    _nfc_mem->small_buffer_counters[array_offset] = 0;
-                } else {
-                    // Large buffers
-                    const size_t array_offset =
-                        (offset - offsetof(_nfc_memory_area_s, large_buffers)) / _large_buffer_size;
-                    _nfc_mem->large_buffer_counters[array_offset] = 0;
-                }
-            }
-
             /**
              * @brief gets the pointer for the data for the current type and uid
              * 
@@ -214,131 +176,6 @@ namespace r2d2 {
                     }
                 }
             }
-
-            /**
-             * Allocate a memory block for the given size.
-             * If no memory could be allocated, a nullptr is returned.
-             * 
-             * @param size 
-             * @return uint8_t* 
-             */
-            static uint8_t *alloc(const size_t size) {
-                if (size <= _extra_small_buffer_size) {
-                    for (size_t i = 0; i < _extra_small_buffer_count; i++) {
-                        if (!(_nfc_mem->extra_small_buffer_counters[i])) {
-                            return reinterpret_cast<uint8_t *>(&_nfc_mem->extra_small_buffers[i]);
-                        }
-                    }
-                } else if (size <= _small_buffer_size) {
-                    for (size_t i = 0; i < _small_buffer_count; i++) {
-                        if (!(_nfc_mem->small_buffer_counters[i])) {
-                            return reinterpret_cast<uint8_t *>(&_nfc_mem->small_buffers[i]);
-                        }
-                    }
-                } else {
-                    for (size_t i = 0; i < _large_buffer_count; i++) {
-                        if (!(_nfc_mem->large_buffer_counters[i])) {
-                            return reinterpret_cast<uint8_t *>(&_nfc_mem->large_buffers[i]);
-                        }
-                    }
-                }
-
-                return nullptr;
-            }
-
-            static void print_memory_statistics() {
-                hwlib::cout << "Counters: \r\n\tSmall buffers:\r\n\t\t";
-
-                for (size_t i = 0; i < _small_buffer_count; i++) {
-                    hwlib::cout << _nfc_mem->small_buffer_counters[i] << ' ';
-                }
-
-                hwlib::cout << "\r\n\r\n\tLarge buffers:\r\n\t\t";
-
-                for (size_t i = 0; i < _large_buffer_count; i++) {
-                    hwlib::cout << _nfc_mem->large_buffer_counters[i] << ' ';
-                }
-
-                hwlib::cout << "\r\n";
-            }
         };
     }
-
-#ifdef HWLIB_TARGET_native
-#include <memory>
-
-    using shared_nfc_ptr_c = std::shared_ptr<uint8_t*>;
-#else
-
-    class shared_nfc_ptr_c {
-    protected:
-        uint8_t *ptr = nullptr;
-        size_t *counter = nullptr;
-
-        void increment() {
-            (*counter) += 1;
-        }
-
-        void decrement() {
-            (*counter) -= 1;
-        }
-
-    public:
-        shared_nfc_ptr_c() = default;
-
-        explicit shared_nfc_ptr_c(uint8_t *ptr) : ptr(ptr) {
-            counter = can_bus::detail::_memory_manager_s::get_counter(ptr);
-            (*counter) = 1;
-        }
-
-        ~shared_nfc_ptr_c() {
-            decrement();
-
-            if ((*counter) == 0) {
-                can_bus::detail::_memory_manager_s::dealloc(ptr);
-            }
-        }
-
-        shared_nfc_ptr_c(const shared_nfc_ptr_c &other)
-            : ptr(other.ptr), counter(other.counter) {
-            increment();
-        }
-
-        shared_nfc_ptr_c(shared_nfc_ptr_c &&other)
-            : ptr(other.ptr), counter(other.counter) {}
-
-        shared_nfc_ptr_c &operator=(const shared_nfc_ptr_c &other) {
-            shared_nfc_ptr_c tmp(other);
-            swap(tmp);
-
-            return *this;
-        }
-
-        uint8_t const *get() const {
-            return ptr;
-        }
-
-        uint8_t *get() {
-            return ptr;
-        }
-
-        size_t get_counter() const {
-            return *counter;
-        }
-
-        uint8_t *operator*() {
-            return ptr;
-        }
-
-        uint8_t const *operator*() const {
-            return ptr;
-        }
-
-        void swap(shared_nfc_ptr_c &other) {
-            std::swap(ptr, other.ptr);
-            std::swap(counter, other.counter);
-        }
-    };
-
-#endif
 }
