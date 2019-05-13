@@ -17,9 +17,9 @@ namespace r2d2::can_bus::detail {
      */
     #pragma pack(1)
     struct _uid_index {
+        uint8_t uid;
         uint8_t frame_type;
         uint8_t *data;
-        uint8_t uid:5;
     };
 
     /**
