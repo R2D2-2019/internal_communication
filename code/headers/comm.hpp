@@ -29,6 +29,24 @@ namespace r2d2 {
         using channel = can_bus::channel_c<bus, Priority>;
 
         /**
+         * checks if the local modules accept the current frame
+         * 
+         * @return true if a/multiple frames accept this frame type
+         * @return false if no frames or only the current frame accepts this frame type
+         */
+        bool _local_accepts_frame(frame_type type){
+            using regs = can_bus::comm_module_register_s;
+        
+            for (uint8_t i = 0; i < regs::count; i++) {
+                if (regs::reg[i] != this && regs::reg[i]->accepts_frame(type)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /**
          * Make sure all other modules
          * on this device get the given frame.
          * 
@@ -65,15 +83,19 @@ namespace r2d2 {
             }
 
             // Only internally distribute when needed
-            if (can_bus::comm_module_register_s::count <= 1) {
+            if (can_bus::comm_module_register_s::count <= 1 && _local_accepts_frame(type)) {
                 return;
             }
 
             frame_s frame{};
             frame.type = type;
+            frame.length = length;
+            
+            // allocate memory for the internal frames
+            frame.data = r2d2::can_bus::detail::_nfc_mem->allocate(frame.length);
 
-            for(uint_fast8_t i = 0; i < 8; i++){
-                // frame.bytes[i] = data[i];
+            for(uint_fast8_t i = 0; i < frame.length; i++){
+                frame.data[i] = data[i];
             }
 
             distribute_frame_internally(frame);
@@ -166,7 +188,7 @@ namespace r2d2 {
             }
 
             // Only internally distribute when needed
-            if (can_bus::comm_module_register_s::count <= 1) {
+            if (can_bus::comm_module_register_s::count <= 1 && _local_accepts_frame(type)) {
                 return;
             }
 
