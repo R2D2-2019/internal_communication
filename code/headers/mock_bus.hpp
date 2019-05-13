@@ -21,6 +21,7 @@ namespace r2d2 {
             // TODO: large frame support
             frame_s frame{};
             frame.type = type;
+            frame.data = new uint8_t[length];
 
             memcpy(
                 (void *) frame.data,
@@ -59,6 +60,7 @@ namespace r2d2 {
             frame_s frame{};
 
             frame.type = P;
+            frame.data = new uint8_t[sizeof(frame_data_t<P>)];
 
             memcpy(
                 (void *) &frame.data,
