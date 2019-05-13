@@ -214,12 +214,12 @@ namespace r2d2 {
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
     struct frame_display_character_s {
-        // position of rectangle
+        // position of character
         uint8_t x;
         uint8_t y;
 
         // character
-        uint8_t character;
+        char character;
 
         // color of pixels
         uint8_t red;
