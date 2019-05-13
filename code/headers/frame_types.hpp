@@ -206,9 +206,7 @@ namespace r2d2 {
      * can be any character from the un-extended
      * ascii table (characters 0-127)
      * 
-     * Currently only the 8x8 font from hwlib is supported,
-     * When extended frames are realised, 16x16 may be 
-     * implemented.
+     * 
      * 
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
