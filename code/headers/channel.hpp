@@ -454,9 +454,9 @@ void __CAN0_Handler() {
     );
 }
 
-void __CAN1_Handler() {
-    r2d2::can_bus::detail::_route_isr<r2d2::can_bus::can1>(
-        CAN1->CAN_SR & CAN1->CAN_IMR
-    );
-}
+// void __CAN1_Handler() {
+//     r2d2::can_bus::detail::_route_isr<r2d2::can_bus::can1>(
+//         CAN1->CAN_SR & CAN1->CAN_IMR
+//     );
+// }
 }
