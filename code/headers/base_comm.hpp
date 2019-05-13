@@ -25,7 +25,7 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-            is_suitable_frame_v < T> && !is_extended_frame_v <T>
+            is_suitable_frame_v <T> && !is_extended_frame_v <T>
         >
         >
 
@@ -109,7 +109,7 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_frame_v < T>
+                is_suitable_frame_v <T>
         >
         >
 
@@ -134,7 +134,7 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_frame_v < T>
+                is_suitable_frame_v <T>
         >
         >
 
