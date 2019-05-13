@@ -43,6 +43,38 @@ In the constructor, the `listen_for_frames` method of the communication instance
 
 You **need** to specify frames you want to receive. This is also the case for requests. Please look at the examples folder for more usage examples.
 
+**On naming:** the module class should simply be called `module_c`. The differentiating factor between multiple modules is the namespace in this case. This makes it quite easy to combine multiple modules without knowning class names.
+
+## Connecting the hardware
+### What do I need to solder on the board?
+All header locations on the board should be soldered. You can choose if you want male headers, female headers or a combination. We recommend a combination of headers.
+In the resistor slot, a 3.3k resistor should be soldered. A 3.3k resistor has the color code "orange orange black brown brown" (3, 3, 0, x10, 1%).
+
+### How should I connect the Arduino's to the board?
+The following connections should be made:
+ - One of the Arduino's should power the board; connect the 3.3v header
+ - All Arduino's should be connected to a ground pin on the board
+ - The CAN connection cable should be connected as follows:
+     - On the Arduino side of the cable, the pin with the diode should be connected to CANTX. The other pin should go into the CANRX
+     - On the board side of the cable, the pin should go into the header marked CAN.
+
+### F.A.Q.
+#### When I connect my Arduino to the board, it immediately shuts down
+Either the board has been damaged during the soldering process, or one of the grounds doesn't make a good connection.
+Things to check for:
+ - Is there any solder connecting two components that shouldn't be connected (e.g. ground tot 3.3v before the resistor)?
+ - Are any of the jumper wires broken?
+ - Are the male or female headers properly connected?
+ 
+#### When I try to compile the examples, I get linkers errors mentioning Catch2
+You probably copied `test.cpp` into the LED module folder. This file is meant as an example and should not be copied to the sources of the LED module! 
+
+#### It just doesn't work!
+Check the following things:
+ - Did you use CANTX/CANRX? These or *not* the TX and RX pins, those are for UART.
+ - Did you connect the LED and/or button correctly? Add some cout's in the code to check the value.
+ - Try another Arduino
+
 ## Usage (C++)
 
 ### Using the interface
@@ -107,6 +139,9 @@ ns2::module_c mod2(comm2);
 #### More usage examples
 Usage examples can be found in the "examples" folder. Each subfolder in an example represents a module.
 These examples are updated to represent the latest version of the library.
+
+##### Running the examples
+For each module, copy the `template-arduino` folder. Copy the `main.cpp` and `module.hpp` to the correct locations in these module folders. The LED has a `test.cpp` file; this is an example and should **not** be copied!
 
 ### Testing
 ### The mock bus
