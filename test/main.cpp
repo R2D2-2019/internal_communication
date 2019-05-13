@@ -1,5 +1,3 @@
-#include "ostream"
-
 #include <mock_bus.hpp>
 
 #define CATCH_CONFIG_MAIN
