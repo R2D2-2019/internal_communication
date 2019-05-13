@@ -371,64 +371,32 @@ namespace r2d2::can_bus {
             frame.type = frame_type;
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
-            // check if we have a frame that is larger than 8 bytes
-            if (can_frame.sequence_total > 0) {
-                uint8_t *ptr = nullptr;
+            if (can_frame.sequence_id == 0) {
+                // Allocate memory for the frame
+                frame.data = detail::_nfc_mem->allocate((can_frame.sequence_total + 1) * 8);
 
-                if (can_frame.sequence_id == 0) {
-                    // Allocate memory for the frame
-                    ptr = detail::_nfc_mem->allocate((can_frame.sequence_total + 1) * 8);
-
-                    if (!ptr) {
-                        // Return because we don't have enough memory available for the current sequence
-                        return;
-                    }
-
+                if (can_frame.sequence_total > 0) {
                     // Save the pointer for the rest of the data
-                    detail::_memory_manager_s::_set_data_for_uid(ptr, can_frame.sequence_uid, can_frame.frame_type);
-
-                } else {
-                    // Get ptr to data
-                    ptr = detail::_memory_manager_s::_get_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
-
-                    if (!ptr) {
-                        // No valid pointer in uid set so return
-                        return;
-                    }
+                    detail::_memory_manager_s::_set_data_for_uid(frame.data, can_frame.sequence_uid, can_frame.frame_type);
                 }
-
-                frame.data = ptr;
-
-                // Copy CAN frame to frame.data
-                for (uint_fast8_t i = 0; i < can_frame.length; i++) {
-                    frame.data[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
-                }
-
-                // Check if the frame is complete. Otherwise return because we don't want
-                // to notify the receiving end yet.
-                if (can_frame.sequence_id != can_frame.sequence_total) {
-                    return;
-                }
-
-                // Set the amount of bytes the frame uses.
-                frame.length = ((can_frame.sequence_total * 8) + can_frame.length);
-
             } else {
-                // copy can frame to frame.data
-                uint8_t *ptr = detail::_nfc_mem->allocate(can_frame.length);
-
-                if (!ptr) {
-                    return;
-                }
-
-                frame.data = ptr;
-
-                for (uint_fast8_t i = 0; i < can_frame.length; i++) {
-                    frame.data[i] = can_frame.data.bytes[i];
-                }
-
-                frame.length = can_frame.length;
+                // Get ptr to data
+                frame.data = detail::_memory_manager_s::_get_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
             }
+
+            // Copy CAN frame to frame.data
+            for (uint_fast8_t i = 0; i < can_frame.length; i++) {
+                frame.data[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
+            }
+
+            // Check if the frame is complete. Otherwise return because we don't want
+            // to notify the receiving end yet.
+            if (can_frame.sequence_id != can_frame.sequence_total) {
+                return;
+            }
+
+            // Set the amount of bytes the frame uses.
+            frame.length = ((can_frame.sequence_total * 8) + can_frame.length);
 
             // Distribute the frame to all registered modules
             // that will accept it.
