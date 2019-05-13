@@ -10,7 +10,6 @@
 #include <ringbuffer.hpp>
 #include <cmath>
 #include "base_comm.hpp"
-#include <trng.hpp>
 
 namespace r2d2::can_bus {
     /**
@@ -150,22 +149,6 @@ namespace r2d2::can_bus {
          * Initialize the channel mailboxes.
          */
         static void init() {
-            /*
-             * On the Due, there is a separate memory area of just over 4 kilobytes
-             * that is normally used for NFC. If NFC is not used, the core is free
-             * to repurpose this memory.
-             *
-             * In this case, this memory area is used to store send and
-             * receive buffers for the different channels.
-             */
-            detail::_init_nfc_memory_area();
-
-            /**
-             * init the hardware true random number generator (trng) 
-             * for the unique identifier (uid)
-             */
-            trng_c::init();
-
             // Set mailbox mode
             constexpr uint32_t accept_mask = 0x07 << 26;
 
@@ -318,7 +301,7 @@ namespace r2d2::can_bus {
 
                 detail::_write_tx_registers<Bus>(frame, tx_id);
 
-                switch (static_cast<priority>(prio / 2)) {
+                switch (static_cast<priority>(prio)) {
                     case priority::HIGH:
                         channel_c<Bus, priority::HIGH>::space_in_tx_queue = true; 
                         break;
@@ -343,9 +326,8 @@ namespace r2d2::can_bus {
 
         template<typename Bus>
         void _receive(const uint8_t index) {
-            detail::_can_frame_s can_frame;
-            detail::_read_mailbox<Bus>(index, can_frame);
-
+            detail::_can_frame_s can_frame = detail::_read_mailbox<Bus>(index);
+            
             using regs = comm_module_register_s;
 
             /*
@@ -453,7 +435,7 @@ namespace r2d2::can_bus {
         template<typename Bus>
         void _route_isr(uint32_t status) {
             status = __RBIT(status & 0xFF);
-
+            
             uint8_t trailing_zeros = 0;
 
             while ((trailing_zeros = __CLZ(status)) < 32) {   

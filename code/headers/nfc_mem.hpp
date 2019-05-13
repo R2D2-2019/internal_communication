@@ -5,9 +5,8 @@
 #include <sam3.h>
 #include <hwlib.hpp>
 #include <array>
-
 #include "priority.hpp"
-#include "can.hpp"
+#include "can_frame.hpp"
 
 namespace r2d2::can_bus::detail {
     /**

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "sam.h"
+#include "nfc_mem.hpp" 
+#include "can_frame.hpp"
+#include <trng.hpp>
 
 namespace r2d2::can_bus {
     /**
@@ -226,24 +229,6 @@ namespace r2d2::can_bus {
     };
 
     /**
-     * All statuses that a mailbox can
-     * have.
-     *
-     * @internal
-     */
-    enum mailbox_status {
-        TRANSFER_OK = 0,
-        NOT_READY = 0x01,
-        RX_OVER = 0x02,
-        RX_NEED_RD_AGAIN = 0x03,
-
-        // This is not from the datasheet; this
-        // is notification of a badly configured message
-        // that doesn't use the extended id.
-            RX_FAILURE_STD_RECEIVED = 0x04
-    };
-
-    /**
      * All baudrates that are generally used
      * with a CAN bus. 1000k is picked the default.
      */
@@ -264,37 +249,6 @@ namespace r2d2::can_bus {
         enum _can_frame_mode : uint8_t {
             READ = 1,
             WRITE = 0
-        };
-
-        /**
-         * Representation of a CAN frame
-         * that is put on the network. The frame
-         * format has been adjusted from a "normal" CAN
-         * frame in the following ways:
-         *  - The channel priority decides the ID
-         *  - Extended ID mode is in use, but the extended ID is used
-         *    to store the packet_type (1 byte), sequence number (5 bits) and
-         *    the sequence total (5 bits).
-         *
-         * @internal
-         */
-        struct _can_frame_s {
-            uint8_t mode; // Read or write
-            uint8_t frame_type;
-            uint8_t sequence_uid;
-            uint8_t sequence_id;
-            uint8_t sequence_total;
-            uint8_t length;
-
-            // Data
-            union {
-                struct {
-                    uint32_t low;
-                    uint32_t high;
-                };
-
-                uint8_t bytes[8];
-            } data;
         };
 
         /**
@@ -337,16 +291,17 @@ namespace r2d2::can_bus {
         }
 
         template<typename Bus>
-        uint32_t _read_mailbox(const uint8_t index, _can_frame_s &frame) {
-            uint32_t retval = 0;
+        _can_frame_s _read_mailbox(const uint8_t index) {
             uint32_t status = port<Bus>->CAN_MB[index].CAN_MSR;
+
+            _can_frame_s frame;
 
             /* 
              * Check whether there is overwriting happening in Receive with Overwrite mode, 
              * or there're messages lost in Receive mode. 
              */
             if ((status & CAN_MSR_MRDY) && (status & CAN_MSR_MMI)) {
-                retval = mailbox_status::RX_OVER;
+                return frame;
             }
 
             uint32_t id = port<Bus>->CAN_MB[index].CAN_MID;
@@ -361,8 +316,7 @@ namespace r2d2::can_bus {
             }
             // Standard ID, this is an error.
             else {
-                retval = mailbox_status::RX_FAILURE_STD_RECEIVED;
-                return retval;
+                return frame;
             }
 
             // Data length
@@ -372,21 +326,10 @@ namespace r2d2::can_bus {
             frame.data.low = port<Bus>->CAN_MB[index].CAN_MDL;
             frame.data.high = port<Bus>->CAN_MB[index].CAN_MDH;
 
-            /* 
-             * Read the mailbox status again to check whether the software
-             * needs to re-read mailbox data register. 
-             */
-            status = port<Bus>->CAN_MB[index].CAN_MSR;
-            if (status & CAN_MSR_MMI) {
-                retval |= mailbox_status::RX_NEED_RD_AGAIN;
-            } else {
-                retval |= mailbox_status::TRANSFER_OK;
-            }
-
             // Enable next receive process.
             port<Bus>->CAN_MB[index].CAN_MCR |= CAN_MCR_MTCR;
 
-            return retval;
+            return frame;
         }
 
         /**
@@ -567,7 +510,7 @@ namespace r2d2::can_bus {
         template<baudrate Baud = BPS_1000K>
         static bool init() {
             constexpr uint32_t can_timeout = 100000;
-
+            
             // Init bus clock
             enable_clock<Bus>();
 
@@ -576,6 +519,22 @@ namespace r2d2::can_bus {
 
             NVIC_SetPriority(irqn, 12);
             NVIC_EnableIRQ(irqn);
+
+            /*
+             * On the Due, there is a separate memory area of just over 4 kilobytes
+             * that is normally used for NFC. If NFC is not used, the core is free
+             * to repurpose this memory.
+             *
+             * In this case, this memory area is used to store send and
+             * receive buffers for the different channels.
+             */
+            detail::_init_nfc_memory_area();
+
+            /**
+             * init the hardware true random number generator (trng) 
+             * for the unique identifier (uid)
+             */
+            trng_c::init();
 
             // Change multiplexers on tx/rx pins to CAN
             set_peripheral<typename Bus::tx>();
