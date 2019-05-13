@@ -400,7 +400,7 @@ namespace r2d2::can_bus {
                 frame.data = ptr;
 
                 // Copy CAN frame to frame.data
-                for(uint_fast8_t i = 0; i < can_frame.length; i++) {
+                for (uint_fast8_t i = 0; i < can_frame.length; i++) {
                     frame.data[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
                 }
 
@@ -411,19 +411,19 @@ namespace r2d2::can_bus {
                 }
 
                 // Set the amount of bytes the frame uses.
-                frame.length = ((can_frame.sequence_total * 8) + can_frame.length - 1);
+                frame.length = ((can_frame.sequence_total * 8) + can_frame.length);
 
             } else {
                 // copy can frame to frame.data
-                uint8_t *ptr = detail::_nfc_mem->allocate(can_frame.length);;
+                uint8_t *ptr = detail::_nfc_mem->allocate(can_frame.length);
 
-                if(!ptr){
+                if (!ptr) {
                     return;
                 }
 
                 frame.data = ptr;
 
-                for(uint_fast8_t i = 0; i < can_frame.length; i++) {
+                for (uint_fast8_t i = 0; i < can_frame.length; i++) {
                     frame.data[i] = can_frame.data.bytes[i];
                 }
 
