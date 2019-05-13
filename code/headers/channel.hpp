@@ -94,9 +94,7 @@ namespace r2d2::can_bus {
      */
     template<typename Bus, priority Priority>
     class channel_c {
-    protected:
-        using ids = detail::_mailbox_assignment_s<Priority>;
-
+    public:
         /**
          * Volatile flag that is used to signify that there is space
          * in the tx_queue. The tx_queue is emptied in an interrupt and the
@@ -110,6 +108,9 @@ namespace r2d2::can_bus {
          * the size of tx_queue is reduced is the best option.
          */
         inline volatile static bool space_in_tx_queue = true;
+
+    protected:
+        using ids = detail::_mailbox_assignment_s<Priority>;
 
         /**
          * Place a frame into the tx_queue, accounting for
@@ -303,43 +304,45 @@ namespace r2d2::can_bus {
             // and put on the bus.
             port<Bus>->CAN_IER = (0x01 << ids::tx);
         }
+    };
 
-        /**
-         * Handle a interrupt meant for this channel.
-         */
-        static void handle_interrupt(const uint8_t index) {
-            // Is the mailbox ready?
-            if (!(port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRDY)) {
-                return;
-            }
+    namespace detail {
+        template<typename Bus>
+        void _transmit(const uint8_t index, const uint8_t prio) {
+            auto &tx_queue = _nfc_mem->tx_queues[prio];
+            const auto tx_id = prio * 2;
 
-            // Get the MOT (Mailbox Object Type) from the Message Mode (MMR) register
-            const uint32_t mmr = (port<Bus>->CAN_MB[index].CAN_MMR >> 24) & 7;
+            if (!tx_queue.empty()) {
+                // Put the data on the bus
+                const auto frame = tx_queue.copy_and_pop();
 
-            // if the MOT is 5 (MB_PRODUCER) or 6 (reserved), ignore
-            if (mmr > 4) {
-                return;
-            }
+                detail::_write_tx_registers<Bus>(frame, tx_id);
 
-            // For convenience; get a ref to the tx_queue
-            auto &tx_queue = detail::_get_tx_queue_for_channel<Priority>();
+                switch (static_cast<priority>(prio / 2)) {
+                    case priority::HIGH:
+                        channel_c<Bus, priority::HIGH>::space_in_tx_queue = true; 
+                        break;
 
-            // Transmit
-            if (mmr == 3) {
-                if (!tx_queue.empty()) {
-                    // Put the data on the bus
-                    const auto frame = tx_queue.copy_and_pop();
-                    detail::_write_tx_registers<Bus>(frame, ids::tx);
-                    space_in_tx_queue = true;
-                } else {
-                    // Nothing left to send, disable interrupt on the tx mailbox
-                    port<Bus>->CAN_IDR = (0x01 << ids::tx);
+                    case priority::NORMAL: 
+                        channel_c<Bus, priority::NORMAL>::space_in_tx_queue = true; 
+                        break;
+
+                    case priority::LOW: 
+                        channel_c<Bus, priority::LOW>::space_in_tx_queue = true; 
+                        break;
+
+                    case priority::DATA_STREAM: 
+                        channel_c<Bus, priority::DATA_STREAM>::space_in_tx_queue = true; 
+                        break;
                 }
-
-                return;
+            } else {
+                // Nothing left to send, disable interrupt on the tx mailbox
+                port<Bus>->CAN_IDR = (0x01 << tx_id);
             }
+        }
 
-            // Receive
+        template<typename Bus>
+        void _receive(const uint8_t index) {
             detail::_can_frame_s can_frame;
             detail::_read_mailbox<Bus>(index, can_frame);
 
@@ -411,9 +414,29 @@ namespace r2d2::can_bus {
                 detail::_memory_manager_s::_clear_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
             }      
         }
-    };
+        
+        template<typename Bus>
+        void _dispatch_isr(const uint8_t index, const uint8_t priority) {
+             // Is the mailbox ready?
+            if (!(port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRDY)) {
+                return;
+            }
 
-    namespace detail {
+            // Get the MOT (Mailbox Object Type) from the Message Mode (MMR) register
+            const uint32_t mmr = (port<Bus>->CAN_MB[index].CAN_MMR >> 24) & 7;
+
+            // if the MOT is 5 (MB_PRODUCER) or 6 (reserved), ignore
+            if (mmr > 4) {
+                return;
+            }
+
+            if (mmr == 3) {
+                _transmit<Bus>(index, priority);
+            } else {
+                _receive<Bus>(index);
+            }
+        }
+
         /**
          * With the given status gained from
          * ANDing the Status Register (SR) with the
@@ -428,37 +451,15 @@ namespace r2d2::can_bus {
          * @param status
          */
         template<typename Bus>
-        void _route_isr(const uint32_t status) {
-            if ((status & 1) != 0) {
-                channel_c<Bus, priority::HIGH>::handle_interrupt(0);
-            }
+        void _route_isr(uint32_t status) {
+            status = __RBIT(status & 0xFF);
 
-            if ((status & (1 << 1)) != 0) {
-                channel_c<Bus, priority::HIGH>::handle_interrupt(1);
-            }
+            uint8_t trailing_zeros = 0;
 
-            if ((status & (1 << 2)) != 0) {
-                channel_c<Bus, priority::NORMAL>::handle_interrupt(2);
-            }
+            while ((trailing_zeros = __CLZ(status)) < 32) {   
+                _dispatch_isr<Bus>(trailing_zeros, trailing_zeros / 2);
 
-            if ((status & (1 << 3)) != 0) {
-                channel_c<Bus, priority::NORMAL>::handle_interrupt(3);
-            }
-
-            if ((status & (1 << 4)) != 0) {
-                channel_c<Bus, priority::LOW>::handle_interrupt(4);
-            }
-
-            if ((status & (1 << 5)) != 0) {
-                channel_c<Bus, priority::LOW>::handle_interrupt(5);
-            }
-
-            if ((status & (1 << 6)) != 0) {
-                channel_c<Bus, priority::DATA_STREAM>::handle_interrupt(6);
-            }
-
-            if ((status & (1 << 7)) != 0) {
-                channel_c<Bus, priority::DATA_STREAM>::handle_interrupt(7);
+                status &= ~(1 << (31 - trailing_zeros));
             }
         }
     }
