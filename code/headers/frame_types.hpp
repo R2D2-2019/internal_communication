@@ -256,7 +256,7 @@ namespace r2d2 {
         std::array<bool, amountOfButtons> buttons;
 
         // sliders: X or Y axis in a range of 0 - 255.
-        std::array<uint8_t, amountOfButtons> sliders;
+        std::array<uint8_t, amountOfSliders> sliders;
     };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
