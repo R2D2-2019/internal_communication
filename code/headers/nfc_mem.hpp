@@ -58,7 +58,7 @@ namespace r2d2::can_bus::detail {
             p32_buffers_count
         ];
 
-        uint8_t *allocate(uint8_t size) {
+        constexpr uint8_t *allocate(const uint8_t size) {
             if (size <= 1 * 8) {
                 return &(p1_buffers.emplace()[0]); 
             } else if (size <= 4 * 8) {
