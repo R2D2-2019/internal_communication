@@ -23,7 +23,7 @@ namespace r2d2 {
             frame.type = type;
             frame.data = new uint8_t[length];
 
-            for (size_t i = 0; i < length; i++){
+            for (size_t i = 0; i < length; i++) {
                 frame.data[i] = data[i];
             }
 
@@ -62,7 +62,7 @@ namespace r2d2 {
             frame.type = P;
             frame.data = new uint8_t[length];
 
-            for (size_t i = 0; i < length; i++){
+            for (size_t i = 0; i < length; i++) {
                 frame.data[i] = reinterpret_cast<const uint8_t*>(&data)[i];
             }            
 

@@ -170,7 +170,7 @@ namespace r2d2::can_bus {
          * 
          * @return uint32_t 
          */
-        static uint32_t get_mask(){
+        static uint32_t get_mask() {
             return detail::_get_mailbox_accept_mask<Bus>(ids::rx);
         }
 
@@ -179,7 +179,7 @@ namespace r2d2::can_bus {
          * 
          * @param mask 
          */
-        static void set_mask(const uint32_t mask){
+        static void set_mask(const uint32_t mask) {
             detail::_set_mailbox_accept_mask<Bus>(ids::rx, mask);
         }
 

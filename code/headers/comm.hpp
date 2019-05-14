@@ -34,7 +34,7 @@ namespace r2d2 {
          * @return true if a/multiple frames accept this frame type
          * @return false if no frames or only the current frame accepts this frame type
          */
-        bool local_accepts_frame(frame_type type){
+        bool local_accepts_frame(frame_type type) {
             using regs = can_bus::comm_module_register_s;
         
             for (uint8_t i = 0; i < regs::count; i++) {
@@ -94,7 +94,7 @@ namespace r2d2 {
             // allocate memory for the internal frames
             frame.data = r2d2::can_bus::detail::_nfc_mem->allocate(frame.length);
 
-            for(uint_fast8_t i = 0; i < frame.length; i++){
+            for (uint_fast8_t i = 0; i < frame.length; i++) {
                 frame.data[i] = data[i];
             }
 
