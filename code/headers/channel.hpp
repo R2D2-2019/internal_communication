@@ -362,11 +362,28 @@ namespace r2d2::can_bus {
 
                 if (can_frame.sequence_total > 0) {
                     // Save the pointer for the rest of the data
-                    detail::_memory_manager_s::_set_data_for_uid(frame.data, can_frame.sequence_uid, can_frame.frame_type);
+                    for (auto &index : detail::_nfc_mem->uid_indices) {
+                        if (index.data == nullptr) {
+                            index.uid = can_frame.sequence_uid;
+                            index.frame_type = can_frame.frame_type;
+                            index.data = frame.data;
+                            break;
+                        }
+                    }
                 }
             } else {
-                // Get ptr to data
-                frame.data = detail::_memory_manager_s::_get_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
+                for (const auto &index : detail::_nfc_mem->uid_indices) {
+                    if (index.uid == can_frame.sequence_uid && 
+                            index.frame_type == can_frame.frame_type) {
+                        frame.data = index.data;
+                        break;
+                    }
+                }
+            }
+
+            if(!frame.data){
+                // something went wrong with getting a data ptr.
+                return;
             }
 
             // Copy CAN frame to frame.data
@@ -393,7 +410,16 @@ namespace r2d2::can_bus {
 
             // Mark the uid as not available anymore. (stops data from being written in the data)
             if (can_frame.sequence_total) {
-                detail::_memory_manager_s::_clear_data_for_uid(can_frame.sequence_uid, can_frame.frame_type);
+                // remove pointer from active uid_indices
+                for (auto &index : detail::_nfc_mem->uid_indices) {
+                    if (index.uid == can_frame.sequence_uid && 
+                            index.frame_type == can_frame.frame_type) {
+                        // empty pointer and frame_type
+                        index.frame_type = 0;
+                        index.data = nullptr;
+                        break;
+                    }
+                }
             }      
         }
         
