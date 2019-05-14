@@ -434,13 +434,20 @@ namespace r2d2::can_bus {
          */
         template<typename Bus>
         void _route_isr(uint32_t status) {
+            // get the first 8 bits (The mailbox channels). And
+            // reverse the bit order for the count trailing zero's.
             status = __RBIT(status & 0xFF);
             
             uint8_t trailing_zeros = 0;
 
+            // We dont have a count trailing zero's so we use the count leading
+            // zero's on the reverse of the data we want.
             while ((trailing_zeros = __CLZ(status)) < 32) {   
+                // execute the isr with the correct handler and priority
                 _dispatch_isr<Bus>(trailing_zeros, trailing_zeros / 2);
 
+                // remove the bit from the status so it doesn't trigger
+                // the isr again.
                 status &= ~(1 << (31 - trailing_zeros));
             }
         }
