@@ -274,7 +274,7 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
-    R2D2_INTERNAL_FRAME_HELPER(frame_display_character_s, DISPLAY_CHARACTER)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_8x8_character_s, DISPLAY_CHARACTER)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
 }
