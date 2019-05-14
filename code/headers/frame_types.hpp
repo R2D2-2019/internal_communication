@@ -60,6 +60,7 @@ namespace r2d2 {
         DISPLAY_FILLED_RECTANGLE,
         BATTERY_LEVEL,
         UI_COMMAND,
+        MOVEMENT_CONTROL,
 
         // Don't touch
         EXTERNAL,
@@ -243,10 +244,32 @@ namespace r2d2 {
         uint32_t voltage;
     };
 
+    /**
+     * Struct that represent the state
+     * of how the robot should move.
+     * 
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     * 
+     * Moving Platform wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Moving-Platform
+     */
+    struct frame_movement_control_s {
+        // A value between -100% & 100% 
+        int8_t speed;
+
+        // A value between -90 & 90 (degrees)
+        int8_t rotation;
+
+        // state of the brake button
+        bool brake;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
+    R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
 }
