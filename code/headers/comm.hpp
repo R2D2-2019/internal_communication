@@ -34,7 +34,7 @@ namespace r2d2 {
          * @return true if a/multiple frames accept this frame type
          * @return false if no frames or only the current frame accepts this frame type
          */
-        bool _local_accepts_frame(frame_type type){
+        bool local_accepts_frame(frame_type type){
             using regs = can_bus::comm_module_register_s;
         
             for (uint8_t i = 0; i < regs::count; i++) {
@@ -83,7 +83,7 @@ namespace r2d2 {
             }
 
             // Only internally distribute when needed
-            if (can_bus::comm_module_register_s::count <= 1 && _local_accepts_frame(type)) {
+            if (can_bus::comm_module_register_s::count <= 1 && local_accepts_frame(type)) {
                 return;
             }
 
