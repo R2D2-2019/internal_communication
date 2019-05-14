@@ -229,6 +229,39 @@ namespace r2d2 {
 
 
 
+    // The display will require each user to claim a cursor
+    // these can be used to store data (like position
+    // and color).
+    enum display_cursor : uint8_t {
+    	// Free for any person to use.
+    	OPEN_CURSOR,
+
+    	// Don't touch
+    	CURSORS_COUNT
+    };
+
+    struct frame_display_8x8_character_cursor_s {
+    	// Targets which cursor to write to. This should be one
+    	// your module claimed.
+    	display_cursor cursor_id;
+    	char characters[6];
+    	uint8_t amount_characters;
+    };
+
+    struct frame_display_set_cursor_position_s {
+    	// 
+    	display_cursor cursor_id;
+    	uint8_t cursor_x;
+    	uint8_t cursor_y;
+    };
+
+    struct frame_display_set_cursor_color_s {
+    	display_cursor cursor_id;
+		uint8_t red;
+		uint8_t green;
+		uint8_t blue; 	
+    };
+
     /**
      *ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
      *This is a hack that uses the python frame generator to create a frame with strings instead of chars.
