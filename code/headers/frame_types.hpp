@@ -256,7 +256,7 @@ namespace r2d2 {
         int8_t speed;
 
         // A value between -90 & 90 (degrees)
-        int8_t rotate;
+        int8_t rotation;
 
         // state of the brake button
         bool brake;
