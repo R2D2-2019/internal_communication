@@ -60,7 +60,7 @@ namespace r2d2 {
         DISPLAY_FILLED_RECTANGLE,
         BATTERY_LEVEL,
         UI_COMMAND,
-        MANUAL_CONTROL,
+        MOVEMENT_CONTROL,
 
         // Don't touch
         EXTERNAL,
@@ -242,21 +242,24 @@ namespace r2d2 {
     };
 
     /**
-     * Struct containing the state of
-     * buttons and sliders of a manual controller.
-     * 
-     * @tparam amountOfButtons
-     * @tparam amountOfSliders
+     * Struct that represent the state
+     * of how the robot should move.
      * 
      * Manual_control wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     * 
+     * Moving Platform wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Moving-Platform
      */
-    template<int amountOfButtons, int amountOfSliders>
-    struct frame_manual_control_s {
-        std::array<bool, amountOfButtons> buttons;
+    struct frame_movement_control_s {
+        // A value between -100% & 100% 
+        int8_t speed;
 
-        // sliders: X or Y axis in a range of 0 - 255.
-        std::array<uint8_t, amountOfSliders> sliders;
+        // A value between -90 & 90 (degrees)
+        int8_t rotate;
+
+        // state of the brake button
+        bool brake;
     };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
@@ -265,5 +268,5 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
-    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
 }
