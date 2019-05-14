@@ -356,6 +356,9 @@ namespace r2d2::can_bus {
             frame.type = frame_type;
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
+            // store the uid_index the frame is stored on for the last frame
+            _uid_index * uid_index;
+
             if (can_frame.sequence_id == 0) {
                 // Allocate memory for the frame
                 frame.data = detail::_nfc_mem->allocate((can_frame.sequence_total + 1) * 8);
@@ -363,19 +366,27 @@ namespace r2d2::can_bus {
                 if (can_frame.sequence_total > 0) {
                     // Save the pointer for the rest of the data
                     for (auto &index : detail::_nfc_mem->uid_indices) {
-                        if (index.data == nullptr) {
-                            index.uid = can_frame.sequence_uid;
-                            index.frame_type = can_frame.frame_type;
-                            index.data = frame.data;
-                            break;
+                        // check if the frame_type is NONE. This implies it is not used
+                        if (index.frame_type != static_cast<uint8_t>(frame_type::NONE)) {
+                            continue;
                         }
+
+                        index.uid = can_frame.sequence_uid;
+                        index.frame_type = can_frame.frame_type;
+                        index.data = frame.data;   
+                        break;                     
                     }
                 }
             } else {
-                for (const auto &index : detail::_nfc_mem->uid_indices) {
+                // search if we have the current uid and type in the uid_indices
+                for (auto &index : detail::_nfc_mem->uid_indices) {
                     if (index.uid == can_frame.sequence_uid && 
                             index.frame_type == can_frame.frame_type) {
+                        // get the data pointer
                         frame.data = index.data;
+
+                        // store the uid_index
+                        uid_index = &index;
                         break;
                     }
                 }
@@ -409,17 +420,9 @@ namespace r2d2::can_bus {
             }    
 
             // Mark the uid as not available anymore. (stops data from being written in the data)
-            if (can_frame.sequence_total) {
-                // remove pointer from active uid_indices
-                for (auto &index : detail::_nfc_mem->uid_indices) {
-                    if (index.uid == can_frame.sequence_uid && 
-                            index.frame_type == can_frame.frame_type) {
-                        // empty pointer and frame_type
-                        index.frame_type = 0;
-                        index.data = nullptr;
-                        break;
-                    }
-                }
+            if (can_frame.sequence_total && uid_index != nullptr) {
+                // set frame_type to NONE so we know it is not being used
+                uid_index->frame_type = static_cast<uint8_t>(frame_type::NONE);
             }      
         }
         
