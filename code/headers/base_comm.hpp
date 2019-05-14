@@ -25,8 +25,8 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-            is_suitable_frame_v <T> && !is_extended_frame_v <T>
-        >
+                is_suitable_frame_v <T> && !is_extended_frame_v <T>
+            >
         >
 
         T as_type() const {
@@ -110,7 +110,7 @@ namespace r2d2 {
             typename T,
             typename = std::enable_if_t<
                 is_suitable_frame_v <T>
-        >
+            >
         >
 
         void send(const T &data, const priority prio = priority::NORMAL) {
@@ -135,7 +135,7 @@ namespace r2d2 {
             typename T,
             typename = std::enable_if_t<
                 is_suitable_frame_v <T>
-        >
+            >
         >
 
         void send_external(const external_id_s &id, const T &data, const priority prio = priority::NORMAL) {
