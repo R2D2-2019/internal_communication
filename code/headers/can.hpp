@@ -296,28 +296,13 @@ namespace r2d2::can_bus {
 
             _can_frame_s frame;
 
-            /* 
-             * Check whether there is overwriting happening in Receive with Overwrite mode, 
-             * or there're messages lost in Receive mode. 
-             */
-            if ((status & CAN_MSR_MRDY) && (status & CAN_MSR_MMI)) {
-                return frame;
-            }
-
             uint32_t id = port<Bus>->CAN_MB[index].CAN_MID;
 
-            // Extended id
-            if ((id & CAN_MID_MIDE) == CAN_MID_MIDE) {
-                frame.mode = (id >> 25) & 0x01;
-                frame.sequence_uid = (id >> 18) & 0x7F;
-                frame.frame_type = (id >> 10) & 0xFF;
-                frame.sequence_id = (id >> 5) & 0x1F;
-                frame.sequence_total = id & 0x1F;
-            }
-            // Standard ID, this is an error.
-            else {
-                return frame;
-            }
+            frame.mode = (id >> 25) & 0x01;
+            frame.sequence_uid = (id >> 18) & 0x7F;
+            frame.frame_type = (id >> 10) & 0xFF;
+            frame.sequence_id = (id >> 5) & 0x1F;
+            frame.sequence_total = id & 0x1F;
 
             // Data length
             frame.length = (status & CAN_MSR_MDLC_Msk) >> CAN_MSR_MDLC_Pos;
