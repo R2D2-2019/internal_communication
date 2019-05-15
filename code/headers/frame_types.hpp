@@ -154,7 +154,7 @@ namespace r2d2 {
         bool pressed;
     };
 
-    /**
+    /** @cond CLI COMMAND @endcond
      * Packet containing the state of
      * an activity led.
      */
@@ -244,7 +244,7 @@ namespace r2d2 {
         uint32_t voltage;
     };
 
-    /**
+    /** @cond CLI COMMAND @endcond
      * Struct that represent the state
      * of how the robot should move.
      * 
