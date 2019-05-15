@@ -212,14 +212,13 @@ namespace r2d2 {
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI    
      */
     struct frame_ui_command_s {
-        // module is the name of the targeted module, mostly used 
-        // to prevent nameclash
-        char module;
+        // name of the frame which we want to send for evaluation to SMM
+        char frame_name;
 
-        // command is the command that needs to be executed, with parameters
-        char command;
+        // parameters for the frame from frame_name
+        char params;
 
-        // destination is used to tell what robot to send the command to
+        // destination is used to tell what robot or swarm to send the command to
         char destination;
     };
 
