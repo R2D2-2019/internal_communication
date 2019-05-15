@@ -10,33 +10,54 @@ int main() {
 
     hwlib::wait_ms(1000);
 
-    r2d2::comm_c comm;
+    r2d2::comm_c comm1;
+    r2d2::comm_c comm2;
 
-    comm.listen_for_frames({frame_type::ALL});
+    comm1.listen_for_frames({frame_type::ALL});
+    comm2.listen_for_frames({frame_type::DISPLAY_FILLED_RECTANGLE});
+
+    frame_display_filled_rectangle_s state;
+    state.x = 0xAAAA;
+    state.y = 0xBABA;
+    state.width = 1000;
+    state.height = 2000;
+    state.red = 0xFF;
+    state.green = 0xEE;
+    state.blue = 0xCC;
 
     for (;;) {
-        frame_display_filled_rectangle_s state;
-        state.x = 0xAA;
-        state.y = 0xBA;
-        state.width = 10;
-        state.height = 20;
-        state.red = 0xFF;
-        state.green = 0xEE;
-        state.blue = 0xCC;
+        state.x++;
+        comm1.send(state);
+        hwlib::cout << "Com1 Sending: " << hwlib::hex << state.x << hwlib::dec << '\n';
 
+        hwlib::wait_ms(500);
 
-        comm.send(state);
-        // comm.send_external({0xAA, 0xFA}, state);
+        while(comm2.has_data()){
+            auto t = comm2.get_data();
 
-        hwlib::wait_ms(50);
-
-        while(comm.has_data()){
-            auto t = comm.get_data();
+            if(t.request){
+                hwlib::cout << "\tCom2 got a request\n";
+                continue;
+            }
 
             const auto data = t.as_frame_type<
                 frame_type::DISPLAY_FILLED_RECTANGLE>();
 
-            hwlib::cout << "Got frame: " << int(data.x) << '\n';
+            hwlib::cout << "\tCom2 Got frame: " << hwlib::hex << int(data.x) << hwlib::dec << '\n';
+        }
+
+        while(comm1.has_data()){
+            auto t = comm1.get_data();
+
+            if(t.request){
+                hwlib::cout << "\tCom1 got a request\n";
+                continue;
+            }
+
+            const auto data = t.as_frame_type<
+                frame_type::DISPLAY_FILLED_RECTANGLE>();
+
+            hwlib::cout << "\tCom1 Got frame: " << hwlib::hex << int(data.x) << hwlib::dec << '\n';
         }
     }
 }
