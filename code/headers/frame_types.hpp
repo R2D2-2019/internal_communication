@@ -61,6 +61,7 @@ namespace r2d2 {
         BATTERY_LEVEL,
         UI_COMMAND,
         MOVEMENT_CONTROL,
+        PATH_STEP,
 
         // Don't touch
         EXTERNAL,
@@ -262,6 +263,19 @@ namespace r2d2 {
         bool brake;
     };
 
+    /**
+     * Struct thats used as a "step" in an A-star algorithm path.
+     * 
+     * Navigation wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
+     */
+    struct frame_path_step_s {
+        uint8_t path_id;
+        uint16_t step_id;
+        uint32_t x;
+        uint32_t y;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
@@ -269,4 +283,6 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
+
 }
