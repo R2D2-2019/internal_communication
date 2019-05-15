@@ -45,6 +45,9 @@ namespace r2d2::can_bus::detail {
         constexpr static size_t p16_buffers_count = 4;
         constexpr static size_t p32_buffers_count = 2;
 
+        // Buffers for receiving the can_bus data. Every buffer
+        // specifies a amount of packets it can hold. These buffers
+        // are a ringbuffer so we dont need to deallocate memory
         buffer_type<1, p1_buffers_count>    p1_buffers;
         buffer_type<4, p4_buffers_count>    p4_buffers;
         buffer_type<16, p16_buffers_count>  p16_buffers;
@@ -57,6 +60,15 @@ namespace r2d2::can_bus::detail {
             p32_buffers_count
         ];
 
+        /**
+         * Allocate size amount of data from the buffers.
+         * This function returns a pointer to a array within 
+         * the ringbuffer. Because we have a ringbuffer we 
+         * dont need to deallocate the memory.
+         * 
+         * @param size 
+         * @return constexpr uint8_t*
+         */
         constexpr uint8_t *allocate(const uint8_t size) {
             if (size <= 1 * 8) {
                 return &(p1_buffers.emplace()[0]); 
