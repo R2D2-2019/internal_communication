@@ -264,16 +264,26 @@ namespace r2d2 {
     };
 
     /**
-     * Struct thats used as a "step" in an A-star algorithm path.
+     * Our A-star algorithm outputs a list of 2D vector so the path_id 
+     * indentifies which list it's from, the step id is basically 
+     * the list index. x and y are the 2D vector's attributes.
      * 
      * Navigation wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
      */
+    pragma pack(1)
     struct frame_path_step_s {
-        uint8_t path_id;
-        uint16_t step_id;
+        //x coordinate (in 2d x/y space)
         uint32_t x;
+
+        // y coordinate (in 2d x/y space)
         uint32_t y;
+
+        // sequence integer that indentifies what step in the path we're at.
+        uint16_t step_id;
+
+        // unique indentifier for a path so we don't mix up multiple paths.
+        uint8_t path_id;
     };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
