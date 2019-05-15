@@ -17,10 +17,10 @@ int main() {
     comm2.listen_for_frames({frame_type::DISPLAY_FILLED_RECTANGLE});
 
     frame_display_filled_rectangle_s state;
-    state.x = 0xAAAA;
-    state.y = 0xBABA;
-    state.width = 1000;
-    state.height = 2000;
+    state.x = 0xAA;
+    state.y = 0xBA;
+    state.width = 10;
+    state.height = 20;
     state.red = 0xFF;
     state.green = 0xEE;
     state.blue = 0xCC;
