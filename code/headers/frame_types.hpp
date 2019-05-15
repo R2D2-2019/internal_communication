@@ -271,7 +271,7 @@ namespace r2d2 {
      * Navigation wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
      */
-    pragma pack(1)
+    #pragma pack(1)
     struct frame_path_step_s {
         // x coordinate (in 2d x/y space)
         uint32_t x;
