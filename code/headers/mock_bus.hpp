@@ -21,12 +21,11 @@ namespace r2d2 {
             // TODO: large frame support
             frame_s frame{};
             frame.type = type;
+            frame.data = new uint8_t[length];
 
-            memcpy(
-                (void *) frame.bytes,
-                (const void *) &data,
-                8
-            );
+            for (size_t i = 0; i < length; i++) {
+                frame.data[i] = data[i];
+            }
 
             send_frames.push_back(frame);
         }
@@ -58,13 +57,14 @@ namespace r2d2 {
         frame_s create_frame(const frame_data_t<P> &data) {
             frame_s frame{};
 
-            frame.type = P;
+            const auto length = sizeof(frame_data_t<P>);
 
-            memcpy(
-                (void *) &frame.bytes,
-                (const void *) &data,
-                sizeof(frame_data_t<P>)
-            );
+            frame.type = P;
+            frame.data = new uint8_t[length];
+
+            for (size_t i = 0; i < length; i++) {
+                frame.data[i] = reinterpret_cast<const uint8_t*>(&data)[i];
+            }            
 
             return frame;
         }
