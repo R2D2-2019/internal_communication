@@ -120,7 +120,9 @@ namespace r2d2::can_bus {
          */
         static void safely_push_frame(const detail::_can_frame_s &frame) {
             // For convenience; get a ref to the tx_queue
-            auto &tx_queue = detail::_get_tx_queue_for_channel<Priority>();
+            auto &tx_queue = detail::_nfc_mem->tx_queues[
+                static_cast<uint8_t>(Priority)
+            ];
 
             if (tx_queue.full()) {
                 space_in_tx_queue = false;

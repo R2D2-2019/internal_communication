@@ -78,21 +78,6 @@ namespace r2d2::can_bus::detail {
     _nfc_memory_area_s *const _nfc_mem = ((_nfc_memory_area_s *) NFC_RAM_ADDR);
 
     /**
-     * Helper function to cleanly get the queue for the channel
-     * with the given priority.
-     *
-     * @internal
-     * @tparam P
-     * @return
-     */
-    template<priority P>
-    constexpr _nfc_memory_area_s::queue_type &_get_tx_queue_for_channel() {
-        return _nfc_mem->tx_queues[
-            static_cast<uint8_t>(P)
-        ];
-    }
-
-    /**
      * Initialize the memory area that is normally reserved
      * for NFC. This area is used to store send and receive
      * buffers.
