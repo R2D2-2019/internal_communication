@@ -357,7 +357,7 @@ namespace r2d2::can_bus {
             frame.request = can_frame.mode == detail::_can_frame_mode::READ;
 
             // store the uid_index the frame is stored on for the last frame
-            _uid_index * uid_index;
+            _uid_index *uid_index = nullptr;
 
             if (can_frame.sequence_id == 0) {
                 // Allocate memory for the frame
