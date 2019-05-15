@@ -171,7 +171,7 @@ namespace r2d2::can_bus {
          * @return uint32_t 
          */
         static uint32_t get_mask() {
-            return detail::_get_mailbox_accept_mask<Bus>(ids::rx);
+            return port<Bus>->CAN_MB[ids::rx].CAN_MAM;
         }
 
         /**
