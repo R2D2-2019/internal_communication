@@ -273,7 +273,7 @@ namespace r2d2 {
      */
     pragma pack(1)
     struct frame_path_step_s {
-        //x coordinate (in 2d x/y space)
+        // x coordinate (in 2d x/y space)
         uint32_t x;
 
         // y coordinate (in 2d x/y space)
