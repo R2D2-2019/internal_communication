@@ -201,6 +201,9 @@ namespace r2d2 {
     };
 
     /**
+     * DEPRECATED! Use the frame_display_8x8_character_cursor_s
+     * frame tye.
+     * 
      * Struct to set a character on a display. This shows
      * a colored character at given location. The character
      * can be any character from the un-extended
@@ -209,6 +212,8 @@ namespace r2d2 {
      * Currently only the 8x8 font from hwlib is supported,
      * When extended frames are realised, maybe 16x16 could be
      * implemented.
+     * 
+     * 
      * 
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
@@ -228,10 +233,12 @@ namespace r2d2 {
     };
 
 
+    /**
+     * The display will require each user to claim a cursor
+     * these can be used to store data (like position
+     * and color).
+     */
 
-    // The display will require each user to claim a cursor
-    // these can be used to store data (like position
-    // and color).
     enum display_cursor : uint8_t {
     	// Free for any person to use.
     	OPEN_CURSOR,
@@ -240,22 +247,54 @@ namespace r2d2 {
     	CURSORS_COUNT
     };
 
+    /**
+     * Struct to set a character on a display. This shows
+     * a colored character at given location. The character
+     * can be any character from the un-extended
+     * ascii table (characters 0-127)
+     * 
+     * Currently only the 8x8 font from hwlib is supported,
+     * When extended frames are realised, maybe 16x16 could be
+     * implemented.
+     *
+     * For now an alternative to x/y and color based character
+     * drawing. 
+     */
     struct frame_display_8x8_character_cursor_s {
     	// Targets which cursor to write to. This should be one
     	// your module claimed.
     	display_cursor cursor_id;
+
+    	// The characters to draw
     	char characters[6];
+
+    	// The size of the characters. "abc" = 3.
     	uint8_t amount_characters;
     };
 
+    
+    /**
+     * This frame will move the targeted cursor to the 
+     * given position. (0,0) is the upper left corner.
+     * 
+     */
     struct frame_display_set_cursor_position_s {
-    	// 
+    	// Targets which cursor to write to. This should be one
+    	// your module claimed.
     	display_cursor cursor_id;
     	uint8_t cursor_x;
     	uint8_t cursor_y;
     };
 
+    
+    /**
+     * This frame will set the targeted cursor color to 
+     * given colors.
+     * 
+     */
     struct frame_display_set_cursor_color_s {
+    	// Targets which cursor to write to. This should be one
+    	// your module claimed.
     	display_cursor cursor_id;
 		uint8_t red;
 		uint8_t green;
