@@ -1,5 +1,3 @@
-#include "ostream"
-
 #include <mock_bus.hpp>
 
 #define CATCH_CONFIG_MAIN
@@ -7,8 +5,6 @@
 #include <catch.hpp>
 
 using namespace r2d2;
-
-/** RINGBUFFER **/
 
 TEST_CASE("Mock bus accepts packet", "[mock_bus]") {
     mock_comm_c comm;

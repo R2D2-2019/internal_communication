@@ -126,8 +126,6 @@ namespace r2d2 {
      * This frame describes a frame meant for external
      * systems. Tparam T describes the actual frame being send;
      * this structs wraps the internal frame.
-     *
-     * @tparam T
      */
     struct frame_external_s {
         uint8_t length;
@@ -201,22 +199,27 @@ namespace r2d2 {
     };
 
     /**
-     *ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
-     *This is a hack that uses the python frame generator to create a frame with strings instead of chars.
-     *This conversion does not work in c++.
-     *These frames will be sent to swarm management, they only have to call the command with given parameters and send it to the destined robot.
-     *
-     *Params:
-     *	module is the name of the targeted module, mostly used to prevent nameclash
-     *	command is the command that needs to be executed, with parameters
-     *	destination is used to tell what robot to send the command to
+     * ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
+     * 
+     * This is a hack that uses the python frame generator 
+     * to create a frame with strings instead of chars.
+     * This conversion does not work in c++. These frames 
+     * will be sent to swarm management, they only have to 
+     * call the command with given parameters and send it 
+     * to the destined robot.
      *
      * SwarmUI wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI    
      */
     struct frame_ui_command_s {
+        // module is the name of the targeted module, mostly used 
+        // to prevent nameclash
         char module;
+
+        // command is the command that needs to be executed, with parameters
         char command;
+
+        // destination is used to tell what robot to send the command to
         char destination;
     };
 
