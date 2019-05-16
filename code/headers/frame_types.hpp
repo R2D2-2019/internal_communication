@@ -240,11 +240,11 @@ namespace r2d2 {
      */
 
     enum display_cursor : uint8_t {
-    	// Free for any person to use.
-    	OPEN_CURSOR,
+        // Free for any person to use.
+        OPEN_CURSOR,
 
-    	// Don't touch
-    	CURSORS_COUNT
+        // Don't touch
+        CURSORS_COUNT
     };
 
     /**
@@ -261,15 +261,15 @@ namespace r2d2 {
      * drawing. 
      */
     struct frame_display_8x8_character_cursor_s {
-    	// Targets which cursor to write to. This should be one
-    	// your module claimed.
-    	display_cursor cursor_id;
+        // Targets which cursor to write to. This should be one
+        // your module claimed.
+        display_cursor cursor_id;
 
-    	// The characters to draw
-    	char characters[6];
+        // The characters to draw
+        char characters[6];
 
-    	// The total amount of the characters. "abc" = 3.
-    	uint8_t amount_characters;
+        // The total amount of the characters. "abc" = 3.
+        uint8_t amount_characters;
     };
 
     
@@ -279,11 +279,11 @@ namespace r2d2 {
      * 
      */
     struct frame_cursor_position_s {
-    	// Targets which cursor to write to. This should be one
-    	// your module claimed.
-    	display_cursor cursor_id;
-    	uint8_t cursor_x;
-    	uint8_t cursor_y;
+        // Targets which cursor to write to. This should be one
+        // your module claimed.
+        display_cursor cursor_id;
+        uint8_t cursor_x;
+        uint8_t cursor_y;
     };
 
     
@@ -293,12 +293,12 @@ namespace r2d2 {
      * 
      */
     struct frame_cursor_color_s {
-    	// Targets which cursor to write to. This should be one
-    	// your module claimed.
-    	display_cursor cursor_id;
-		uint8_t red;
-		uint8_t green;
-		uint8_t blue; 	
+        // Targets which cursor to write to. This should be one
+        // your module claimed.
+        display_cursor cursor_id;
+	    uint8_t red;
+	    uint8_t green;
+	    uint8_t blue; 	
     };
 
     /**
