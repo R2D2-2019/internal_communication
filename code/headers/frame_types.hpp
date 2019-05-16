@@ -43,6 +43,17 @@
     \
     __VA_ARGS__
 
+/**
+ * Travis doesn't like #pragma pack(1), this define makes
+ * it so packing is only done on an ARM target.
+ */ 
+#if defined(__arm__) || defined(__thumb__)
+#define R2D2_PACK_STRUCT _Pragma("pack(1)")
+#else
+// Empty define
+#define R2D2_PACK_STRUCT
+#endif
+
 namespace r2d2 {
     /**
      * The underlying type used for packet
@@ -213,6 +224,7 @@ namespace r2d2 {
      * Packet containing the state of 
      * a button.
      */
+    R2D2_PACK_STRUCT
     struct frame_button_state_s {
         bool pressed;
     };
@@ -221,6 +233,7 @@ namespace r2d2 {
      * Packet containing the state of
      * an activity led.
      */
+    R2D2_PACK_STRUCT
     struct frame_activity_led_state_s {
         bool state;
     };
@@ -239,6 +252,7 @@ namespace r2d2 {
      * Distance sensor wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Measuring-distance
      */
+    R2D2_PACK_STRUCT
     struct frame_distance_s {
         uint16_t mm;
     };
@@ -254,6 +268,7 @@ namespace r2d2 {
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
+    R2D2_PACK_STRUCT
     struct frame_display_filled_rectangle_s {
         // position of rectangle
         uint8_t x;
@@ -282,6 +297,7 @@ namespace r2d2 {
      * SwarmUI wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI    
      */
+    R2D2_PACK_STRUCT
     struct frame_ui_command_s {
         // module is the name of the targeted module, mostly used 
         // to prevent nameclash
@@ -301,6 +317,7 @@ namespace r2d2 {
      * Power wiki: 
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Power
      */ 
+    R2D2_PACK_STRUCT
     struct frame_battery_level_s {
         // Battery percentage. Between 0 - 100
         uint8_t percentage;
@@ -325,6 +342,7 @@ namespace r2d2 {
      * Moving Platform wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Moving-Platform
      */
+    R2D2_PACK_STRUCT
     struct frame_movement_control_s {
         // A value between -100% & 100% 
         int8_t speed;
