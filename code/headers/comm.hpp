@@ -1,5 +1,7 @@
 #pragma once
 
+#define register
+
 #include <type_traits>
 
 #include "frame_types.hpp"
@@ -25,6 +27,24 @@ namespace r2d2 {
          */
         template<priority Priority>
         using channel = can_bus::channel_c<bus, Priority>;
+
+        /**
+         * checks if the local modules accept the current frame
+         * 
+         * @return true if a/multiple frames accept this frame type
+         * @return false if no frames or only the current frame accepts this frame type
+         */
+        bool local_accepts_frame(frame_type type) {
+            using regs = can_bus::comm_module_register_s;
+        
+            for (uint8_t i = 0; i < regs::count; i++) {
+                if (regs::reg[i] != this && regs::reg[i]->accepts_frame(type)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         /**
          * Make sure all other modules
@@ -63,18 +83,66 @@ namespace r2d2 {
             }
 
             // Only internally distribute when needed
-            if (can_bus::comm_module_register_s::count <= 1) {
+            if (can_bus::comm_module_register_s::count <= 1 && local_accepts_frame(type)) {
                 return;
             }
 
             frame_s frame{};
             frame.type = type;
+            frame.length = length;
+            
+            // allocate memory for the internal frames
+            frame.data = r2d2::can_bus::detail::_nfc_mem->allocate(frame.length);
 
-            for(uint_fast8_t i = 0; i < 8; i++){
-                frame.bytes[i] = data[i];
+            for (uint_fast8_t i = 0; i < frame.length; i++) {
+                frame.data[i] = data[i];
             }
 
             distribute_frame_internally(frame);
+        }
+
+        /**
+         * Update all the acceptance masks to use the mask
+         * 
+         * @param mask 
+         */
+        void update_all_channels(r2d2::frame_id mask) {
+            // Set the acceptance mask of all the channels to use the mask
+            uint32_t normal_mask = channel<priority::NORMAL>::get_mask();
+            channel<priority::NORMAL>::set_mask((normal_mask & ~0xFF << 10) | mask << 10);
+
+            uint32_t high_mask = channel<priority::HIGH>::get_mask();
+            channel<priority::HIGH>::set_mask((high_mask & ~0xFF << 10) | mask << 10);
+
+            uint32_t low_mask = channel<priority::LOW>::get_mask();
+            channel<priority::LOW>::set_mask((low_mask & ~0xFF << 10) | mask << 10);
+
+            uint32_t data_stream_mask = channel<priority::DATA_STREAM>::get_mask();
+            channel<priority::DATA_STREAM>::set_mask((data_stream_mask & ~0xFF << 10) | mask << 10);                        
+        }
+
+        /**
+         * Calculate a acceptance mask depending on the modules on the comm.
+         */
+        void update_filter() override {
+            using regs = can_bus::comm_module_register_s;
+
+            // Start with a full mask.
+            r2d2::frame_id mask = ~0x00;
+
+            for (const auto &reg : regs::reg) {
+                for (const auto type : reg->get_accepted_frame_types()) {
+                    if (type == r2d2::frame_type::ALL) {
+                        // Accept all frames and return
+                        update_all_channels(0x00);
+                        return;
+                    }
+
+                    mask &= ~(type);
+                }
+            }
+
+        	update_all_channels(mask);
         }
 
     public:
