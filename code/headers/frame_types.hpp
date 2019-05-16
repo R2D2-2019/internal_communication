@@ -59,6 +59,9 @@ namespace r2d2 {
         DISTANCE,
         DISPLAY_FILLED_RECTANGLE,
         DISPLAY_CHARACTER,
+        DISPLAY_CURSOR_CHARACTER,
+        CURSOR_POSITION,
+        CURSOR_COLOR,
         BATTERY_LEVEL,
         UI_COMMAND,
 
@@ -278,7 +281,7 @@ namespace r2d2 {
      * given position. (0,0) is the upper left corner.
      * 
      */
-    struct frame_display_set_cursor_position_s {
+    struct frame_cursor_position_s {
     	// Targets which cursor to write to. This should be one
     	// your module claimed.
     	display_cursor cursor_id;
@@ -292,7 +295,7 @@ namespace r2d2 {
      * given colors.
      * 
      */
-    struct frame_display_set_cursor_color_s {
+    struct frame_cursor_color_s {
     	// Targets which cursor to write to. This should be one
     	// your module claimed.
     	display_cursor cursor_id;
@@ -347,6 +350,9 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_8x8_character_s, DISPLAY_CHARACTER)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_8x8_character_cursor_s, DISPLAY_CURSOR_CHARACTER)
+    R2D2_INTERNAL_FRAME_HELPER(frame_cursor_position_s, CURSOR_POSITION)
+    R2D2_INTERNAL_FRAME_HELPER(frame_cursor_color_s, CURSOR_COLOR)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
 }
