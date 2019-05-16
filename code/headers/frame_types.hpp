@@ -10,15 +10,15 @@
  * that help the communication system understand how to use
  * and refer to packets.
  */
-#define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal)             \
-    template <>                                               \
-    struct frame_type_s<Type> {                               \
+#define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal) \
+    template<> \
+    struct frame_type_s<Type> { \
         constexpr static frame_id type = frame_type::EnumVal; \
-    };                                                        \
-                                                              \
-    template <>                                               \
-    struct frame_data_s<frame_type::EnumVal> {                \
-        using type = Type;                                    \
+    }; \
+    \
+    template<> \
+    struct frame_data_s<frame_type::EnumVal> { \
+        using type = Type; \
     };
 
 namespace r2d2 {
@@ -35,7 +35,7 @@ namespace r2d2 {
      *
      * @tparam T
      */
-    template <typename T>
+    template<typename T>
     constexpr bool is_suitable_frame_v = std::is_pod_v<T>;
 
     /**
@@ -44,7 +44,7 @@ namespace r2d2 {
      *
      * @tparam T
      */
-    template <typename T>
+    template<typename T>
     constexpr bool is_extended_frame_v = sizeof(T) > 8;
 
     /**
@@ -78,21 +78,21 @@ namespace r2d2 {
      *
      * @tparam T
      */
-    template <typename T>
+    template<typename T>
     struct frame_type_s {
         constexpr static frame_id type = frame_type::NONE;
     };
 
     /**
-     * Empty base packet.
-     */
+    * Empty base packet.
+    */
     struct empty_frame {};
 
     /**
      * Packet data type accessor
      * base template.
      */
-    template <frame_type>
+    template<frame_type>
     struct frame_data_s {
         using type = empty_frame;
     };
@@ -101,7 +101,7 @@ namespace r2d2 {
      * Helper accessor to get the
      * datatype for the given packet type.
      */
-    template <frame_type P>
+    template<frame_type P>
     using frame_data_t = typename frame_data_s<P>::type;
 
     /**
@@ -110,15 +110,15 @@ namespace r2d2 {
      *
      * @tparam T
      */
-    template <typename T>
+    template<typename T>
     constexpr frame_id frame_type_v = frame_type_s<T>::type;
 
     /**
-     * A struct that helps to describe
-     * an external system address.
-     * Might change, depending on the external
-     * communication module.
-     */
+    * A struct that helps to describe
+    * an external system address.
+    * Might change, depending on the external
+    * communication module.
+    */
     struct external_id_s {
         // 3th and 4th octet
         uint8_t octets[2];
@@ -136,19 +136,20 @@ namespace r2d2 {
 
         // NOTE: data should come last; ordering is important
         // for this specific struct!
-        uint8_t data[256 - sizeof(uint8_t) - sizeof(external_id_s) -
-                     sizeof(frame_type)];
+        uint8_t data[256 - sizeof(uint8_t) - sizeof(external_id_s) - sizeof(frame_type)];
     };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_external_s, EXTERNAL)
 
     /** USER STRUCTS */
 
-    /** DO NOT REMOVE */
-    /** #PythonAnchor# */
+		
+	/** DO NOT REMOVE */
+	/** #PythonAnchor# */
+
 
     /**
-     * Packet containing the state of
+     * Packet containing the state of 
      * a button.
      */
     struct frame_button_state_s {
@@ -165,22 +166,22 @@ namespace r2d2 {
 
     /**
      * Distance in milimeter
-     *
+     * 
      * Distance sensor wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Measuring-distance
      */
     struct frame_distance_s {
         uint16_t mm;
     };
-
+    
     /**
-     * Struct to set a rectangle on a display. This fills a
+     * Struct to set a rectangle on a display. This fills a 
      * rectangle with the color specified.
-     *
+     * 
      * Currently we can't fill the bigger screens. When the
      * extended frames are here the position and width/height
      * will change to a uint16_t to support the bigger screens.
-     *
+     * 
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
@@ -201,19 +202,19 @@ namespace r2d2 {
 
     /**
      * ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
-     *
-     * This is a hack that uses the python frame generator
+     * 
+     * This is a hack that uses the python frame generator 
      * to create a frame with strings instead of chars.
-     * This conversion does not work in c++. These frames
-     * will be sent to swarm management, they only have to
-     * call the command with given parameters and send it
+     * This conversion does not work in c++. These frames 
+     * will be sent to swarm management, they only have to 
+     * call the command with given parameters and send it 
      * to the destined robot.
      *
      * SwarmUI wiki:
-     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI    
      */
     struct frame_ui_command_s {
-        // module is the name of the targeted module, mostly used
+        // module is the name of the targeted module, mostly used 
         // to prevent nameclash
         char module;
 
@@ -225,12 +226,12 @@ namespace r2d2 {
     };
 
     /**
-     * Struct that represents the level of
-     * the battery on the robot.
-     *
-     * Power wiki:
+     * Struct that represents the level of 
+     * the battery on the robot. 
+     * 
+     * Power wiki: 
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Power
-     */
+     */ 
     struct frame_battery_level_s {
         // Battery percentage. Between 0 - 100
         uint8_t percentage;
@@ -238,7 +239,7 @@ namespace r2d2 {
         // Battery voltage.
         // The voltage is multiplied by 1000 in this
         // representation. That means that a value of
-        // 12.1V will be 12100. This larger value is
+        // 12.1V will be 12100. This larger value is 
         // used to alleviate the need for floating point numbers.
         // A scale of x1000 is used, because thas is the maximum precision
         // the sensor can read.
@@ -248,15 +249,15 @@ namespace r2d2 {
     /**
      * Struct that represent the state
      * of how the robot should move.
-     *
+     * 
      * Manual_control wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
-     *
+     * 
      * Moving Platform wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Moving-Platform
      */
     struct frame_movement_control_s {
-        // A value between -100% & 100%
+        // A value between -100% & 100% 
         int8_t speed;
 
         // A value between -90 & 90 (degrees)
@@ -273,4 +274,4 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
-} // namespace r2d2
+}
