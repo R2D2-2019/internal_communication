@@ -295,9 +295,9 @@ namespace r2d2 {
         // Targets which cursor to write to. This should be one
         // your module claimed.
         display_cursor cursor_id;
-	    uint8_t red;
-	    uint8_t green;
-	    uint8_t blue; 	
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue; 	
     };
 
     /**
