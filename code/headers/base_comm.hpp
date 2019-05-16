@@ -229,7 +229,7 @@ namespace r2d2 {
         * @return
         */
         frame_s get_data() {
-            return rx_buffer.copy_and_pop();
+            return rx_buffer.copy_and_pop_front();
         }
 
         /**
