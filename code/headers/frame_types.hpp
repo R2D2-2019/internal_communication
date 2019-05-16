@@ -262,12 +262,13 @@ namespace r2d2 {
     struct frame_display_8x8_character_cursor_s {
         // Targets which cursor to write to. This should be one
         // your module claimed.
-        display_cursor cursor_id;
+        uint8_t cursor_id;
 
         // The characters to draw
-        char characters[246];
+        char characters[245];
 
-        // The total amount of the characters. "abc" = 3.
+        // The total amount of the characters. "abc" = 4 (due to 
+        // the null termination)
         uint8_t amount_characters;
     };
 
