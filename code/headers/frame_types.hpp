@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <type_traits>
 
@@ -14,7 +15,17 @@
  * is an exception. It is possible there will be another exception for 
  * the robos instructions later.
  */
-#define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal) \
+#define R2D2_OPTIMISE_STRING(Type, MemberName) \
+    template<> \
+    struct supports_string_optimisation<Type> : std::true_type {}; \
+    \
+    template<> \
+    struct string_member_offset<Type> { \
+        constexpr static uint16_t offset = offsetof(Type, MemberName); \
+    };
+
+
+#define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal, ...) \
     template<> \
     struct frame_type_s<Type> { \
         constexpr static frame_id type = frame_type::EnumVal; \
@@ -28,7 +39,9 @@
     static_assert( \
         std::is_same_v<Type, frame_external_s> \
         || sizeof(Type) <= 248, "The size of a frame type should not exceed 248 bytes!" \
-    );
+    ); \
+    \
+    __VA_ARGS__
 
 /**
  * Travis doesn't like #pragma pack(1), this define makes
@@ -84,6 +97,7 @@ namespace r2d2 {
         UI_COMMAND,
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
+        STRING_TEST,
 
         // Don't touch
         EXTERNAL,
@@ -133,6 +147,44 @@ namespace r2d2 {
      */
     template<typename T>
     constexpr frame_id frame_type_v = frame_type_s<T>::type;
+
+    /**
+     * This struct is specialized to indicate that the
+     * type it is specialized for support the string optimzation.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    struct supports_string_optimisation : std::false_type {};
+    
+    /**
+     * Struct that stores the offset of
+     * the string member that can be optimised against.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    struct string_member_offset {
+        constexpr static uint16_t offset = 0;
+    };
+
+    /**
+     * Helper accessor to check for string
+     * optimisation support on the given type.
+     *
+     * @tparam T
+     */  
+    template<typename T>
+    constexpr bool supports_string_optimisation_v = supports_string_optimisation<T>::value;
+
+    /**
+     * Helper accessor to get the string member
+     * offset for the given type.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    constexpr bool string_member_offset_v = string_member_offset<T>::offset;
 
     /**
     * A struct that helps to describe
@@ -317,6 +369,6 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
-    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
-    R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)    
+    R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)    
 }
