@@ -254,15 +254,6 @@ namespace r2d2 {
     };
 
     /**
-     * TEST FRAME; REMOVE BEFORE MERGING!
-     */ 
-    R2D2_PACK_STRUCT
-    struct frame_string_test_s {
-        uint8_t val1, val2;
-        char data[42];
-    };
-
-    /**
      * Distance in milimeter
      * 
      * Distance sensor wiki:
@@ -394,13 +385,4 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND, R2D2_POISON_TYPE(frame_ui_command_s))
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
-
-    // EXAMPLE: for string optimalisation, the frame doesn't actually support it
-    R2D2_INTERNAL_FRAME_HELPER(
-        frame_string_test_s,
-        STRING_TEST,
-
-        // Any extra tags here
-        R2D2_OPTIMISE_STRING(frame_string_test_s, data)
-    )        
 }
