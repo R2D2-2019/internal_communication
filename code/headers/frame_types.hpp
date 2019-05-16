@@ -32,8 +32,7 @@
  * using structs that are meant purely for the
  * Python bus
  */ 
-#define R2D2_POISON_TYPE_HELPER(x) R2D2_TO_STRING(GCC poison x)
-#define R2D2_POISON_TYPE(Type) _Pragma(R2D2_POISON_TYPE_HELPER(Type))
+#define R2D2_POISON_TYPE(Type) _Pragma(R2D2_TO_STRING(GCC poison Type))
 
 #define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal, ...) \
     template<> \
