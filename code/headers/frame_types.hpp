@@ -203,11 +203,8 @@ namespace r2d2 {
         uint8_t blue;
     };
 
-    /**
-     * DEPRECATED! Use the frame_display_8x8_character_cursor_s
-     * frame tye.
-     * 
-     * Struct to set a character on a display. This shows
+    /** 
+     * Struct to set a single character on a display. This shows
      * a colored character at given location. The character
      * can be any character from the un-extended
      * ascii table (characters 0-127)
@@ -271,7 +268,7 @@ namespace r2d2 {
     	// The characters to draw
     	char characters[6];
 
-    	// The size of the characters. "abc" = 3.
+    	// The total amount of the characters. "abc" = 3.
     	uint8_t amount_characters;
     };
 
