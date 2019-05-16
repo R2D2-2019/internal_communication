@@ -1,38 +1,18 @@
 #pragma once
 
-#include <algorithm>
-#include <cstring>
 #include <array>
-#include <type_traits>
 #include <ringbuffer.hpp>
 
+#include "priority.hpp"
 #include "frame_types.hpp"
 
 namespace r2d2 {
-    /**
-     * All priority levels that can be assigned
-     * to packets.
-     */
-    enum class priority {
-        // High priority packet
-            HIGH = 0,
-
-        // Normal priority packet, default
-            NORMAL = 1,
-
-        // Low priority packet, used when there is no hard time constraint on the delivery of the data
-            LOW = 2,
-
-        // Data stream packet. Used when a stream of packets (e.g. video data) is put on the bus.
-        // Assigning this will given these packets the lowest priority, preventing the large data stream
-        // from clogging up the bus.
-            DATA_STREAM = 3
-    };
-
     struct frame_s {
+        uint8_t* data;
+        size_t length;
+
         frame_type type;
         bool request;
-        uint8_t bytes[8];
 
         /**
          * Consider the data in the frame as
@@ -45,11 +25,14 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_frame_v < T> && !is_extended_frame_v <T>
+                is_suitable_frame_v <T> && !is_extended_frame_v <T>
             >
         >
-        T &as_type() {
-            return *(reinterpret_cast<T *>(&bytes));
+
+        T as_type() const {
+            return *(
+                reinterpret_cast<const T *>(*data)
+            );
         }
 
         /**
@@ -62,8 +45,10 @@ namespace r2d2 {
          * @return
          */
         template<frame_type P>
-        auto as_frame_type() -> frame_data_t <P> & {
-            return *(reinterpret_cast<frame_data_t<P> *>(&bytes));
+        auto as_frame_type() const -> frame_data_t <P> {
+            return *(
+                reinterpret_cast<const frame_data_t<P> *>(data)
+            );
         }
     };
 
@@ -94,7 +79,15 @@ namespace r2d2 {
          * @param buffer
          * @param prio
          */
-        virtual void send_impl(const frame_type &type, const uint8_t data[], const size_t length, const priority prio) = 0;
+        virtual void send_impl(
+            const frame_type &type, const uint8_t data[], size_t length, priority prio
+        ) = 0;
+
+        /**
+         * Update the acceptance filter for some of the buses
+         * 
+         */
+        virtual void update_filter() {}
 
     public:
         /**
@@ -116,9 +109,10 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-               is_suitable_frame_v<T>
+                is_suitable_frame_v <T>
             >
         >
+
         void send(const T &data, const priority prio = priority::NORMAL) {
             send_impl(
                 static_cast<frame_type>(frame_type_v<T>),
@@ -140,15 +134,16 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_frame_v<T>
+                is_suitable_frame_v <T>
             >
         >
+
         void send_external(const external_id_s &id, const T &data, const priority prio = priority::NORMAL) {
             // No {} needed, since all fields are filled.
             // Adding it will cause a call to memset
             frame_external_s frame;
 
-            for(size_t i = 0; i < sizeof(T); i++){
+            for (size_t i = 0; i < sizeof(T); i++) {
                 frame.data[i] = reinterpret_cast<const uint8_t *>(&data)[i];
             }
 
@@ -173,17 +168,24 @@ namespace r2d2 {
          * @param listen_for
          */
         void listen_for_frames(std::array<frame_id, 8> listen_for /* Copy to allow move */) {
-            this->listen_for = listen_for;
-
             // Sort to enable binary search
-            std::sort(
-                std::begin(this->listen_for),
-                std::end(this->listen_for)
-            );
+            int i = 1;
+            while (i != listen_for.size()) {
+                if (i > 0 && listen_for[i] < listen_for[i - 1]) {
+                    std::swap(listen_for[i], listen_for[i - 1]);
+                    i -= 1;
+                } else {
+                    i += 1;
+                }
+            }
+
+            this->listen_for = listen_for;
 
             if (accepts_frame(frame_type::ALL)) {
                 accept_all = true;
             }
+
+            update_filter();
         }
 
         /**
@@ -212,7 +214,7 @@ namespace r2d2 {
         * @return
         */
         frame_s get_data() {
-            return rx_buffer.copy_and_pop();
+            return rx_buffer.copy_and_pop_front();
         }
 
         /**
@@ -220,7 +222,7 @@ namespace r2d2 {
          * listens for.
          * @return
          */
-        std::array<frame_id, 8> const& get_accepted_frame_types() const {
+        std::array<frame_id, 8> const &get_accepted_frame_types() const {
             return listen_for;
         }
 
@@ -238,11 +240,28 @@ namespace r2d2 {
 
             const auto &frames = get_accepted_frame_types();
 
-            return std::binary_search(
-                std::begin(frames),
-                std::end(frames),
-                p
-            );
+            // Binary search
+            int lower = 0;
+            int upper = frames.size();
+
+            while (lower < upper) {
+                int x = lower + (upper - lower) / 2;
+                int val = frames[x];
+
+                if (p == val) {
+                    return true;
+                } else if (p > val) {
+                    if (lower == x) {
+                        break;
+                    }
+
+                    lower = x;
+                } else if (p < val) {
+                    upper = x;
+                }
+            }
+
+            return false;
         }
     };
 }

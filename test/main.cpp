@@ -1,5 +1,3 @@
-#include "ostream"
-
 #include <mock_bus.hpp>
 
 #define CATCH_CONFIG_MAIN
@@ -7,8 +5,6 @@
 #include <catch.hpp>
 
 using namespace r2d2;
-
-/** RINGBUFFER **/
 
 TEST_CASE("Mock bus accepts packet", "[mock_bus]") {
     mock_comm_c comm;
@@ -57,6 +53,6 @@ TEST_CASE("Accept all packets works", "[bus]") {
     const auto from1 = comm.get_data();
     const auto from2 = comm.get_data();
 
-    REQUIRE(from1.type == frame_type::ACTIVITY_LED_STATE);
-    REQUIRE(from2.type == frame_type::BUTTON_STATE);
+    REQUIRE(from1.type == frame_type::BUTTON_STATE);
+    REQUIRE(from2.type == frame_type::ACTIVITY_LED_STATE);    
 }

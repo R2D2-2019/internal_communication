@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "C++ Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/code/main.elf",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceRoot}",
+            "environment": [],
+            "externalConsole": false,
+            "serverLaunchTimeout": 20000,
+            "filterStderr": true,
+            "filterStdout": false,
+            "serverStarted": "target halted due to debug-request, current mode: Thread",
+            "setupCommands": [
+                { "text": "-target-select remote 192.168.1.99:3333", "description": "connect to target", "ignoreFailures": false },
+                { "text": "-interpreter-exec console \"monitor reset\"", "ignoreFailures": false },
+                { "text": "-interpreter-exec console \"monitor halt\"", "ignoreFailures": false },
+                { "text": "-interpreter-exec console \"monitor arm semihosting enable\"", "ignoreFailures": false },
+            ],
+            "windows": {
+                "MIMode": "gdb",
+                "MIDebuggerPath": "C:/SysGCC/arm-none-eabi/bin/arm-none-eabi-gdb.exe",
+            }
+        }
+    ]
+}

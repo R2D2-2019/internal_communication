@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "can.hpp"
+#include "nfc_mem.hpp" 
 #include <queue.hpp>
 #include <ringbuffer.hpp>
 #include <cmath>
@@ -92,13 +93,7 @@ namespace r2d2::can_bus {
      */
     template<typename Bus, priority Priority>
     class channel_c {
-    protected:
-        using ids = detail::_mailbox_assignment_s<Priority>;
-
-        // Transfer queue for this channel, is processed in the
-        // send interrupt.
-        inline static queue_c<detail::_can_frame_s, 32, queue_optimization::READ> tx_queue;
-
+    public:
         /**
          * Volatile flag that is used to signify that there is space
          * in the tx_queue. The tx_queue is emptied in an interrupt and the
@@ -113,6 +108,9 @@ namespace r2d2::can_bus {
          */
         inline volatile static bool space_in_tx_queue = true;
 
+    protected:
+        using ids = detail::_mailbox_assignment_s<Priority>;
+
         /**
          * Place a frame into the tx_queue, accounting for
          * a full transfer queue and waiting for the interrupt
@@ -121,6 +119,11 @@ namespace r2d2::can_bus {
          * @param frame
          */
         static void safely_push_frame(const detail::_can_frame_s &frame) {
+            // For convenience; get a ref to the tx_queue
+            auto &tx_queue = detail::_nfc_mem->tx_queues[
+                static_cast<uint8_t>(Priority)
+            ];
+
             if (tx_queue.full()) {
                 space_in_tx_queue = false;
             }
@@ -162,6 +165,24 @@ namespace r2d2::can_bus {
 
             // Rx interrupt
             port<Bus>->CAN_IER = 1U << ids::rx;
+        }
+
+        /**
+         * Returns the mask of the rx mailbox
+         * 
+         * @return uint32_t 
+         */
+        static uint32_t get_mask() {
+            return port<Bus>->CAN_MB[ids::rx].CAN_MAM;
+        }
+
+        /**
+         * @brief Sets the mask of the rx mailbox
+         * 
+         * @param mask 
+         */
+        static void set_mask(const uint32_t mask) {
+            detail::_set_mailbox_accept_mask<Bus>(ids::rx, mask);
         }
 
         /**
@@ -212,7 +233,13 @@ namespace r2d2::can_bus {
                 const uint_fast8_t total = length / 8;
                 const uint_fast8_t remainder = length % 8;
                 const int rem = remainder > 0;
-                const uint16_t timer = port<Bus>->CAN_TIM & 0xF; // get the current timer register
+                
+                /**
+                 * get a random number for the uid. The send frame is more than 84 clock cycles
+                 * so there is no need to check if there is a new value available when sending
+                 * a large packet
+                 */
+                const uint16_t curr_uid = trng_c::get();
 
                 const uint8_t *ptr = data;
 
@@ -231,7 +258,7 @@ namespace r2d2::can_bus {
                     frame.sequence_total = total + rem - 1;
 
                     // set uid for current transfer
-                    frame.sequence_uid = timer;
+                    frame.sequence_uid = curr_uid;
 
                     safely_push_frame(frame);
                 }
@@ -250,7 +277,7 @@ namespace r2d2::can_bus {
                     frame.sequence_total = total; // -1 and rem cancel each other out
 
                     // set uid for current transfer
-                    frame.sequence_uid = timer;
+                    frame.sequence_uid = curr_uid;
 
                     safely_push_frame(frame);
                 }
@@ -262,12 +289,148 @@ namespace r2d2::can_bus {
             // and put on the bus.
             port<Bus>->CAN_IER = (0x01 << ids::tx);
         }
+    };
 
-        /**
-         * Handle a interrupt meant for this channel.
-         */
-        static void handle_interrupt(const uint8_t index) {
-            // Is the mailbox ready?
+    namespace detail {
+        template<typename Bus>
+        void _transmit(const uint8_t index, const uint8_t prio) {
+            auto &tx_queue = _nfc_mem->tx_queues[prio];
+            const auto tx_id = prio * 2;
+
+            if (!tx_queue.empty()) {
+                // Put the data on the bus
+                const auto frame = tx_queue.copy_and_pop();
+
+                detail::_write_tx_registers<Bus>(frame, tx_id);
+
+                switch (static_cast<priority>(prio)) {
+                    case priority::HIGH:
+                        channel_c<Bus, priority::HIGH>::space_in_tx_queue = true; 
+                        break;
+
+                    case priority::NORMAL: 
+                        channel_c<Bus, priority::NORMAL>::space_in_tx_queue = true; 
+                        break;
+
+                    case priority::LOW: 
+                        channel_c<Bus, priority::LOW>::space_in_tx_queue = true; 
+                        break;
+
+                    case priority::DATA_STREAM: 
+                        channel_c<Bus, priority::DATA_STREAM>::space_in_tx_queue = true; 
+                        break;
+                }
+            } else {
+                // Nothing left to send, disable interrupt on the tx mailbox
+                port<Bus>->CAN_IDR = (0x01 << tx_id);
+            }
+        }
+
+        template<typename Bus>
+        void _receive(const uint8_t index) {
+            detail::_can_frame_s can_frame = detail::_read_mailbox<Bus>(index);
+            
+            using regs = comm_module_register_s;
+
+            /*
+             * First, whe want to make sure that we actually
+             * want to receive this message. It has already passed the
+             * dynamic acceptance mask, but it's possible that it just
+             * happens to pass that mask.
+             */
+            bool reject = true;
+            const auto frame_type = static_cast<enum frame_type>(can_frame.frame_type);
+
+            for (uint8_t i = 0; i < regs::count; i++) {
+                if (regs::reg[i]->accepts_frame(frame_type)) {
+                    reject = false;
+                    break;
+                }
+            }
+
+            if (reject) {
+                return;
+            }
+
+            // Actually start reading the can_frame
+            frame_s frame{};
+
+            frame.type = frame_type;
+            frame.request = can_frame.mode == detail::_can_frame_mode::READ;
+
+            // store the uid_index the frame is stored on for the last frame
+            _uid_index *uid_index = nullptr;
+
+            if (can_frame.sequence_id == 0) {
+                // Allocate memory for the frame
+                frame.data = detail::_nfc_mem->allocate((can_frame.sequence_total + 1) * 8);
+
+                if (can_frame.sequence_total > 0) {
+                    // Save the pointer for the rest of the data
+                    for (auto &index : detail::_nfc_mem->uid_indices) {
+                        // check if the frame_type is NONE. This implies it is not used
+                        if (index.frame_type != static_cast<uint8_t>(frame_type::NONE)) {
+                            continue;
+                        }
+
+                        index.uid = can_frame.sequence_uid;
+                        index.frame_type = can_frame.frame_type;
+                        index.data = frame.data;   
+                        break;                     
+                    }
+                }
+            } else {
+                // search if we have the current uid and type in the uid_indices
+                for (auto &index : detail::_nfc_mem->uid_indices) {
+                    if (index.uid == can_frame.sequence_uid && 
+                            index.frame_type == can_frame.frame_type) {
+                        // get the data pointer
+                        frame.data = index.data;
+
+                        // store the uid_index
+                        uid_index = &index;
+                        break;
+                    }
+                }
+            }
+
+            if(!frame.data){
+                // something went wrong with getting a data ptr.
+                return;
+            }
+
+            // Copy CAN frame to frame.data
+            for (uint_fast8_t i = 0; i < can_frame.length; i++) {
+                frame.data[i + (can_frame.sequence_id * 8)] = can_frame.data.bytes[i];
+            }
+
+            // Check if the frame is complete. Otherwise return because we don't want
+            // to notify the receiving end yet.
+            if (can_frame.sequence_id != can_frame.sequence_total) {
+                return;
+            }
+
+            // Set the amount of bytes the frame uses.
+            frame.length = ((can_frame.sequence_total * 8) + can_frame.length);
+
+            // Distribute the frame to all registered modules
+            // that will accept it.
+            for (uint8_t i = 0; i < regs::count; i++) {
+                if (regs::reg[i]->accepts_frame(frame.type)) {
+                    regs::reg[i]->accept_frame(frame);
+                }
+            }    
+
+            // Mark the uid as not available anymore. (stops data from being written in the data)
+            if (can_frame.sequence_total && uid_index != nullptr) {
+                // set frame_type to NONE so we know it is not being used
+                uid_index->frame_type = static_cast<uint8_t>(frame_type::NONE);
+            }      
+        }
+        
+        template<typename Bus>
+        void _dispatch_isr(const uint8_t index, const uint8_t priority) {
+             // Is the mailbox ready?
             if (!(port<Bus>->CAN_MB[index].CAN_MSR & CAN_MSR_MRDY)) {
                 return;
             }
@@ -280,45 +443,13 @@ namespace r2d2::can_bus {
                 return;
             }
 
-            // Transmit
             if (mmr == 3) {
-                if (!tx_queue.empty()) {
-                    // Put the data on the bus
-                    const auto frame = tx_queue.copy_and_pop();
-                    detail::_write_tx_registers<Bus>(frame, ids::tx);
-                    space_in_tx_queue = true;
-                } else {
-                    // Nothing left to send, disable interrupt on the tx mailbox
-                    port<Bus>->CAN_IDR = (0x01 << ids::tx);
-                }
-
-                return;
-            }
-
-            // Receive
-            detail::_can_frame_s can_frame;
-            detail::_read_mailbox<Bus>(index, can_frame);
-
-            frame_s frame{};
-
-            frame.type = static_cast<frame_type>(can_frame.frame_type);
-            frame.request = can_frame.mode == detail::_can_frame_mode::READ;
-
-            for(uint_fast8_t i = 0; i < can_frame.length; i++){
-                frame.bytes[i] = can_frame.data.bytes[i];
-            }
-
-            using regs = comm_module_register_s;
-
-            for (uint8_t i = 0; i < regs::count; i++) {
-                if (regs::reg[i]->accepts_frame(frame.type)) {
-                    regs::reg[i]->accept_frame(frame);
-                }
+                _transmit<Bus>(index, priority);
+            } else {
+                _receive<Bus>(index);
             }
         }
-    };
 
-    namespace detail {
         /**
          * With the given status gained from
          * ANDing the Status Register (SR) with the
@@ -333,37 +464,22 @@ namespace r2d2::can_bus {
          * @param status
          */
         template<typename Bus>
-        void _route_isr(const uint32_t status) {
-            if ((status & 1) != 0) {
-                channel_c<Bus, priority::HIGH>::handle_interrupt(0);
-            }
+        void _route_isr(uint32_t status) {
+            // get the first 8 bits (The mailbox channels). And
+            // reverse the bit order for the count trailing zero's.
+            status = __RBIT(status & 0xFF);
+            
+            uint8_t trailing_zeros = 0;
 
-            if ((status & (1 << 1)) != 0) {
-                channel_c<Bus, priority::HIGH>::handle_interrupt(1);
-            }
+            // We dont have a count trailing zero's so we use the count leading
+            // zero's on the reverse of the data we want.
+            while ((trailing_zeros = __CLZ(status)) < 32) {   
+                // execute the isr with the correct handler and priority
+                _dispatch_isr<Bus>(trailing_zeros, trailing_zeros / 2);
 
-            if ((status & (1 << 2)) != 0) {
-                channel_c<Bus, priority::NORMAL>::handle_interrupt(2);
-            }
-
-            if ((status & (1 << 3)) != 0) {
-                channel_c<Bus, priority::NORMAL>::handle_interrupt(3);
-            }
-
-            if ((status & (1 << 4)) != 0) {
-                channel_c<Bus, priority::LOW>::handle_interrupt(4);
-            }
-
-            if ((status & (1 << 5)) != 0) {
-                channel_c<Bus, priority::LOW>::handle_interrupt(5);
-            }
-
-            if ((status & (1 << 6)) != 0) {
-                channel_c<Bus, priority::DATA_STREAM>::handle_interrupt(6);
-            }
-
-            if ((status & (1 << 7)) != 0) {
-                channel_c<Bus, priority::DATA_STREAM>::handle_interrupt(7);
+                // remove the bit from the status so it doesn't trigger
+                // the isr again.
+                status &= ~(1 << (31 - trailing_zeros));
             }
         }
     }
@@ -376,9 +492,9 @@ void __CAN0_Handler() {
     );
 }
 
-void __CAN1_Handler() {
-    r2d2::can_bus::detail::_route_isr<r2d2::can_bus::can1>(
-        CAN1->CAN_SR & CAN1->CAN_IMR
-    );
-}
+// void __CAN1_Handler() {
+//     r2d2::can_bus::detail::_route_isr<r2d2::can_bus::can1>(
+//         CAN1->CAN_SR & CAN1->CAN_IMR
+//     );
+// }
 }

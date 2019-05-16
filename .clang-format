@@ -1,0 +1,54 @@
+# The extra indent or outdent of access modifiers, e.g. public:.
+AccessModifierOffset: -4
+
+# If true, aligns escaped newlines as far left as possible.
+# Otherwise puts them into the right-most column.
+AlignEscapedNewlinesLeft: true
+
+# If true, aligns trailing comments.
+AlignTrailingComments: true
+
+# Allow putting all parameters of a function declaration onto
+# the next line even if BinPackParameters is false.
+AllowAllParametersOfDeclarationOnNextLine: false
+
+# If true, int f() { return 0; } can be put on a single line.
+AllowShortFunctionsOnASingleLine: false
+
+# If true, if (a) return; can be put on a single line.
+AllowShortIfStatementsOnASingleLine: false
+
+# If true, while (true) continue; can be put on a single line.
+AllowShortLoopsOnASingleLine: false
+
+# If true, always break after the template<…> of a template declaration.
+AlwaysBreakTemplateDeclarations: true
+
+# If the constructor initializers don’t fit on a line, put each initializer on its own line.
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+
+# The number of columns to use for indentation.
+IndentWidth: 4
+
+BreakBeforeBraces: Attach
+
+# The indentation used for namespaces.
+# Possible values:
+#  - None (in configuration: None) Don’t indent in namespaces.
+#  - Inner (in configuration: Inner) Indent only in inner namespaces (nested in other namespaces).
+#  - All (in configuration: All) Indent in all namespaces.
+NamespaceIndentation: All
+
+# Sort includes
+IncludeCategories:
+  - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
+    Priority:        2
+  - Regex:           '^(<|"(gtest|gmock|isl|json)/)'
+    Priority:        3
+  - Regex:           '<[[:alnum:].]+>'
+    Priority:        4
+  - Regex:           '.*'
+    Priority:        1
+
+# If true, clang-format will attempt to re-flow comments.
+ReflowComments: true

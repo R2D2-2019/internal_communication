@@ -1,6 +1,6 @@
+#include <comm.hpp>
 #include "hwlib.hpp"
 
-#include <comm.hpp>
 
 int main() {
     using namespace r2d2;
@@ -10,21 +10,54 @@ int main() {
 
     hwlib::wait_ms(1000);
 
-    r2d2::comm_c comm;
+    r2d2::comm_c comm1;
     r2d2::comm_c comm2;
 
-    comm2.listen_for_frames({r2d2::frame_type::BUTTON_STATE});
+    comm1.listen_for_frames({frame_type::ALL});
+    comm2.listen_for_frames({frame_type::DISPLAY_FILLED_RECTANGLE});
+
+    frame_display_filled_rectangle_s state;
+    state.x = 0xAA;
+    state.y = 0xBA;
+    state.width = 10;
+    state.height = 20;
+    state.red = 0xFF;
+    state.green = 0xEE;
+    state.blue = 0xCC;
 
     for (;;) {
-        frame_button_state_s state;
-        state.pressed = true;
+        state.x++;
+        comm1.send(state);
+        hwlib::cout << "Com1 Sending: " << hwlib::hex << state.x << hwlib::dec << '\n';
 
-        comm.send(state);
+        hwlib::wait_ms(500);
 
-        while (comm2.has_data()) {
-            const auto frame = comm2.get_data();
+        while(comm2.has_data()){
+            auto t = comm2.get_data();
 
-            hwlib::cout << "rec fr\n";
+            if(t.request){
+                hwlib::cout << "\tCom2 got a request\n";
+                continue;
+            }
+
+            const auto data = t.as_frame_type<
+                frame_type::DISPLAY_FILLED_RECTANGLE>();
+
+            hwlib::cout << "\tCom2 Got frame: " << hwlib::hex << int(data.x) << hwlib::dec << '\n';
+        }
+
+        while(comm1.has_data()){
+            auto t = comm1.get_data();
+
+            if(t.request){
+                hwlib::cout << "\tCom1 got a request\n";
+                continue;
+            }
+
+            const auto data = t.as_frame_type<
+                frame_type::DISPLAY_FILLED_RECTANGLE>();
+
+            hwlib::cout << "\tCom1 Got frame: " << hwlib::hex << int(data.x) << hwlib::dec << '\n';
         }
     }
 }

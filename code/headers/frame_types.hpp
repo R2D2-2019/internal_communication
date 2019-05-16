@@ -2,11 +2,17 @@
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
 
 /*
- * This macro is used to quickly add packet helper structs
+ * This set of macros is used to quickly add packet helper structs
  * that help the communication system understand how to use
- * and refer to packets.
+ * and refer to packets. It also checks whether the size of the frame
+ * struct is within the hard limits of the protocol.
+ * 
+ * All frames should be 248 bytes or less, the frame_external_s 
+ * is an exception. It is possible there will be another exception for 
+ * the robos instructions later.
  */
 #define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal) \
     template<> \
@@ -17,7 +23,23 @@
     template<> \
     struct frame_data_s<frame_type::EnumVal> { \
         using type = Type; \
-    };
+    }; \
+    \
+    static_assert( \
+        std::is_same_v<Type, frame_external_s> \
+        || sizeof(Type) <= 248, "The size of a frame type should not exceed 248 bytes!" \
+    );
+
+/**
+ * Travis doesn't like #pragma pack(1), this define makes
+ * it so packing is only done on an ARM target.
+ */ 
+#if defined(__arm__) || defined(__thumb__)
+#define R2D2_PACK_STRUCT _Pragma("pack(1)")
+#else
+// Empty define
+#define R2D2_PACK_STRUCT
+#endif
 
 namespace r2d2 {
     /**
@@ -60,7 +82,9 @@ namespace r2d2 {
         DISPLAY_FILLED_RECTANGLE,
         BATTERY_LEVEL,
         UI_COMMAND,
-        COORDINATE,
+        MOVEMENT_CONTROL,
+        COORDINATE_STRUCT,
+
 
         // Don't touch
         EXTERNAL,
@@ -126,8 +150,6 @@ namespace r2d2 {
      * This frame describes a frame meant for external
      * systems. Tparam T describes the actual frame being send;
      * this structs wraps the internal frame.
-     *
-     * @tparam T
      */
     struct frame_external_s {
         uint8_t length;
@@ -152,6 +174,7 @@ namespace r2d2 {
      * Packet containing the state of 
      * a button.
      */
+    R2D2_PACK_STRUCT
     struct frame_button_state_s {
         bool pressed;
     };
@@ -160,6 +183,7 @@ namespace r2d2 {
      * Packet containing the state of
      * an activity led.
      */
+    R2D2_PACK_STRUCT
     struct frame_activity_led_state_s {
         bool state;
     };
@@ -170,6 +194,7 @@ namespace r2d2 {
      * Distance sensor wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Measuring-distance
      */
+    R2D2_PACK_STRUCT
     struct frame_distance_s {
         uint16_t mm;
     };
@@ -185,6 +210,7 @@ namespace r2d2 {
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
+    R2D2_PACK_STRUCT
     struct frame_display_filled_rectangle_s {
         // position of rectangle
         uint8_t x;
@@ -201,22 +227,28 @@ namespace r2d2 {
     };
 
     /**
-     *ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
-     *This is a hack that uses the python frame generator to create a frame with strings instead of chars.
-     *This conversion does not work in c++.
-     *These frames will be sent to swarm management, they only have to call the command with given parameters and send it to the destined robot.
-     *
-     *Params:
-     *	module is the name of the targeted module, mostly used to prevent nameclash
-     *	command is the command that needs to be executed, with parameters
-     *	destination is used to tell what robot to send the command to
+     * ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
+     * 
+     * This is a hack that uses the python frame generator 
+     * to create a frame with strings instead of chars.
+     * This conversion does not work in c++. These frames 
+     * will be sent to swarm management, they only have to 
+     * call the command with given parameters and send it 
+     * to the destined robot.
      *
      * SwarmUI wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI    
      */
+    R2D2_PACK_STRUCT
     struct frame_ui_command_s {
+        // module is the name of the targeted module, mostly used 
+        // to prevent nameclash
         char module;
+
+        // command is the command that needs to be executed, with parameters
         char command;
+
+        // destination is used to tell what robot to send the command to
         char destination;
     };
 
@@ -227,6 +259,7 @@ namespace r2d2 {
      * Power wiki: 
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Power
      */ 
+    R2D2_PACK_STRUCT
     struct frame_battery_level_s {
         // Battery percentage. Between 0 - 100
         uint8_t percentage;
@@ -242,21 +275,59 @@ namespace r2d2 {
     };
 
     /**
+     * Struct that represent the state
+     * of how the robot should move.
+     * 
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     * 
+     * Moving Platform wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Moving-Platform
+     */
+    R2D2_PACK_STRUCT
+    struct frame_movement_control_s {
+        // A value between -100% & 100% 
+        int8_t speed;
+
+        // A value between -90 & 90 (degrees)
+        int8_t rotation;
+
+        // state of the brake button
+        bool brake;
+    };
+
+    /**
      * Struct that represents a coordinate on the planet.
      * 
-     * Location Detector wiki: 
-     * https://github.com/R2D2-2019/R2D2-2019/wiki/Location-Detector
-     */ 
+     * Location_detector wiki:
+     * https://github.com/R2D2-2019/location_detector
+     */
+
+    R2D2_PACK_STRUCT
     struct frame_coordinate_s {
-        // This is the latitude of the coordinate. This value is always positive.
-        uint32_t latitude;
-        // This is the longitude of the coordinate. This value is always positive.
-        uint32_t longtitude;
-        // This variable describes if the latitude value is towards north or south and if the longitude value is towards east or west.
-        uint8_t north_east;
-        // This is the altitude of the coordinate.
+        // This variable represents the degrees of the latitude coordinate.
+        uint8_t latitude_degrees;
+        // This variable represents the minutes of the latitude coordinate.
+        uint8_t latitude_minutes;
+        // This variable represents the seconds of the latitude coordinate.
+        uint8_t latitude_seconds;
+        // This variable represents the thousandths seconds of the latitude coordinate.
+        uint16_t latitude_thousandth_second;
+        // This variable represents the degrees of the longitude coordinate.
+        uint8_t longitude_degrees;
+        // This variable represents the minutes of the longitude coordinate.
+        uint8_t longitude_minutes;
+        // This variable represents the seconds of the longitude coordinate.
+        uint8_t longitude_seconds;
+        // This variable represents the thousandths seconds of the longitude coordinate.
+        uint16_t longitude_thousandth_second;
+        // This variable represents the nothern or southern hemisphere the coordinate is located on.
+        char north_south_hemisphere;
+        // This variable represents the eastern or western hemisphere the coordinate is located on.
+        char east_west_hemisphere;
+        // This variable represents the height relative to the average sea level.
         int16_t altitude;
-    };
+    }
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
@@ -264,5 +335,6 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
-    R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE_STRUCT)
 }
