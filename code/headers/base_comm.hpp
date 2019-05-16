@@ -90,19 +90,25 @@ namespace r2d2 {
         virtual void update_filter() {}
 
         /**
-         * Calculate the length of a provided string the string HAS to
-         * be NULL-terminated (C style string)
+         * Calculate the size of the struct with the
+         * string optimization.
          * 
-         * @param string 
-         * @return size_t 
-         */
-        constexpr size_t strlen(const uint8_t *string){
+         * @tparam T
+         */ 
+        template<typename T>
+        constexpr size_t get_optimized_size(const T &data) const {
+            constexpr size_t offset = string_member_offset_v<T>;
+            auto *string = reinterpret_cast<const uint8_t *>(&data) + offset;
+
+            // The string has to be 0-terminated.
             size_t string_length = 0;
             while (*(string++)) {
                 string_length++;
             }
 
-            return string_length;
+            // Add 1 to the offset to get the amount of bytes used of 
+            // the data before the string
+            return (offset + 1) + string_length;
         }
 
     public:
@@ -133,13 +139,7 @@ namespace r2d2 {
 
             // Calculate string length and only send the relevant part.
             if constexpr (supports_string_optimisation_v<T>) {
-                constexpr size_t offset = string_member_offset_v<T>;
-
-                auto *string = reinterpret_cast<const uint8_t *>(&data) + offset;
-
-                // add 1 to the offset to get the amount of bytes used of 
-                // the data before the string
-                size = (offset + 1) + strlen(string);
+                size = get_optimized_size(data);
             }
 
             send_impl(
@@ -174,13 +174,7 @@ namespace r2d2 {
 
             // Calculate string length and only send the relevant part.
             if constexpr (supports_string_optimisation_v<T>) {
-                constexpr size_t offset = string_member_offset_v<T>;
-
-                auto *string = reinterpret_cast<const uint8_t *>(&data) + offset;
-
-                // add 1 to the offset to get the amount of bytes used of 
-                // the data before the string
-                size = (offset + 1) + strlen(string);
+                size = get_optimized_size(data);
             }
 
             for (size_t i = 0; i < size; i++) {
