@@ -61,6 +61,7 @@ namespace r2d2 {
         BATTERY_LEVEL,
         UI_COMMAND,
         MOVEMENT_CONTROL,
+        ROBOS_INSTRUCTION,
 
         // Don't touch
         EXTERNAL,
@@ -265,6 +266,23 @@ namespace r2d2 {
         bool brake;
     };
 
+    /**
+     * Struct that represents an instruction for
+     * RobOS. Embedded in it is the actual instruction that
+     * is created by the Swarm Management Module. A separate frame
+     * type is required, because only RobOS should receive these instructions.
+     * 
+     * RobOS wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/RobOS
+     */ 
+    struct frame_robos_instruction_s {
+        // The type of the embedded frame.
+        frame_type type;
+
+        // The embedded frame as a bunch of bytes.
+        uint8_t data[248];
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
@@ -272,4 +290,5 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_robos_instruction_s, ROBOS_INSTRUCTION)    
 }
