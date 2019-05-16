@@ -2,11 +2,17 @@
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
 
 /*
- * This macro is used to quickly add packet helper structs
+ * This set of macros is used to quickly add packet helper structs
  * that help the communication system understand how to use
- * and refer to packets.
+ * and refer to packets. It also checks whether the size of the frame
+ * struct is within the hard limits of the protocol.
+ * 
+ * All frames should be 248 bytes or less, the frame_external_s 
+ * is an exception. It is possible there will be another exception for 
+ * the robos instructions later.
  */
 #define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal) \
     template<> \
@@ -17,7 +23,12 @@
     template<> \
     struct frame_data_s<frame_type::EnumVal> { \
         using type = Type; \
-    };
+    }; \
+    \
+    static_assert( \
+        std::is_same_v<Type, frame_external_s> \
+        || sizeof(Type) <= 248, "The size of a frame type should not exceed 248 bytes!" \
+    );
 
 namespace r2d2 {
     /**
