@@ -200,20 +200,20 @@ namespace r2d2 {
 
     /**
      * ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
-     * 
-     * This is a hack that uses the python frame generator 
+     *
+     * This is a hack that uses the python frame generator
      * to create a frame with strings instead of chars.
-     * This conversion does not work in c++. These frames 
-     * will be sent to swarm management, they only have to 
-     * call the command with given parameters and send it 
+     * This conversion does not work in c++. These frames
+     * will be sent to swarm management, they only have to
+     * call the command with given parameters and send it
      * to the destined robot.
      *
      * SwarmUI wiki:
-     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI    
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
      */
     struct frame_ui_command_s {
-        // name of the frame which we want to send for evaluation to SMM
-        char frame_name;
+        // name of the frame or json command which we want to send for evaluation to SMM
+        char command;
 
         // parameters for the frame from frame_name
         char params;
