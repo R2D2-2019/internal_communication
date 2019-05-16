@@ -89,6 +89,22 @@ namespace r2d2 {
          */
         virtual void update_filter() {}
 
+        /**
+         * Calculate the length of a provided string the string HAS to
+         * be NULL-terminated (C style string)
+         * 
+         * @param string 
+         * @return size_t 
+         */
+        constexpr size_t strlen(const uint8_t *string){
+            size_t string_length = 0;
+            while (*(string++)) {
+                string_length++;
+            }
+
+            return string_length;
+        }
+
     public:
         /**
          * Request the given packet on
@@ -121,19 +137,15 @@ namespace r2d2 {
 
                 auto *string = reinterpret_cast<const uint8_t *>(&data) + offset;
 
-                size_t string_length = 0;
-                while (*(string++)) {
-                    string_length++;
-                }
-
-                size = offset + string_length;
+                // add 1 to the offset to get the amount of bytes used of 
+                // the data before the string
+                size = (offset + 1) + strlen(string);
             }
 
             send_impl(
                 static_cast<frame_type>(frame_type_v<T>),
                 reinterpret_cast<const uint8_t *>(&data),
-                sizeof(T),
-                prio
+                size, prio
             );
         }
 
@@ -158,12 +170,25 @@ namespace r2d2 {
             // Adding it will cause a call to memset
             frame_external_s frame;
 
-            for (size_t i = 0; i < sizeof(T); i++) {
+            size_t size = sizeof(T);
+
+            // Calculate string length and only send the relevant part.
+            if constexpr (supports_string_optimisation_v<T>) {
+                constexpr size_t offset = string_member_offset_v<T>;
+
+                auto *string = reinterpret_cast<const uint8_t *>(&data) + offset;
+
+                // add 1 to the offset to get the amount of bytes used of 
+                // the data before the string
+                size = (offset + 1) + strlen(string);
+            }
+
+            for (size_t i = 0; i < size; i++) {
                 frame.data[i] = reinterpret_cast<const uint8_t *>(&data)[i];
             }
 
             frame.type = static_cast<frame_type>(frame_type_v<T>);
-            frame.length = sizeof(T);
+            frame.length = size;
             frame.id = id;
 
             send_impl(
@@ -172,7 +197,7 @@ namespace r2d2 {
 
                 // NOTE: we rely on the fact that data is the last member
                 // in the struct here!
-                offsetof(frame_external_s, data) + sizeof(T),
+                offsetof(frame_external_s, data) + size,
                 prio
             );
         }
