@@ -241,6 +241,7 @@ namespace r2d2 {
     /**
      * TEST FRAME; REMOVE BEFORE MERGING!
      */ 
+    R2D2_PACK_STRUCT
     struct frame_string_test_s {
         uint8_t val1, val2;
         char data[42];
