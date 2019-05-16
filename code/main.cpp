@@ -25,11 +25,8 @@ int main() {
     state.green = 0xEE;
     state.blue = 0xCC;
 
-    frame_string_test_s str_test;
-
     for (;;) {
         state.x++;
-        comm1.send(str_test);
         comm1.send(state);
         hwlib::cout << "Com1 Sending: " << hwlib::hex << state.x << hwlib::dec << '\n';
 
