@@ -85,6 +85,7 @@ namespace r2d2 {
         BATTERY_LEVEL,
         UI_COMMAND,
         MOVEMENT_CONTROL,
+        STRING_TEST,
 
         // Don't touch
         EXTERNAL,
@@ -225,6 +226,14 @@ namespace r2d2 {
     };
 
     /**
+     * TEST FRAME; REMOVE BEFORE MERGING!
+     */ 
+    struct frame_string_test_s {
+        uint8_t val1, val2;
+        char data[42];
+    };
+
+    /**
      * Distance in milimeter
      * 
      * Distance sensor wiki:
@@ -333,14 +342,14 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
-    //R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
 
     // EXAMPLE: for string optimalisation, the frame doesn't actually support it
     R2D2_INTERNAL_FRAME_HELPER(
-        frame_movement_control_s,
-        MOVEMENT_CONTROL,
+        frame_string_test_s,
+        STRING_TEST,
 
         // Any extra tags here
-        R2D2_OPTIMISE_STRING(frame_movement_control_s, brake)
+        R2D2_OPTIMISE_STRING(frame_string_test_s, data)
     )        
 }

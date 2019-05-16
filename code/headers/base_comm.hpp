@@ -109,11 +109,26 @@ namespace r2d2 {
         template<
             typename T,
             typename = std::enable_if_t<
-                is_suitable_frame_v <T>
+                is_suitable_frame_v<T>
             >
         >
-
         void send(const T &data, const priority prio = priority::NORMAL) {
+            size_t size = sizeof(T);
+
+            // Calculate string length and only send the relevant part.
+            if constexpr (supports_string_optimisation_v<T>) {
+                constexpr size_t offset = string_member_offset_v<T>;
+
+                auto *string = reinterpret_cast<const uint8_t *>(&data) + offset;
+
+                size_t string_length = 0;
+                while (*(string++)) {
+                    string_length++;
+                }
+
+                size = offset + string_length;
+            }
+
             send_impl(
                 static_cast<frame_type>(frame_type_v<T>),
                 reinterpret_cast<const uint8_t *>(&data),
