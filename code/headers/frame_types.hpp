@@ -265,7 +265,7 @@ namespace r2d2 {
         display_cursor cursor_id;
 
         // The characters to draw
-        char characters[6];
+        char characters[255];
 
         // The total amount of the characters. "abc" = 3.
         uint8_t amount_characters;
