@@ -58,8 +58,8 @@ namespace r2d2 {
         ACTIVITY_LED_STATE,
         DISTANCE,
         DISPLAY_FILLED_RECTANGLE,
-        DISPLAY_CHARACTER,
-        DISPLAY_CURSOR_CHARACTER,
+        DISPLAY_8x8_CHARACTER,
+        DISPLAY_8x8_CURSOR_CHARACTER,
         CURSOR_POSITION,
         CURSOR_COLOR,
         BATTERY_LEVEL,
@@ -346,8 +346,8 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
-    R2D2_INTERNAL_FRAME_HELPER(frame_display_8x8_character_s, DISPLAY_CHARACTER)
-    R2D2_INTERNAL_FRAME_HELPER(frame_display_8x8_character_cursor_s, DISPLAY_CURSOR_CHARACTER)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_8x8_character_s, DISPLAY_8x8_CHARACTER)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_8x8_character_cursor_s, DISPLAY_8x8_CURSOR_CHARACTER)
     R2D2_INTERNAL_FRAME_HELPER(frame_cursor_position_s, CURSOR_POSITION)
     R2D2_INTERNAL_FRAME_HELPER(frame_cursor_color_s, CURSOR_COLOR)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
