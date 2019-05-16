@@ -20,3 +20,6 @@ HEADERS += $(wildcard $(internal_comm)/code/headers/*.hpp)
 
 # include datastructures
 SEARCH += $(internal_comm)/../datastructures/code/headers
+
+# include trng library
+SEARCH += $(internal_comm)/../trng_library/code/headers

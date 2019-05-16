@@ -64,6 +64,7 @@ namespace r2d2 {
         CURSOR_COLOR,
         BATTERY_LEVEL,
         UI_COMMAND,
+        MOVEMENT_CONTROL,
 
         // Don't touch
         EXTERNAL,
@@ -129,8 +130,6 @@ namespace r2d2 {
      * This frame describes a frame meant for external
      * systems. Tparam T describes the actual frame being send;
      * this structs wraps the internal frame.
-     *
-     * @tparam T
      */
     struct frame_external_s {
         uint8_t length;
@@ -302,22 +301,27 @@ namespace r2d2 {
     };
 
     /**
-     *ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
-     *This is a hack that uses the python frame generator to create a frame with strings instead of chars.
-     *This conversion does not work in c++.
-     *These frames will be sent to swarm management, they only have to call the command with given parameters and send it to the destined robot.
-     *
-     *Params:
-     *	module is the name of the targeted module, mostly used to prevent nameclash
-     *	command is the command that needs to be executed, with parameters
-     *	destination is used to tell what robot to send the command to
+     * ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
+     * 
+     * This is a hack that uses the python frame generator 
+     * to create a frame with strings instead of chars.
+     * This conversion does not work in c++. These frames 
+     * will be sent to swarm management, they only have to 
+     * call the command with given parameters and send it 
+     * to the destined robot.
      *
      * SwarmUI wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI    
      */
     struct frame_ui_command_s {
+        // module is the name of the targeted module, mostly used 
+        // to prevent nameclash
         char module;
+
+        // command is the command that needs to be executed, with parameters
         char command;
+
+        // destination is used to tell what robot to send the command to
         char destination;
     };
 
@@ -342,6 +346,27 @@ namespace r2d2 {
         uint32_t voltage;
     };
 
+    /**
+     * Struct that represent the state
+     * of how the robot should move.
+     * 
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     * 
+     * Moving Platform wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Moving-Platform
+     */
+    struct frame_movement_control_s {
+        // A value between -100% & 100% 
+        int8_t speed;
+
+        // A value between -90 & 90 (degrees)
+        int8_t rotation;
+
+        // state of the brake button
+        bool brake;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
@@ -352,4 +377,5 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_cursor_color_s, CURSOR_COLOR)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
+    R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
 }
