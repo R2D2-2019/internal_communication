@@ -256,6 +256,7 @@ namespace r2d2::can_bus {
                     frame.frame_type = type;
                     frame.sequence_id = i;
                     frame.sequence_total = total + rem - 1;
+                    frame.mode = 0; 
 
                     // set uid for current transfer
                     frame.sequence_uid = curr_uid;
@@ -275,6 +276,7 @@ namespace r2d2::can_bus {
                     frame.frame_type = type;
                     frame.sequence_id = total;
                     frame.sequence_total = total; // -1 and rem cancel each other out
+                    frame.mode = 0; 
 
                     // set uid for current transfer
                     frame.sequence_uid = curr_uid;
