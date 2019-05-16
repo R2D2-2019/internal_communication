@@ -96,7 +96,7 @@ namespace r2d2 {
          * @param string 
          * @return size_t 
          */
-        constexpr size_t strlen(const uint8_t * string){
+        constexpr size_t strlen(const uint8_t *string){
             size_t string_length = 0;
             while (*(string++)) {
                 string_length++;
