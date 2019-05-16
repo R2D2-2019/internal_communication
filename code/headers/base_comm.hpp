@@ -126,14 +126,15 @@ namespace r2d2 {
                     string_length++;
                 }
 
-                size = offset + string_length;
+                // add 1 to the offset to get the amount of bytes used of 
+                // the data before the string
+                size = (offset + 1) + string_length;
             }
 
             send_impl(
                 static_cast<frame_type>(frame_type_v<T>),
                 reinterpret_cast<const uint8_t *>(&data),
-                sizeof(T),
-                prio
+                size, prio
             );
         }
 
