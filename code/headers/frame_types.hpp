@@ -389,7 +389,10 @@ namespace r2d2 {
         
         // This variable represents the thousandths seconds of the longitude coordinate.
         uint16_t longitude_thousandth_second;
-                
+		   
+        // This variable represents the thousandths seconds of the latitude coordinate.
+        uint16_t latitude_thousandth_second;
+            
         // This variable represents the degrees of the latitude coordinate.
         uint8_t latitude_degrees;
         
@@ -398,9 +401,6 @@ namespace r2d2 {
         
         // This variable represents the seconds of the latitude coordinate.
         uint8_t latitude_seconds;
-        
-        // This variable represents the thousandths seconds of the latitude coordinate.
-        uint16_t latitude_thousandth_second;
         
         // This variable represents the degrees of the longitude coordinate.
         uint8_t longitude_degrees;
