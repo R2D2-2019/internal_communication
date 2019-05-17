@@ -109,6 +109,7 @@ namespace r2d2 {
         UI_COMMAND,
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
+        PATH_STEP,
         STRING_TEST,
 
         // Don't touch
@@ -375,12 +376,36 @@ namespace r2d2 {
         bool brake;
     };
 
+    /**
+     * Our A-star algorithm outputs a list of 2D vector so the path_id 
+     * indentifies which list it's from, the step id is basically 
+     * the list index. x and y are the 2D vector's attributes.
+     * 
+     * Navigation wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
+     */
+    R2D2_PACK_STRUCT
+    struct frame_path_step_s {
+        // x coordinate (in 2d x/y space)
+        uint32_t x;
+
+        // y coordinate (in 2d x/y space)
+        uint32_t y;
+
+        // sequence integer that indentifies what step in the path we're at.
+        uint16_t step_id;
+
+        // unique indentifier for a path so we don't mix up multiple paths.
+        uint8_t path_id;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND, R2D2_POISON_TYPE(frame_ui_command_s))
-    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)    
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
 }
