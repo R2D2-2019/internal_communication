@@ -409,7 +409,7 @@ namespace r2d2 {
      */
     R2D2_PYTHON_FRAME
     struct frame_command_log_s {
-        // The current status of the command, [for example received,processed,send etc.]
+        // The current status of the command, [for example received, processed, send etc.]
         // This is specified as an integer since swarm analytics will provide a table 
         // containing the explanation for each status.
         uint16_t status;
