@@ -258,16 +258,21 @@ enum frame_type : frame_id {
 
 The second one is the actual struct definition:
 ```cpp
+R2D2_PACK_STRUCT
 struct frame_button_state_s {
     bool pressed;
 };
 
+R2D2_PACK_STRUCT
 struct frame_activity_led_state_s {
     bool state;
 };
 ```
 Please note that the name doesn't reflect whether it is a request, instruction or something else.
 The name of the struct should simply refer to it's contents, not what it is used for.
+
+You've probably noticed the `R2D2_PACK_STRUCT` above the struct. This is a macro definition that instructs the compiler to make the struct as small as possible (no padding bytes). This is important, is it makes communication on the CAN bus more efficient.
+Struct members should be ordered from large to small. That means `uint32_t` goes before `uint16_t` for example. 
 
 The third one is a macro definition at the bottom of the file. This macro definition connects the enumeration value to the struct type:
 ```cpp
