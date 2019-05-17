@@ -323,21 +323,6 @@ namespace r2d2 {
     };
 
     /**
-     * The display will require each user to claim a cursor
-     * these can be used to store data (like position
-     * and color).
-     * 
-     * Further references to cursor_id will mean this value.
-     */
-    enum claimed_display_cursor : uint8_t {
-        // Free for any person to use.
-        OPEN_CURSOR,
-
-        // Don't touch
-        CURSORS_COUNT
-    };
-
-    /**
      * Struct to set a character on a display. This shows
      * a colored character at given location. The character
      * can be any character from the un-extended
