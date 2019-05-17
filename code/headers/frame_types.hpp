@@ -244,6 +244,7 @@ namespace r2d2 {
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
+    R2D2_PACK_STRUCT
     struct frame_display_8x8_character_s {
         // position of character
         uint8_t x;
@@ -286,6 +287,7 @@ namespace r2d2 {
      * For now an alternative to x/y and color based character
      * drawing. 
      */
+    R2D2_PACK_STRUCT
     struct frame_display_8x8_character_cursor_s {
         // Targets which cursor to write to. This should be one
         // your module claimed.
@@ -305,10 +307,11 @@ namespace r2d2 {
      * given position. (0,0) is the upper left corner.
      * 
      */
+    R2D2_PACK_STRUCT
     struct frame_cursor_position_s {
         // Targets which cursor to write to. This should be one
         // your module claimed.
-        display_cursor cursor_id;
+        uint8_t cursor_id;
         uint8_t cursor_x;
         uint8_t cursor_y;
     };
@@ -319,10 +322,11 @@ namespace r2d2 {
      * given colors.
      * 
      */
+    R2D2_PACK_STRUCT
     struct frame_cursor_color_s {
         // Targets which cursor to write to. This should be one
         // your module claimed.
-        display_cursor cursor_id;
+        uint8_t cursor_id;
         uint8_t red;
         uint8_t green;
         uint8_t blue; 	
