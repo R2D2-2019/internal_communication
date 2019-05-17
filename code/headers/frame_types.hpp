@@ -429,8 +429,8 @@ namespace r2d2 {
      * SMM wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-Management
      */
-	R2D2_PACK_STRUCT
-	struct frame_command_status_update_s {
+    R2D2_PACK_STRUCT
+    struct frame_command_status_update_s {
         // The command id for wich the status needs to be updated.
         uint32_t cmd_id;
 		
