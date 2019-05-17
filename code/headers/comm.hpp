@@ -83,7 +83,7 @@ namespace r2d2 {
             }
 
             // Only internally distribute when needed
-            if (can_bus::comm_module_register_s::count <= 1 && local_accepts_frame(type)) {
+            if (can_bus::comm_module_register_s::count <= 1 || !local_accepts_frame(type)) {
                 return;
             }
 
