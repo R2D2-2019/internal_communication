@@ -311,9 +311,6 @@ namespace r2d2 {
      */
     R2D2_PACK_STRUCT
     struct frame_display_8x8_character_s {
-        // character
-        char character[243];
-
         // position of character
         uint8_t x;
         uint8_t y;
@@ -322,6 +319,10 @@ namespace r2d2 {
         uint8_t red;
         uint8_t green;
         uint8_t blue;
+
+        // The characters to draw
+        // Last element because of string optimisation
+        char characters[243];
     };
 
 
@@ -354,15 +355,15 @@ namespace r2d2 {
      */
     R2D2_PACK_STRUCT
     struct frame_display_8x8_character_cursor_s {
-        // The characters to draw
-        char characters[247];
-
         // Targets which cursor to write to. This should be one
         // your module claimed.
         uint8_t cursor_id;
+
+        // The characters to draw
+        // Last element because of string optimisation
+        char characters[247];
     };
 
-    
     /**
      * This frame will move the targeted cursor to the 
      * given position. (0,0) is the upper left corner.
@@ -506,8 +507,19 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
-    R2D2_INTERNAL_FRAME_HELPER(frame_display_8x8_character_s, DISPLAY_8x8_CHARACTER)
-    R2D2_INTERNAL_FRAME_HELPER(frame_display_8x8_character_cursor_s, DISPLAY_8x8_CURSOR_CHARACTER)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_display_8x8_character_s,
+        DISPLAY_8x8_CHARACTER,
+        R2D2_OPTIMISE_STRING(frame_display_8x8_character_s, characters)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_display_8x8_character_cursor_s,
+        DISPLAY_8x8_CURSOR_CHARACTER,
+        R2D2_OPTIMISE_STRING(frame_display_8x8_character_cursor_s, characters)
+    )
+
     R2D2_INTERNAL_FRAME_HELPER(frame_cursor_position_s, CURSOR_POSITION)
     R2D2_INTERNAL_FRAME_HELPER(frame_cursor_color_s, CURSOR_COLOR)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
