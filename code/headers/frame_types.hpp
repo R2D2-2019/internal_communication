@@ -311,12 +311,12 @@ namespace r2d2 {
      */
     R2D2_PACK_STRUCT
     struct frame_display_8x8_character_s {
+        // character
+        char character[243];
+
         // position of character
         uint8_t x;
         uint8_t y;
-
-        // character
-        char character[243];
 
         // color of pixels
         uint8_t red;
@@ -354,12 +354,12 @@ namespace r2d2 {
      */
     R2D2_PACK_STRUCT
     struct frame_display_8x8_character_cursor_s {
+        // The characters to draw
+        char characters[247];
+
         // Targets which cursor to write to. This should be one
         // your module claimed.
         uint8_t cursor_id;
-
-        // The characters to draw
-        char characters[247];
     };
 
     
