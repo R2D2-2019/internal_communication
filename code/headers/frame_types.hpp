@@ -110,6 +110,7 @@ namespace r2d2 {
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
         PATH_STEP,
+		COMMAND_LOG,
 
         // Don't touch
         EXTERNAL,
@@ -396,6 +397,29 @@ namespace r2d2 {
         // unique indentifier for a path so we don't mix up multiple paths.
         uint8_t path_id;
     };
+	
+		 /*
+     * This frame will only be used with the python bus.
+     * The frame will be responsible for sending log data from 
+     * SMM to the swarm analytics module
+	 *
+     * SMM wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-Management
+     */
+    R2D2_PACK_STRUCT
+    struct frame_command_log_s {
+		// The current status of the command, for example received,processed,send etc.
+		// This is specified as an integer since swarm analytics will provide a table 
+		// containing the explanation for each status.
+        uint16_t status;
+		
+        // This variable will contain the original recieved command type
+        char original_command;
+
+        // This variable will contain the original command data
+        char original_data;
+
+    };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
@@ -406,4 +430,5 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)    
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
+	R2D2_INTERNAL_FRAME_HELPER(frame_command_log_s, COMMAND_LOG)
 }
