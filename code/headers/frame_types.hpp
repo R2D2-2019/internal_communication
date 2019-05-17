@@ -331,7 +331,7 @@ namespace r2d2 {
      * and color).
      */
 
-    enum display_cursor : uint8_t {
+    enum claimed_display_cursor : uint8_t {
         // Free for any person to use.
         OPEN_CURSOR,
 
