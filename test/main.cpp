@@ -53,6 +53,6 @@ TEST_CASE("Accept all packets works", "[bus]") {
     const auto from1 = comm.get_data();
     const auto from2 = comm.get_data();
 
-    REQUIRE(from1.type == frame_type::ACTIVITY_LED_STATE);
-    REQUIRE(from2.type == frame_type::BUTTON_STATE);
+    REQUIRE(from1.type == frame_type::BUTTON_STATE);
+    REQUIRE(from2.type == frame_type::ACTIVITY_LED_STATE);    
 }
