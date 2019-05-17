@@ -324,6 +324,8 @@ namespace r2d2 {
      * The display will require each user to claim a cursor
      * these can be used to store data (like position
      * and color).
+     * 
+     * Further references to cursor_id will mean this value.
      */
     enum claimed_display_cursor : uint8_t {
         // Free for any person to use.
@@ -343,9 +345,10 @@ namespace r2d2 {
      * drawing.
      */
     R2D2_PACK_STRUCT
-    struct frame_display_8x8_character_cursor_s {
+    struct frame_display_8x8_character_via_cursor_s {
         // Targets which cursor to write to. This should be one
-        // your module claimed.
+        // your module claimed. The characters will be drawn from the cursor
+        // position as starting location.
         uint8_t cursor_id;
 
         // The characters to draw
@@ -361,7 +364,8 @@ namespace r2d2 {
     R2D2_PACK_STRUCT
     struct frame_cursor_position_s {
         // Targets which cursor to write to. This should be one
-        // your module claimed.
+        // your module claimed. The targeted cursor will have the new 
+        // x and y values. These are used to draw from.
         uint8_t cursor_id;
         uint8_t cursor_x;
         uint8_t cursor_y;
@@ -375,7 +379,8 @@ namespace r2d2 {
     R2D2_PACK_STRUCT
     struct frame_cursor_color_s {
         // Targets which cursor to write to. This should be one
-        // your module claimed.
+        // your module claimed. The targeted cursor will have the new color
+        // values.
         uint8_t cursor_id;
         uint8_t red;
         uint8_t green;
@@ -543,9 +548,9 @@ namespace r2d2 {
     )
 
     R2D2_INTERNAL_FRAME_HELPER(
-        frame_display_8x8_character_cursor_s,
+        frame_display_8x8_character_via_cursor_s,
         DISPLAY_8x8_CURSOR_CHARACTER,
-        R2D2_OPTIMISE_STRING(frame_display_8x8_character_cursor_s, characters)
+        R2D2_OPTIMISE_STRING(frame_display_8x8_character_via_cursor_s, characters)
     )
 
     R2D2_INTERNAL_FRAME_HELPER(frame_cursor_position_s, CURSOR_POSITION)
