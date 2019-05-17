@@ -1,14 +1,31 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 /*
- * This macro is used to quickly add packet helper structs
+ * This set of macros is used to quickly add packet helper structs
  * that help the communication system understand how to use
- * and refer to packets.
+ * and refer to packets. It also checks whether the size of the frame
+ * struct is within the hard limits of the protocol.
+ * 
+ * All frames should be 248 bytes or less, the frame_external_s 
+ * is an exception. It is possible there will be another exception for 
+ * the robos instructions later.
  */
-#define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal) \
+#define R2D2_OPTIMISE_STRING(Type, MemberName) \
+    template<> \
+    struct supports_string_optimisation<Type> : std::true_type {}; \
+    \
+    template<> \
+    struct string_member_offset<Type> { \
+        constexpr static uint16_t offset = offsetof(Type, MemberName); \
+    };
+
+
+#define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal, ...) \
     template<> \
     struct frame_type_s<Type> { \
         constexpr static frame_id type = frame_type::EnumVal; \
@@ -17,7 +34,25 @@
     template<> \
     struct frame_data_s<frame_type::EnumVal> { \
         using type = Type; \
-    };
+    }; \
+    \
+    static_assert( \
+        std::is_same_v<Type, frame_external_s> \
+        || sizeof(Type) <= 248, "The size of a frame type should not exceed 248 bytes!" \
+    ); \
+    \
+    __VA_ARGS__
+
+/**
+ * Travis doesn't like #pragma pack(1), this define makes
+ * it so packing is only done on an ARM target.
+ */ 
+#if defined(__arm__) || defined(__thumb__)
+#define R2D2_PACK_STRUCT _Pragma("pack(1)")
+#else
+// Empty define
+#define R2D2_PACK_STRUCT
+#endif
 
 namespace r2d2 {
     /**
@@ -60,7 +95,10 @@ namespace r2d2 {
         DISPLAY_FILLED_RECTANGLE,
         BATTERY_LEVEL,
         UI_COMMAND,
+        MANUAL_CONTROL,
         MOVEMENT_CONTROL,
+        PATH_STEP,
+        STRING_TEST,
 
         // Don't touch
         EXTERNAL,
@@ -112,6 +150,44 @@ namespace r2d2 {
     constexpr frame_id frame_type_v = frame_type_s<T>::type;
 
     /**
+     * This struct is specialized to indicate that the
+     * type it is specialized for support the string optimzation.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    struct supports_string_optimisation : std::false_type {};
+    
+    /**
+     * Struct that stores the offset of
+     * the string member that can be optimised against.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    struct string_member_offset {
+        constexpr static uint16_t offset = 0;
+    };
+
+    /**
+     * Helper accessor to check for string
+     * optimisation support on the given type.
+     *
+     * @tparam T
+     */  
+    template<typename T>
+    constexpr bool supports_string_optimisation_v = supports_string_optimisation<T>::value;
+
+    /**
+     * Helper accessor to get the string member
+     * offset for the given type.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    constexpr bool string_member_offset_v = string_member_offset<T>::offset;
+
+    /**
     * A struct that helps to describe
     * an external system address.
     * Might change, depending on the external
@@ -150,6 +226,7 @@ namespace r2d2 {
      * Packet containing the state of 
      * a button.
      */
+    R2D2_PACK_STRUCT
     struct frame_button_state_s {
         bool pressed;
     };
@@ -158,6 +235,7 @@ namespace r2d2 {
      * Packet containing the state of
      * an activity led.
      */
+    R2D2_PACK_STRUCT
     struct frame_activity_led_state_s {
         bool state;
     };
@@ -168,6 +246,7 @@ namespace r2d2 {
      * Distance sensor wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Measuring-distance
      */
+    R2D2_PACK_STRUCT
     struct frame_distance_s {
         uint16_t mm;
     };
@@ -183,6 +262,7 @@ namespace r2d2 {
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
+    R2D2_PACK_STRUCT
     struct frame_display_filled_rectangle_s {
         // position of rectangle
         uint8_t x;
@@ -211,6 +291,7 @@ namespace r2d2 {
      * SwarmUI wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
      */
+    R2D2_PACK_STRUCT
     struct frame_ui_command_s {
         // name of the frame or json command which we want to send for evaluation to SMM
         char command;
@@ -229,6 +310,7 @@ namespace r2d2 {
      * Power wiki: 
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Power
      */ 
+    R2D2_PACK_STRUCT
     struct frame_battery_level_s {
         // Battery percentage. Between 0 - 100
         uint8_t percentage;
@@ -245,14 +327,31 @@ namespace r2d2 {
 
     /**
      * Struct that represent the state
-     * of how the robot should move.
+     * of how the robot SHOULD move according the controller.
      * 
      * Manual_control wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
      * 
+     */
+    struct frame_manual_control_s {
+        // A value between -100% & 100% 
+        int8_t speed;
+
+        // A value between -90 & 90 (degrees)
+        int8_t rotation;
+
+        // state of the brake button
+        bool brake;
+    };
+
+    /**
+     * Struct that represent the state
+     * of how the robot WILL move.
+     * 
      * Moving Platform wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Moving-Platform
      */
+    R2D2_PACK_STRUCT
     struct frame_movement_control_s {
         // A value between -100% & 100% 
         int8_t speed;
@@ -264,11 +363,36 @@ namespace r2d2 {
         bool brake;
     };
 
+    /**
+     * Our A-star algorithm outputs a list of 2D vector so the path_id 
+     * indentifies which list it's from, the step id is basically 
+     * the list index. x and y are the 2D vector's attributes.
+     * 
+     * Navigation wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
+     */
+    R2D2_PACK_STRUCT
+    struct frame_path_step_s {
+        // x coordinate (in 2d x/y space)
+        uint32_t x;
+
+        // y coordinate (in 2d x/y space)
+        uint32_t y;
+
+        // sequence integer that indentifies what step in the path we're at.
+        uint16_t step_id;
+
+        // unique indentifier for a path so we don't mix up multiple paths.
+        uint8_t path_id;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
+    R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)    
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
 }
