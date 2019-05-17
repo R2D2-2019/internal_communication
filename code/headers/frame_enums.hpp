@@ -15,7 +15,7 @@ namespace r2d2 {
      * 
      * Further references to cursor_id will mean this value.
      */
-    enum claimed_display_cursor : uint8_t {
+    enum class claimed_display_cursor : uint8_t {
         // Free for any person to use.
         OPEN_CURSOR,
 
