@@ -457,11 +457,11 @@ namespace r2d2::can_bus {
             (void) port<Bus>->CAN_SR;
 
             // Write to CAN baudrate register
-            port<Bus>->CAN_BR = CAN_BR_PHASE2(bit_time.phase2 - 1) |
-                                CAN_BR_PHASE1(bit_time.phase1 - 1) |
-                                CAN_BR_PROPAG(bit_time.propagation - 1) |
-                                CAN_BR_SJW(bit_time.sync_jump_width - 1) |
-                                CAN_BR_BRP(prescale - 1);
+            port<Bus>->CAN_BR = CAN_BR_PHASE2(2) |
+                                CAN_BR_PHASE1(3) |
+                                CAN_BR_PROPAG(8) |
+                                CAN_BR_SJW(1) |
+                                CAN_BR_BRP(6);
 
             return true;
         }
