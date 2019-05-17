@@ -433,7 +433,7 @@ namespace r2d2 {
         // The command id for wich the status needs to be updated.
         uint32_t cmd_id;
 		
-        // The current status of the command, for example received, processed,send etc.
+        // The current status of the command, for example received, processed, send etc.
         // This is specified as an integer since swarm analytics will provide a table 
         // containing the explanation for each status.
         uint16_t status;
