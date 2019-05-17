@@ -15,6 +15,9 @@
  * is an exception. It is possible there will be another exception for 
  * the robos instructions later.
  */
+#define R2D2_STRINGIFY(x) #x
+#define R2D2_TO_STRING(x) R2D2_STRINGIFY(x)
+
 #define R2D2_OPTIMISE_STRING(Type, MemberName) \
     template<> \
     struct supports_string_optimisation<Type> : std::true_type {}; \
@@ -24,6 +27,12 @@
         constexpr static uint16_t offset = offsetof(Type, MemberName); \
     };
 
+/**
+ * Poisioning is used to prevent people from
+ * using structs that are meant purely for the
+ * Python bus
+ */ 
+#define R2D2_POISON_TYPE(Type) _Pragma(R2D2_TO_STRING(GCC poison Type))
 
 #define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal, ...) \
     template<> \
@@ -53,6 +62,9 @@
 // Empty define
 #define R2D2_PACK_STRUCT
 #endif
+
+// Tag that indicates that the frame is meant for Python only
+#define R2D2_PYTHON_FRAME
 
 namespace r2d2 {
     /**
@@ -98,7 +110,6 @@ namespace r2d2 {
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
         PATH_STEP,
-        STRING_TEST,
 
         // Don't touch
         EXTERNAL,
@@ -291,7 +302,7 @@ namespace r2d2 {
      * SwarmUI wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
      */
-    R2D2_PACK_STRUCT
+    R2D2_PYTHON_FRAME
     struct frame_ui_command_s {
         // name of the frame or json command which we want to send for evaluation to SMM
         char command;
@@ -391,7 +402,7 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
-    R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND)
+    R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND, R2D2_POISON_TYPE(frame_ui_command_s))
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)    
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
