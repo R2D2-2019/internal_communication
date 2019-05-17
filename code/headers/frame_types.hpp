@@ -418,7 +418,7 @@ namespace r2d2 {
         // 12.1V will be 12100. This larger value is 
         // used to alleviate the need for floating point numbers.
         // A scale of x1000 is used, because thas is the maximum 
-        //precision the sensor can read.
+        // precision the sensor can read.
         uint32_t voltage;        
         
         // Battery percentage. Between 0 - 100
