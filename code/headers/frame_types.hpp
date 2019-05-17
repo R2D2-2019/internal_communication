@@ -114,7 +114,6 @@ namespace r2d2 {
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
         PATH_STEP,
-        STRING_TEST,
 
         // Don't touch
         EXTERNAL,
@@ -428,9 +427,6 @@ namespace r2d2 {
      */ 
     R2D2_PACK_STRUCT
     struct frame_battery_level_s {
-        // Battery percentage. Between 0 - 100
-        uint8_t percentage;
-
         // Battery voltage.
         // The voltage is multiplied by 1000 in this
         // representation. That means that a value of
@@ -438,7 +434,10 @@ namespace r2d2 {
         // used to alleviate the need for floating point numbers.
         // A scale of x1000 is used, because thas is the maximum precision
         // the sensor can read.
-        uint32_t voltage;
+        uint32_t voltage;        
+        
+        // Battery percentage. Between 0 - 100
+        uint8_t percentage;
     };
 
     /**
