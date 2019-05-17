@@ -105,6 +105,10 @@ namespace r2d2 {
         ACTIVITY_LED_STATE,
         DISTANCE,
         DISPLAY_FILLED_RECTANGLE,
+        DISPLAY_8x8_CHARACTER,
+        DISPLAY_8x8_CURSOR_CHARACTER,
+        CURSOR_POSITION,
+        CURSOR_COLOR,
         BATTERY_LEVEL,
         UI_COMMAND,
         MANUAL_CONTROL,
@@ -263,15 +267,15 @@ namespace r2d2 {
     struct frame_distance_s {
         uint16_t mm;
     };
-    
+
     /**
-     * Struct to set a rectangle on a display. This fills a 
+     * Struct to set a rectangle on a display. This fills a
      * rectangle with the color specified.
-     * 
+     *
      * Currently we can't fill the bigger screens. When the
      * extended frames are here the position and width/height
      * will change to a uint16_t to support the bigger screens.
-     * 
+     *
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
@@ -286,6 +290,98 @@ namespace r2d2 {
         uint8_t height;
 
         // color of pixels
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
+    };
+
+    /**
+     * Struct to set a single character on a display. This shows
+     * a colored character at given location. The character
+     * can be any character from the un-extended
+     * ascii table (characters 0-127)
+     *
+     * Display wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
+     */
+    R2D2_PACK_STRUCT
+    struct frame_display_8x8_character_s {
+        // position of character
+        uint8_t x;
+        uint8_t y;
+
+        // color of pixels
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
+
+        // The characters to draw
+        // Last element because of string optimisation
+        char characters[243];
+    };
+
+    /**
+     * The display will require each user to claim a cursor
+     * these can be used to store data (like position
+     * and color).
+     * 
+     * Further references to cursor_id will mean this value.
+     */
+    enum claimed_display_cursor : uint8_t {
+        // Free for any person to use.
+        OPEN_CURSOR,
+
+        // Don't touch
+        CURSORS_COUNT
+    };
+
+    /**
+     * Struct to set a character on a display. This shows
+     * a colored character at given location. The character
+     * can be any character from the un-extended
+     * ascii table (characters 0-127)
+     *
+     * For now an alternative to x/y and color based character
+     * drawing.
+     */
+    R2D2_PACK_STRUCT
+    struct frame_display_8x8_character_via_cursor_s {
+        // Targets which cursor to write to. This should be one
+        // your module claimed. The characters will be drawn from the cursor
+        // position as starting location.
+        uint8_t cursor_id;
+
+        // The characters to draw
+        // Last element because of string optimisation
+        char characters[247];
+    };
+
+    /**
+     * This frame will move the targeted cursor to the
+     * given position. (0,0) is the upper left corner.
+     *
+     */
+    R2D2_PACK_STRUCT
+    struct frame_cursor_position_s {
+        // Targets which cursor to write to. This should be one
+        // your module claimed. The targeted cursor will have the new 
+        // x and y values. These are used to draw from.
+        uint8_t cursor_id;
+        uint8_t cursor_x;
+        uint8_t cursor_y;
+    };
+
+    /**
+     * This frame will set the targeted cursor color to
+     * given colors.
+     *
+     */
+    R2D2_PACK_STRUCT
+    struct frame_cursor_color_s {
+        // Targets which cursor to write to. This should be one
+        // your module claimed. The targeted cursor will have the new color
+        // values.
+        uint8_t cursor_id;
         uint8_t red;
         uint8_t green;
         uint8_t blue;
@@ -444,6 +540,21 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_display_8x8_character_s,
+        DISPLAY_8x8_CHARACTER,
+        R2D2_OPTIMISE_STRING(frame_display_8x8_character_s, characters)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_display_8x8_character_via_cursor_s,
+        DISPLAY_8x8_CURSOR_CHARACTER,
+        R2D2_OPTIMISE_STRING(frame_display_8x8_character_via_cursor_s, characters)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_cursor_position_s, CURSOR_POSITION)
+    R2D2_INTERNAL_FRAME_HELPER(frame_cursor_color_s, CURSOR_COLOR)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND, R2D2_POISON_TYPE(frame_ui_command_s))
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
