@@ -334,8 +334,8 @@ namespace r2d2 {
     R2D2_PACK_STRUCT
     struct frame_display_8x8_character_via_cursor_s {
         // Targets which cursor to write to. This should be one
-        // your module claimed. The characters will be drawn from the cursor
-        // position as starting location.
+        // your module claimed. The characters will be drawn 
+        // from the cursor position as starting location.
         uint8_t cursor_id;
 
         // The characters to draw
@@ -351,9 +351,10 @@ namespace r2d2 {
     R2D2_PACK_STRUCT
     struct frame_cursor_position_s {
         // Targets which cursor to write to. This should be one
-        // your module claimed. The targeted cursor will have the new 
-        // x and y values. These are used to draw from.
+        // your module claimed. 
         uint8_t cursor_id;
+
+        // new location for the cursor
         uint8_t cursor_x;
         uint8_t cursor_y;
     };
@@ -366,9 +367,10 @@ namespace r2d2 {
     R2D2_PACK_STRUCT
     struct frame_cursor_color_s {
         // Targets which cursor to write to. This should be one
-        // your module claimed. The targeted cursor will have the new color
-        // values.
+        // your module claimed.
         uint8_t cursor_id;
+
+        // cursor color
         uint8_t red;
         uint8_t green;
         uint8_t blue;
@@ -389,13 +391,15 @@ namespace r2d2 {
      */
     R2D2_PYTHON_FRAME
     struct frame_ui_command_s {
-        // name of the frame or json command which we want to send for evaluation to SMM
+        // name of the frame or json command which we want to 
+        // send for evaluation to SMM
         char command;
 
         // parameters for the frame from frame_name
         char params;
 
-        // destination is used to tell what robot or swarm to send the command to
+        // destination is used to tell what robot or swarm to 
+        // send the command to
         char destination;
     };
 
@@ -413,8 +417,8 @@ namespace r2d2 {
         // representation. That means that a value of
         // 12.1V will be 12100. This larger value is 
         // used to alleviate the need for floating point numbers.
-        // A scale of x1000 is used, because thas is the maximum precision
-        // the sensor can read.
+        // A scale of x1000 is used, because thas is the maximum 
+        //precision the sensor can read.
         uint32_t voltage;        
         
         // Battery percentage. Between 0 - 100
@@ -492,9 +496,10 @@ namespace r2d2 {
      */
     R2D2_PYTHON_FRAME
     struct frame_command_log_s {
-        // The current status of the command, [for example received, processed, send etc.]
-        // This is specified as an integer since swarm analytics will provide a table 
-        // containing the explanation for each status.
+        // The current status of the command [for example received, 
+        // processed, send etc.] This is specified as an integer since 
+        // swarm analytics will provide a table containing the 
+        // explanation for each status.
         uint16_t status;
 		
         // This variable will contain the original recieved command type
@@ -516,9 +521,10 @@ namespace r2d2 {
         // The command id for wich the status needs to be updated.
         uint32_t cmd_id;
 		
-        // The current status of the command, for example received, processed, send etc.
-        // This is specified as an integer since swarm analytics will provide a table 
-        // containing the explanation for each status.
+        // The current status of the command, for example received, 
+        // processed, send etc. This is specified as an integer 
+        // since swarm analytics will provide a table containing the 
+        // explanation for each status.
         uint16_t status;
     };
 	
