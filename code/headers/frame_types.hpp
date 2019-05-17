@@ -114,7 +114,6 @@ namespace r2d2 {
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
         PATH_STEP,
-        STRING_TEST,
 
         // Don't touch
         EXTERNAL,
@@ -396,27 +395,26 @@ namespace r2d2 {
 
     /**
      * ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
-     * 
-     * This is a hack that uses the python frame generator 
+     *
+     * This is a hack that uses the python frame generator
      * to create a frame with strings instead of chars.
-     * This conversion does not work in c++. These frames 
-     * will be sent to swarm management, they only have to 
-     * call the command with given parameters and send it 
+     * This conversion does not work in c++. These frames
+     * will be sent to swarm management, they only have to
+     * call the command with given parameters and send it
      * to the destined robot.
      *
      * SwarmUI wiki:
-     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI    
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
      */
     R2D2_PYTHON_FRAME
     struct frame_ui_command_s {
-        // module is the name of the targeted module, mostly used 
-        // to prevent nameclash
-        char module;
-
-        // command is the command that needs to be executed, with parameters
+        // name of the frame or json command which we want to send for evaluation to SMM
         char command;
 
-        // destination is used to tell what robot to send the command to
+        // parameters for the frame from frame_name
+        char params;
+
+        // destination is used to tell what robot or swarm to send the command to
         char destination;
     };
 
@@ -429,9 +427,6 @@ namespace r2d2 {
      */ 
     R2D2_PACK_STRUCT
     struct frame_battery_level_s {
-        // Battery percentage. Between 0 - 100
-        uint8_t percentage;
-
         // Battery voltage.
         // The voltage is multiplied by 1000 in this
         // representation. That means that a value of
@@ -439,7 +434,10 @@ namespace r2d2 {
         // used to alleviate the need for floating point numbers.
         // A scale of x1000 is used, because thas is the maximum precision
         // the sensor can read.
-        uint32_t voltage;
+        uint32_t voltage;        
+        
+        // Battery percentage. Between 0 - 100
+        uint8_t percentage;
     };
 
     /**
