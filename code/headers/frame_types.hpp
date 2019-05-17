@@ -347,11 +347,7 @@ namespace r2d2 {
         uint8_t cursor_id;
 
         // The characters to draw
-        char characters[245];
-
-        // The total amount of the characters. "abc" = 4 (due to 
-        // the null termination)
-        uint8_t amount_characters;
+        char characters[247];
     };
 
     
