@@ -280,6 +280,9 @@ R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
 R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
 ```
 
+To prevent clutter of all the structs and enum value's we added a file specificly for all the `enum classes`. This file can be found here: [frame_enum.hpp](https://github.com/R2D2-2019/internal_communication/blob/master/code/headers/frame_enum.hpp).
+
+
 #### I want to create frame type for my module, how do I add one?
 You should create a Pull Request containing the frame definition you want to add.
 It has to follow the structure you can see under the previous heading.
