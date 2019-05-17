@@ -301,12 +301,6 @@ namespace r2d2 {
      * can be any character from the un-extended
      * ascii table (characters 0-127)
      *
-     * Currently only the 8x8 font from hwlib is supported,
-     * When extended frames are realised, maybe 16x16 could be
-     * implemented.
-     *
-     *
-     *
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
@@ -331,7 +325,6 @@ namespace r2d2 {
      * these can be used to store data (like position
      * and color).
      */
-
     enum claimed_display_cursor : uint8_t {
         // Free for any person to use.
         OPEN_CURSOR,
@@ -345,10 +338,6 @@ namespace r2d2 {
      * a colored character at given location. The character
      * can be any character from the un-extended
      * ascii table (characters 0-127)
-     *
-     * Currently only the 8x8 font from hwlib is supported,
-     * When extended frames are realised, maybe 16x16 could be
-     * implemented.
      *
      * For now an alternative to x/y and color based character
      * drawing.
