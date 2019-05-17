@@ -267,15 +267,15 @@ namespace r2d2 {
     struct frame_distance_s {
         uint16_t mm;
     };
-    
+
     /**
-     * Struct to set a rectangle on a display. This fills a 
+     * Struct to set a rectangle on a display. This fills a
      * rectangle with the color specified.
-     * 
+     *
      * Currently we can't fill the bigger screens. When the
      * extended frames are here the position and width/height
      * will change to a uint16_t to support the bigger screens.
-     * 
+     *
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
@@ -295,18 +295,18 @@ namespace r2d2 {
         uint8_t blue;
     };
 
-    /** 
+    /**
      * Struct to set a single character on a display. This shows
      * a colored character at given location. The character
      * can be any character from the un-extended
      * ascii table (characters 0-127)
-     * 
+     *
      * Currently only the 8x8 font from hwlib is supported,
      * When extended frames are realised, maybe 16x16 could be
      * implemented.
-     * 
-     * 
-     * 
+     *
+     *
+     *
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
@@ -325,7 +325,6 @@ namespace r2d2 {
         // Last element because of string optimisation
         char characters[243];
     };
-
 
     /**
      * The display will require each user to claim a cursor
@@ -346,13 +345,13 @@ namespace r2d2 {
      * a colored character at given location. The character
      * can be any character from the un-extended
      * ascii table (characters 0-127)
-     * 
+     *
      * Currently only the 8x8 font from hwlib is supported,
      * When extended frames are realised, maybe 16x16 could be
      * implemented.
      *
      * For now an alternative to x/y and color based character
-     * drawing. 
+     * drawing.
      */
     R2D2_PACK_STRUCT
     struct frame_display_8x8_character_cursor_s {
@@ -366,9 +365,9 @@ namespace r2d2 {
     };
 
     /**
-     * This frame will move the targeted cursor to the 
+     * This frame will move the targeted cursor to the
      * given position. (0,0) is the upper left corner.
-     * 
+     *
      */
     R2D2_PACK_STRUCT
     struct frame_cursor_position_s {
@@ -379,11 +378,10 @@ namespace r2d2 {
         uint8_t cursor_y;
     };
 
-    
     /**
-     * This frame will set the targeted cursor color to 
+     * This frame will set the targeted cursor color to
      * given colors.
-     * 
+     *
      */
     R2D2_PACK_STRUCT
     struct frame_cursor_color_s {
@@ -392,7 +390,7 @@ namespace r2d2 {
         uint8_t cursor_id;
         uint8_t red;
         uint8_t green;
-        uint8_t blue; 	
+        uint8_t blue;
     };
 
     /**
