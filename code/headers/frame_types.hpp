@@ -110,7 +110,6 @@ namespace r2d2 {
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
         PATH_STEP,
-        STRING_TEST,
 
         // Don't touch
         EXTERNAL,
