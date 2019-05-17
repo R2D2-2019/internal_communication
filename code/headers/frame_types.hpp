@@ -416,8 +416,9 @@ namespace r2d2 {
         
         // This variable represents the eastern or western hemisphere the coordinate is located on.
         char east_west_hemisphere;
-    }
-
+    };
+    
+    /*
      * Our A-star algorithm outputs a list of 2D vector so the path_id 
      * indentifies which list it's from, the step id is basically 
      * the list index. x and y are the 2D vector's attributes.
