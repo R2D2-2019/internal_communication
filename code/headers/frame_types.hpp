@@ -407,11 +407,11 @@ namespace r2d2 {
      * SMM wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-Management
      */
-    R2D2_PACK_STRUCT
+    R2D2_PYTHON_FRAME
     struct frame_command_log_s {
         // The current status of the command, for example received,processed,send etc.
         // This is specified as an integer since swarm analytics will provide a table 
-       // containing the explanation for each status.
+        // containing the explanation for each status.
         uint16_t status;
 		
         // This variable will contain the original recieved command type
@@ -419,7 +419,6 @@ namespace r2d2 {
 
         // This variable will contain the original command data
         char original_data;
-
     };
 	
     /*
@@ -429,7 +428,7 @@ namespace r2d2 {
      * SMM wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-Management
      */
-    R2D2_PACK_STRUCT
+    R2D2_PYTHON_FRAME
     struct frame_command_status_update_s {
         // The command id for wich the status needs to be updated.
         uint32_t cmd_id;
@@ -438,7 +437,6 @@ namespace r2d2 {
         // This is specified as an integer since swarm analytics will provide a table 
         // containing the explanation for each status.
         uint16_t status;
-
     };
 	
 
@@ -451,6 +449,6 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)    
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
-    R2D2_INTERNAL_FRAME_HELPER(frame_command_log_s, COMMAND_LOG)
-    R2D2_INTERNAL_FRAME_HELPER(frame_command_status_update_s, COMMAND_STATUS_UPDATE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_command_log_s, COMMAND_LOG, R2D2_POISON_TYPE(frame_command_log_s))
+    R2D2_INTERNAL_FRAME_HELPER(frame_command_status_update_s, COMMAND_STATUS_UPDATE, R2D2_POISON_TYPE(frame_command_status_update_s))
 }
