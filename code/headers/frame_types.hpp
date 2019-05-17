@@ -304,7 +304,7 @@ namespace r2d2 {
         uint8_t y;
 
         // character
-        char character;
+        char character[243];
 
         // color of pixels
         uint8_t red;
