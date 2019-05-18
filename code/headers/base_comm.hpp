@@ -96,30 +96,33 @@ namespace r2d2 {
          * @tparam T
          */ 
         template<typename T>
-        constexpr size_t get_string_optimized_size(const T &data) const {
-            constexpr size_t offset = string_member_offset_v<T>;
-            auto *string = reinterpret_cast<const uint8_t *>(&data) + offset;
+        constexpr size_t get_optimized_size(const T &data) const {
+            if constexpr (supports_array_optimisation_v<T>) {
+                constexpr size_t length_offset = array_length_offset_v<T>;
 
-            // The string has to be 0-terminated.
-            size_t string_length = 0;
-            while (*(string++)) {
-                string_length++;
+                // get a pointer to uint8_t at length offset
+                auto *length = reinterpret_cast<const uint8_t *>(&data) + length_offset;
+
+                return (*length) + array_member_offset_v<T>;
+
+            } else if (supports_string_optimisation_v<T>) {
+                constexpr size_t offset = string_member_offset_v<T>;
+                auto *string = reinterpret_cast<const uint8_t *>(&data) + offset;
+
+                // The string has to be 0-terminated.
+                size_t string_length = 0;
+                while (*(string++)) {
+                    string_length++;
+                }
+
+                // Add 1 to the offset to get the amount of bytes used of 
+                // the data before the string
+                return (offset + 1) + string_length;
+
+            } else {
+                return sizeof(T);
+                
             }
-
-            // Add 1 to the offset to get the amount of bytes used of 
-            // the data before the string
-            return (offset + 1) + string_length;
-        }
-
-        // calculate the array length and send the relevant part.
-        template<typename T>
-        constexpr size_t get_array_optimized_size(const T &data) const {
-            constexpr size_t length_offset = array_length_offset_v<T>;
-
-            // get a pointer to uint8_t at length offset
-            auto *length = reinterpret_cast<const uint8_t *>(&data) + length_offset;
-
-            return (*length) + array_member_offset_v<T>;
         }
 
     public:
@@ -146,17 +149,8 @@ namespace r2d2 {
             >
         >
         void send(const T &data, const priority prio = priority::NORMAL) {
-            size_t size = sizeof(T);
-
-            // Calculate string length and only send the relevant part.
-            if constexpr (supports_string_optimisation_v<T>) {
-                size = get_string_optimized_size(data);
-            }
-
-            // calculate the array length and send the relevant part.
-            if constexpr (supports_array_optimisation_v<T>) {
-                size = get_array_optimized_size(data);
-            }
+            // get the size of the data to send
+            size_t size = get_optimized_size(data);
 
             send_impl(
                 static_cast<frame_type>(frame_type_v<T>),
@@ -186,17 +180,8 @@ namespace r2d2 {
             // Adding it will cause a call to memset
             frame_external_s frame;
 
-            size_t size = sizeof(T);
-
-            // Calculate string length and only send the relevant part.
-            if constexpr (supports_string_optimisation_v<T>) {
-                size = get_string_optimized_size(data);
-            }
-
-            // calculate the array length and send the relevant part.
-            if constexpr (supports_array_optimisation_v<T>) {
-                size = get_array_optimized_size(data);
-            }
+            // get the size of the data to send
+            size_t size = get_optimized_size(data);
 
             for (size_t i = 0; i < size; i++) {
                 frame.data[i] = reinterpret_cast<const uint8_t *>(&data)[i];
