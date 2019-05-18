@@ -480,6 +480,7 @@ namespace r2d2 {
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
      * 
      */
+    R2D2_PACK_STRUCT
     struct frame_manual_control_s {
         // A value between -100% & 100% 
         int8_t speed;
