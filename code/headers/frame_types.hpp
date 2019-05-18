@@ -132,6 +132,7 @@ namespace r2d2 {
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
+        RAW_DATA,
 
         // Don't touch
         EXTERNAL,
@@ -190,7 +191,7 @@ namespace r2d2 {
      */ 
     template<typename T>
     struct supports_string_optimisation : std::false_type {};
-    
+
     /**
      * Struct that stores the offset of
      * the string member that can be optimised against.
@@ -517,6 +518,19 @@ namespace r2d2 {
     };
 
     /**
+     * Test frame REMOVE before merging
+     * 
+     */
+    R2D2_PACK_STRUCT
+    struct frame_raw_data_s {
+        // length of array
+        uint8_t length;
+
+        // data
+        uint8_t data[240];
+    };
+
+    /**
      * Struct that represent the state
      * of how the robot WILL move.
      * 
@@ -616,6 +630,12 @@ namespace r2d2 {
         frame_display_8x8_character_via_cursor_s,
         DISPLAY_8x8_CURSOR_CHARACTER,
         R2D2_OPTIMISE_STRING(frame_display_8x8_character_via_cursor_s, characters)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_raw_data_s, 
+        RAW_DATA, 
+        R2D2_OPTIMISE_ARRAY(frame_raw_data_s, length, data)
     )
 
     R2D2_INTERNAL_FRAME_HELPER(frame_cursor_position_s, CURSOR_POSITION)
