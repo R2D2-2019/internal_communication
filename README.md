@@ -288,7 +288,7 @@ When you have a array in a `struct` you can make them more efficient. To do so w
 * char array's that are used to send strings
 * all the other arrays
 
-The array you want to optimise **ALWAYS** has to be at the end of the struct. If the optimalisation breaks the rule of ordering sizes from large to small contact: @LRstudent or @itzandroidtab and mention this in the comments / PR.
+The array you want to optimise **ALWAYS** has to be at the end of the `struct`. If the optimalisation breaks the rule of ordering sizes from large to small contact: @LRstudent or @itzandroidtab and mention this in the comments / PR.
 
 ##### String optimising
 When you want to have an char array to send strings we can add the `R2D2_OPTIMISE_STRING` macro to the `R2D2_INTERNAL_FRAME_HELPER`. We have to put two things in the `R2D2_OPTIMISE_STRING` macro.
@@ -308,7 +308,7 @@ R2D2_INTERNAL_FRAME_HELPER(
 ##### Generic array optimisation
 When you have a array in your frame we can apply the `R2D2_OPTIMISE_ARRAY` macro in the `R2D2_INTERNAL_FRAME_HELPER` macro. We have to put 3 parameters in this macro
 
-The first parameter is the name of the `struct` again. The second parameter is the name of the variable where the length is stored in and the the third variable is the name of the array again.
+The first parameter is the name of the `struct` again. The second parameter is the name of the variable where the length is stored, the the third variable is the name of the array again.
 
 Example of the array optimisation
 ```cpp
