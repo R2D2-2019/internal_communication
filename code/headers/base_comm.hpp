@@ -90,10 +90,12 @@ namespace r2d2 {
         virtual void update_filter() {}
 
         /**
-         * This functions calculates the length of the actual frame.
+         * This function calculates the length of the actual frame.
          * When the data doesn't support any optimisations, this is simply sizeof(T).
          * When it supports either string optimisation or array optimisation, the length
          * is calculated appropriately.
+         * 
+         * When string optimisation is used, the string has to be 0-terminated.
          * 
          * @tparam T
          */ 
@@ -185,7 +187,9 @@ namespace r2d2 {
             // Adding it will cause a call to memset
             frame_external_s frame;
 
-            // get the size of the data to send
+            // Look at the different optimisations that can be applied
+            // to the frame (type T) and calculate the size (the amount of bytes)
+            // actually send across the wire.
             size_t size = get_optimized_size(data);
 
             for (size_t i = 0; i < size; i++) {

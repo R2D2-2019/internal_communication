@@ -35,7 +35,7 @@
     \
     template<> \
     struct array_member_offset<Type> { \
-        constexpr static uint16_t array_offset = offsetof(Type, MemberName); \
+        constexpr static uint8_t array_offset = offsetof(Type, MemberName); \
         constexpr static uint8_t length_offset = offsetof(Type, LengthName); \
 \
         using array_type = std::remove_pointer_t< \
@@ -243,7 +243,7 @@ namespace r2d2 {
      */ 
     template<typename T>
     struct array_member_offset {
-        constexpr static uint16_t array_offset = 0;
+        constexpr static uint8_t array_offset = 0;
         constexpr static uint8_t length = 0;
     };
 
