@@ -43,8 +43,12 @@
                 decltype(Type::MemberName) \
             > \
         >; \
-    };
-    
+    }; \
+    static_assert( \
+        std::is_same_v<decltype(Type::LengthName), uint8_t>, \
+        "The length variable of a array optimised frame should be a uint8_t." \
+    );
+
 /**
  * Poisioning is used to prevent people from
  * using structs that are meant purely for the
