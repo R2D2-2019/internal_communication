@@ -43,8 +43,12 @@
                 decltype(Type::MemberName) \
             > \
         >; \
-    };
-    
+    }; \
+    static_assert( \
+        std::is_same_v<decltype(Type::LengthName), uint8_t>, \
+        "The length variable of a array optimised frame should be a uint8_t." \
+    );
+
 /**
  * Poisioning is used to prevent people from
  * using structs that are meant purely for the
@@ -480,6 +484,7 @@ namespace r2d2 {
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
      * 
      */
+    R2D2_PACK_STRUCT
     struct frame_manual_control_s {
         // A value between -100% & 100% 
         int8_t speed;
