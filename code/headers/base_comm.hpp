@@ -90,23 +90,30 @@ namespace r2d2 {
         virtual void update_filter() {}
 
         /**
-         * Calculate the size of the struct with the
-         * string optimization.
+         * This functions calculates the length of the actual frame.
+         * When the data doesn't support any optimisations, this is simply sizeof(T).
+         * When it supports either string optimisation or array optimisation, the length
+         * is calculated appropriately.
          * 
          * @tparam T
          */ 
         template<typename T>
         constexpr size_t get_optimized_size(const T &data) const {
             if constexpr (supports_array_optimisation_v<T>) {
-                constexpr size_t length_offset = array_length_offset_v<T>;
+                // We assume the length of the array is given by
+                // a uint8_t. This is currently checked at compile time as
+                // well.
+                uint8_t length = *(
+                    reinterpret_cast<const uint8_t *>(&data) 
+                        + array_member_offset<T>::length_offset
+                );
 
-                // get a pointer to uint8_t at length offset
-                auto *length = reinterpret_cast<const uint8_t *>(&data) + length_offset;
-
-                return (*length) + array_member_offset_v<T>;
+                return array_member_offset<T>::array_offset +
+                    length * sizeof(array_member_offset<T>::array_type);
 
             } else if (supports_string_optimisation_v<T>) {
                 constexpr size_t offset = string_member_offset_v<T>;
+
                 auto *string = reinterpret_cast<const uint8_t *>(&data) + offset;
 
                 // The string has to be 0-terminated.
@@ -118,11 +125,9 @@ namespace r2d2 {
                 // Add 1 to the offset to get the amount of bytes used of 
                 // the data before the string
                 return (offset + 1) + string_length;
-
-            } else {
-                return sizeof(T);
-                
             }
+
+            return sizeof(T);
         }
 
     public:
