@@ -29,6 +29,20 @@
         constexpr static uint16_t offset = offsetof(Type, MemberName); \
     };
 
+#define R2D2_OPTIMISE_ARRAY(Type, Length, MemberName) \
+    template<> \
+    struct supports_array_optimisation<Type> : std::true_type {}; \
+    \
+    template<> \
+    struct array_member_offset<Type> { \
+        constexpr static uint16_t offset = offsetof(Type, MemberName); \
+    }; \
+    \
+    template<> \
+    struct array_length_offset<Type> { \
+        constexpr static uint8_t offset = offsetof(Type, Length); \
+    };
+
 /**
  * Poisioning is used to prevent people from
  * using structs that are meant purely for the
