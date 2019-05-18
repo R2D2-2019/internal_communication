@@ -207,6 +207,64 @@ namespace r2d2 {
     constexpr bool string_member_offset_v = string_member_offset<T>::offset;
 
     /**
+     * This struct is specialized to indicate that the
+     * type it is specialized for support the array optimzation.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    struct supports_array_optimisation : std::false_type {};
+
+    /**
+     * Struct that stores the offset of
+     * the array member that can be optimised against.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    struct array_member_offset {
+        constexpr static uint16_t offset = 0;
+    };
+
+    /**
+     * Struct that stores the offset of the length
+     * of the array to optimise with
+     * 
+     * @tparam T 
+     */
+    template<typename T>
+    struct array_length_offset {
+        constexpr static uint8_t offset = 0;
+    };
+
+    /**
+     * Helper accessor to check for array
+     * optimisation support on the given type.
+     *
+     * @tparam T
+     */  
+    template<typename T>
+    constexpr bool supports_array_optimisation_v = supports_array_optimisation<T>::value;
+
+    /**
+     * Helper accessor to get the array member
+     * offset for the given type.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    constexpr bool array_member_offset_v = array_member_offset<T>::offset;
+
+    /**
+     * Helper accessor to get the array length
+     * offset for the given type.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    constexpr bool array_length_offset_v = array_length_offset<T>::offset;
+
+    /**
     * A struct that helps to describe
     * an external system address.
     * Might change, depending on the external
