@@ -109,7 +109,7 @@ namespace r2d2 {
                 );
 
                 return array_member_offset<T>::array_offset +
-                    length * sizeof(array_member_offset<T>::array_type);
+                    length * sizeof(typename array_member_offset<T>::array_type);
 
             } else if (supports_string_optimisation_v<T>) {
                 constexpr size_t offset = string_member_offset_v<T>;
