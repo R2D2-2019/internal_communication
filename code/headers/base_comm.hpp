@@ -96,7 +96,7 @@ namespace r2d2 {
          * @tparam T
          */ 
         template<typename T>
-        constexpr size_t get_optimized_size(const T &data) const {
+        constexpr size_t get_string_optimized_size(const T &data) const {
             constexpr size_t offset = string_member_offset_v<T>;
             auto *string = reinterpret_cast<const uint8_t *>(&data) + offset;
 
@@ -109,6 +109,17 @@ namespace r2d2 {
             // Add 1 to the offset to get the amount of bytes used of 
             // the data before the string
             return (offset + 1) + string_length;
+        }
+
+        // calculate the array length and send the relevant part.
+        template<typename T>
+        constexpr size_t get_array_optimized_size(const T &data) const {
+            constexpr size_t length_offset = array_length_offset_v<T>;
+
+            // get a pointer to uint8_t at length offset
+            auto *length = reinterpret_cast<const uint8_t *>(&data) + length_offset;
+
+            return (*length) + array_member_offset_v<T>;
         }
 
     public:
@@ -139,7 +150,12 @@ namespace r2d2 {
 
             // Calculate string length and only send the relevant part.
             if constexpr (supports_string_optimisation_v<T>) {
-                size = get_optimized_size(data);
+                size = get_string_optimized_size(data);
+            }
+
+            // calculate the array length and send the relevant part.
+            if constexpr (supports_array_optimisation_v<T>) {
+                size = get_array_optimized_size(data);
             }
 
             send_impl(
@@ -174,7 +190,12 @@ namespace r2d2 {
 
             // Calculate string length and only send the relevant part.
             if constexpr (supports_string_optimisation_v<T>) {
-                size = get_optimized_size(data);
+                size = get_string_optimized_size(data);
+            }
+
+            // calculate the array length and send the relevant part.
+            if constexpr (supports_array_optimisation_v<T>) {
+                size = get_array_optimized_size(data);
             }
 
             for (size_t i = 0; i < size; i++) {
