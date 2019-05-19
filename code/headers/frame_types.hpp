@@ -135,6 +135,7 @@ namespace r2d2 {
         UI_COMMAND,
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
+        COORDINATE_STRUCT,
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
@@ -515,6 +516,51 @@ namespace r2d2 {
     };
 
     /**
+     * Struct that represents a coordinate on the planet.
+     * 
+     * Location_detector wiki:
+     * https://github.com/R2D2-2019/location_detector
+     */
+
+    R2D2_PACK_STRUCT
+    struct frame_coordinate_s {
+        // This variable represents the height relative to the average sea level.
+        int16_t altitude;
+        
+        // This variable represents the thousandths seconds of the longitude coordinate.
+        uint16_t long_thousandth_sec;
+		   
+        // This variable represents the thousandths seconds of the latitude coordinate.
+        uint16_t lat_thousandth_sec;
+            
+        // This variable represents the degrees of the latitude coordinate.
+        uint8_t lat_deg;
+        
+        // This variable represents the minutes of the latitude coordinate.
+        uint8_t lat_min;
+        
+        // This variable represents the seconds of the latitude coordinate.
+        uint8_t lat_sec;
+        
+        // This variable represents the degrees of the longitude coordinate.
+        uint8_t long_deg;
+        
+        // This variable represents the minutes of the longitude coordinate.
+        uint8_t long_min;
+        
+        // This variable represents the seconds of the longitude coordinate.
+        uint8_t long_sec;
+        
+        // This variable represents the nothern or southern hemisphere the coordinate is located on.
+        // North is true, South is false.
+        bool north_south_hemisphere;
+        
+        // This variable represents the eastern or western hemisphere the coordinate is located on.
+        // East is true, West is false.
+        bool east_west_hemisphere;
+    };
+    
+    /*
      * Our A-star algorithm outputs a list of 2D vector so the path_id 
      * indentifies which list it's from, the step id is basically 
      * the list index. x and y are the 2D vector's attributes.
@@ -606,4 +652,5 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_command_log_s, COMMAND_LOG, R2D2_POISON_TYPE(frame_command_log_s))
     R2D2_INTERNAL_FRAME_HELPER(frame_command_status_update_s, COMMAND_STATUS_UPDATE, R2D2_POISON_TYPE(frame_command_status_update_s))
+    R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE_STRUCT)
 }
