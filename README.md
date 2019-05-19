@@ -280,6 +280,50 @@ R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
 R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
 ```
 
+To prevent clutter of all the structs and enum values, we added a file specifically for all the `enum class`'s. This file can be found here: [frame_enums.hpp](https://github.com/R2D2-2019/internal_communication/blob/master/code/headers/frame_enums.hpp).
+
+#### Optimising your frame
+When you have an array in a `struct`, you can make them more efficient. To do so we can apply one of the available optimisations to the frame. Currently we have two optimisations that can be applied:
+
+* char arrays (`char[]`) that are used to send strings
+* all the other arrays (e.g. `uint32_t[]`)
+
+The array you want to optimise **ALWAYS** has to be at the end of the `struct`. If the optimalisation breaks the rule of ordering sizes from large to small contact: @LRstudent or @itzandroidtab and mention this in the comments / PR.
+
+##### String optimisation
+When you want to have an char array to send strings you can add the `R2D2_OPTIMISE_STRING` macro to the `R2D2_INTERNAL_FRAME_HELPER`. You have to put two things in the `R2D2_OPTIMISE_STRING` macro.
+
+The first parameter is the name of the `struct` and the second parameter is the name of the variable of the array.
+
+Example of the string optimisation:
+```cpp
+R2D2_INTERNAL_FRAME_HELPER(
+    frame_display_8x8_character_s,
+    DISPLAY_8x8_CHARACTER,
+    R2D2_OPTIMISE_STRING(frame_display_8x8_character_s, characters)
+)
+```
+**Important notice!!** When using the string optimisation you have to null-terminate the string. Reading after the null-terminator is Undefined Behaviour (UB). 
+
+##### Generic array optimisation
+When you have an array in your frame we can apply the `R2D2_OPTIMISE_ARRAY` macro in the `R2D2_INTERNAL_FRAME_HELPER` macro. We have to put 3 parameters in this macro.
+
+The first parameter is the name of the `struct` again. The second parameter is the name of the variable where the length is stored, the third variable is the name of the array again.
+
+Please note the following:
+ - You are required to have member variable of type `uint8_t` that keeps track of the amount of elements in the array.
+ - The array *has* to be the last member in the `struct`.
+
+Example of the array optimisation
+```cpp
+R2D2_INTERNAL_FRAME_HELPER(
+    frame_raw_data_s, 
+    RAW_DATA, 
+    R2D2_OPTIMISE_ARRAY(frame_raw_data_s, length, data)
+)
+```
+**Important notice!!** Reading data after the data[length] is Undefined behaviour. 
+
 #### I want to create frame type for my module, how do I add one?
 You should create a Pull Request containing the frame definition you want to add.
 It has to follow the structure you can see under the previous heading.
