@@ -68,7 +68,7 @@
     }; \
     \
     static_assert( \
-        std::is_same_v<Type, frame_external_s> \
+        (std::is_same_v<Type, frame_external_s> || std::is_same_v<Type, frame_robos_instruction_s>) \
         || sizeof(Type) <= 248, "The size of a frame type should not exceed 248 bytes!" \
     ); \
     \
@@ -282,8 +282,6 @@ namespace r2d2 {
         // for this specific struct!
         uint8_t data[256 - sizeof(uint8_t) - sizeof(external_id_s) - sizeof(frame_type)];
     };
-
-    R2D2_INTERNAL_FRAME_HELPER(frame_external_s, EXTERNAL)
 
     /** USER STRUCTS */
 
@@ -596,6 +594,10 @@ namespace r2d2 {
         // explanation for each status.
         uint16_t status;
     };
+
+    // frame_external_s has to be here, because the static_assert requires
+    // all other size exceptions to be defined.
+    R2D2_INTERNAL_FRAME_HELPER(frame_external_s, EXTERNAL)
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
