@@ -29,6 +29,26 @@
         constexpr static uint16_t offset = offsetof(Type, MemberName); \
     };
 
+#define R2D2_OPTIMISE_ARRAY(Type, LengthName, MemberName) \
+    template<> \
+    struct supports_array_optimisation<Type> : std::true_type {}; \
+    \
+    template<> \
+    struct array_member_offset<Type> { \
+        constexpr static uint8_t array_offset = offsetof(Type, MemberName); \
+        constexpr static uint8_t length_offset = offsetof(Type, LengthName); \
+\
+        using array_type = std::remove_pointer_t< \
+            std::decay_t< \
+                decltype(Type::MemberName) \
+            > \
+        >; \
+    }; \
+    static_assert( \
+        std::is_same_v<decltype(Type::LengthName), uint8_t>, \
+        "The length variable of a array optimised frame should be a uint8_t." \
+    );
+
 /**
  * Poisioning is used to prevent people from
  * using structs that are meant purely for the
@@ -176,7 +196,7 @@ namespace r2d2 {
      */ 
     template<typename T>
     struct supports_string_optimisation : std::false_type {};
-    
+
     /**
      * Struct that stores the offset of
      * the string member that can be optimised against.
@@ -205,6 +225,36 @@ namespace r2d2 {
      */ 
     template<typename T>
     constexpr bool string_member_offset_v = string_member_offset<T>::offset;
+
+    /**
+     * This struct is specialized to indicate that the
+     * type it is specialized for support the array optimzation.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    struct supports_array_optimisation : std::false_type {};
+
+    /**
+     * Struct that stores the offset of
+     * the array members that can be optimised against.
+     * 
+     * @tparam T
+     */ 
+    template<typename T>
+    struct array_member_offset {
+        constexpr static uint8_t array_offset = 0;
+        constexpr static uint8_t length = 0;
+    };
+
+    /**
+     * Helper accessor to check for array
+     * optimisation support on the given type.
+     *
+     * @tparam T
+     */  
+    template<typename T>
+    constexpr bool supports_array_optimisation_v = supports_array_optimisation<T>::value;
 
     /**
     * A struct that helps to describe
