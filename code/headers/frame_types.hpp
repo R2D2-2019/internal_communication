@@ -1,119 +1,10 @@
-
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <type_traits>
-
+#include "frames/macros.hpp"
+#include "frames/definitions.hpp"
 #include "frame_enums.hpp"
 
-/*
- * This set of macros is used to quickly add packet helper structs
- * that help the communication system understand how to use
- * and refer to packets. It also checks whether the size of the frame
- * struct is within the hard limits of the protocol.
- * 
- * All frames should be 248 bytes or less, the frame_external_s 
- * is an exception. It is possible there will be another exception for 
- * the robos instructions later.
- */
-#define R2D2_STRINGIFY(x) #x
-#define R2D2_TO_STRING(x) R2D2_STRINGIFY(x)
-
-#define R2D2_OPTIMISE_STRING(Type, MemberName) \
-    template<> \
-    struct supports_string_optimisation<Type> : std::true_type {}; \
-    \
-    template<> \
-    struct string_member_offset<Type> { \
-        constexpr static uint16_t offset = offsetof(Type, MemberName); \
-    };
-
-#define R2D2_OPTIMISE_ARRAY(Type, LengthName, MemberName) \
-    template<> \
-    struct supports_array_optimisation<Type> : std::true_type {}; \
-    \
-    template<> \
-    struct array_member_offset<Type> { \
-        constexpr static uint8_t array_offset = offsetof(Type, MemberName); \
-        constexpr static uint8_t length_offset = offsetof(Type, LengthName); \
-\
-        using array_type = std::remove_pointer_t< \
-            std::decay_t< \
-                decltype(Type::MemberName) \
-            > \
-        >; \
-    }; \
-    static_assert( \
-        std::is_same_v<decltype(Type::LengthName), uint8_t>, \
-        "The length variable of a array optimised frame should be a uint8_t." \
-    );
-
-/**
- * Poisioning is used to prevent people from
- * using structs that are meant purely for the
- * Python bus
- */ 
-#define R2D2_POISON_TYPE(Type) _Pragma(R2D2_TO_STRING(GCC poison Type))
-
-#define R2D2_INTERNAL_FRAME_HELPER(Type, EnumVal, ...) \
-    template<> \
-    struct frame_type_s<Type> { \
-        constexpr static frame_id type = frame_type::EnumVal; \
-    }; \
-    \
-    template<> \
-    struct frame_data_s<frame_type::EnumVal> { \
-        using type = Type; \
-    }; \
-    \
-    static_assert( \
-        std::is_same_v<Type, frame_external_s> \
-        || sizeof(Type) <= 248, "The size of a frame type should not exceed 248 bytes!" \
-    ); \
-    \
-    __VA_ARGS__
-
-/**
- * Travis doesn't like #pragma pack(1), this define makes
- * it so packing is only done on an ARM target.
- */ 
-#if defined(__arm__) || defined(__thumb__)
-#define R2D2_PACK_STRUCT _Pragma("pack(1)")
-#else
-// Empty define
-#define R2D2_PACK_STRUCT
-#endif
-
-// Tag that indicates that the frame is meant for Python only
-#define R2D2_PYTHON_FRAME
-
 namespace r2d2 {
-    /**
-     * The underlying type used for packet
-     * identifiers.
-     */
-    using frame_id = uint8_t;
-
-    /**
-     * Central definition that is used to
-     * determine whether the type T is suitable as
-     * a packet type.
-     *
-     * @tparam T
-     */
-    template<typename T>
-    constexpr bool is_suitable_frame_v = std::is_pod_v<T>;
-
-    /**
-     * Is the given packet type
-     * extended (spans multiple network layer packets)?
-     *
-     * @tparam T
-     */
-    template<typename T>
-    constexpr bool is_extended_frame_v = sizeof(T) > 8;
-
     /**
      * This enum will contain all packet types
      * in the system.
@@ -131,10 +22,11 @@ namespace r2d2 {
         DISPLAY_8x8_CURSOR_CHARACTER,
         CURSOR_POSITION,
         CURSOR_COLOR,
+        UI_COMMAND,        
         BATTERY_LEVEL,
-        UI_COMMAND,
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
+        COORDINATE_STRUCT,
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
@@ -189,74 +81,6 @@ namespace r2d2 {
     constexpr frame_id frame_type_v = frame_type_s<T>::type;
 
     /**
-     * This struct is specialized to indicate that the
-     * type it is specialized for support the string optimzation.
-     * 
-     * @tparam T
-     */ 
-    template<typename T>
-    struct supports_string_optimisation : std::false_type {};
-
-    /**
-     * Struct that stores the offset of
-     * the string member that can be optimised against.
-     * 
-     * @tparam T
-     */ 
-    template<typename T>
-    struct string_member_offset {
-        constexpr static uint16_t offset = 0;
-    };
-
-    /**
-     * Helper accessor to check for string
-     * optimisation support on the given type.
-     *
-     * @tparam T
-     */  
-    template<typename T>
-    constexpr bool supports_string_optimisation_v = supports_string_optimisation<T>::value;
-
-    /**
-     * Helper accessor to get the string member
-     * offset for the given type.
-     * 
-     * @tparam T
-     */ 
-    template<typename T>
-    constexpr bool string_member_offset_v = string_member_offset<T>::offset;
-
-    /**
-     * This struct is specialized to indicate that the
-     * type it is specialized for support the array optimzation.
-     * 
-     * @tparam T
-     */ 
-    template<typename T>
-    struct supports_array_optimisation : std::false_type {};
-
-    /**
-     * Struct that stores the offset of
-     * the array members that can be optimised against.
-     * 
-     * @tparam T
-     */ 
-    template<typename T>
-    struct array_member_offset {
-        constexpr static uint8_t array_offset = 0;
-        constexpr static uint8_t length = 0;
-    };
-
-    /**
-     * Helper accessor to check for array
-     * optimisation support on the given type.
-     *
-     * @tparam T
-     */  
-    template<typename T>
-    constexpr bool supports_array_optimisation_v = supports_array_optimisation<T>::value;
-
-    /**
     * A struct that helps to describe
     * an external system address.
     * Might change, depending on the external
@@ -292,7 +116,7 @@ namespace r2d2 {
 
 
     /**
-     * Packet containing the state of 
+     * Packet containing the state of
      * a button.
      */
     R2D2_PACK_STRUCT
@@ -384,7 +208,7 @@ namespace r2d2 {
     R2D2_PACK_STRUCT
     struct frame_display_8x8_character_via_cursor_s {
         // Targets which cursor to write to. This should be one
-        // your module claimed. The characters will be drawn 
+        // your module claimed. The characters will be drawn
         // from the cursor position as starting location.
         uint8_t cursor_id;
 
@@ -441,21 +265,21 @@ namespace r2d2 {
      */
     R2D2_PYTHON_FRAME
     struct frame_ui_command_s {
-        // name of the frame or json command which we want to 
+        // name of the frame or json command which we want to
         // send for evaluation to SMM
         char command;
 
         // parameters for the frame from frame_name
         char params;
 
-        // destination is used to tell what robot or swarm to 
+        // destination is used to tell what robot or swarm to
         // send the command to
         char destination;
     };
 
     /**
-     * Struct that represents the level of 
-     * the battery on the robot. 
+     * Struct that represents the level of
+     * the battery on the robot.
      * 
      * Power wiki: 
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Power
@@ -467,7 +291,7 @@ namespace r2d2 {
         // representation. That means that a value of
         // 12.1V will be 12100. This larger value is 
         // used to alleviate the need for floating point numbers.
-        // A scale of x1000 is used, because thas is the maximum 
+        // A scale of x1000 is used, because thas is the maximum
         // precision the sensor can read.
         uint32_t voltage;        
         
@@ -485,7 +309,7 @@ namespace r2d2 {
      */
     R2D2_PACK_STRUCT
     struct frame_manual_control_s {
-        // A value between -100% & 100% 
+        // A value between -100% & 100%
         int8_t speed;
 
         // A value between -90 & 90 (degrees)
@@ -504,7 +328,7 @@ namespace r2d2 {
      */
     R2D2_PACK_STRUCT
     struct frame_movement_control_s {
-        // A value between -100% & 100% 
+        // A value between -100% & 100%
         int8_t speed;
 
         // A value between -90 & 90 (degrees)
@@ -515,9 +339,66 @@ namespace r2d2 {
     };
 
     /**
-     * Our A-star algorithm outputs a list of 2D vector so the path_id 
-     * indentifies which list it's from, the step id is basically 
-     * the list index. x and y are the 2D vector's attributes.
+     * Struct that represents a coordinate on the planet.
+     * 
+     * Location_detector wiki:
+     * https://github.com/R2D2-2019/location_detector
+     */
+
+    R2D2_PACK_STRUCT
+    struct frame_coordinate_s {
+        // This variable represents the height relative
+        // to the average sea level.
+        int16_t altitude;
+        
+        // This variable represents the thousandths
+        // seconds of the longitude coordinate.
+        uint16_t long_thousandth_sec;
+		   
+        // This variable represents the thousandths
+        // seconds of the latitude coordinate.
+        uint16_t lat_thousandth_sec;
+            
+        // This variable represents the degrees of
+        // the latitude coordinate.
+        uint8_t lat_deg;
+        
+        // This variable represents the minutes of
+        // the latitude coordinate.
+        uint8_t lat_min;
+        
+        // This variable represents the seconds of
+        // the latitude coordinate.
+        uint8_t lat_sec;
+        
+        // This variable represents the degrees of
+        // the longitude coordinate.
+        uint8_t long_deg;
+        
+        // This variable represents the minutes of
+        // the longitude coordinate.
+        uint8_t long_min;
+        
+        // This variable represents the seconds of
+        // the longitude coordinate.
+        uint8_t long_sec;
+        
+        // This variable represents the nothern or
+        // southern hemisphere the coordinate is located
+        // on. North is true, South is false.
+        bool north_south_hemisphere;
+        
+        // This variable represents the eastern or 
+        // western hemisphere the coordinate is located
+        // on. East is true, West is false.
+        bool east_west_hemisphere;
+    };
+    
+    /*
+     * Our A-star algorithm outputs a list of 2D vector so
+     * the path_id indentifies which list it's from, the 
+     * step id is basically the list index. x and y are the
+     * 2D vector's attributes.
      * 
      * Navigation wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
@@ -530,39 +411,43 @@ namespace r2d2 {
         // y coordinate (in 2d x/y space)
         uint32_t y;
 
-        // sequence integer that indentifies what step in the path we're at.
+        // sequence integer that indentifies what step in
+        // the path we're at.
         uint16_t step_id;
 
-        // unique indentifier for a path so we don't mix up multiple paths.
+        // unique indentifier for a path so we don't mix
+        // up multiple paths.
         uint8_t path_id;
     };
 	
     /*
      * This frame will only be used with the python bus.
-     * The frame will be responsible for sending log data from 
-     * SMM to the swarm analytics module
+     * The frame will be responsible for sending log data from
+     * SMM to the swarm analytics module.
      *
      * SMM wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-Management
      */
     R2D2_PYTHON_FRAME
     struct frame_command_log_s {
-        // The current status of the command [for example received, 
-        // processed, send etc.] This is specified as an integer since 
-        // swarm analytics will provide a table containing the 
+        // The current status of the command [for example received,
+        // processed, send etc.] This is specified as an integer 
+        // since swarm analytics will provide a table containing the
         // explanation for each status.
         uint16_t status;
 		
-        // This variable will contain the original recieved command type
+        // This variable will contain the original recieved command
+        // type.
         char original_command;
 
-        // This variable will contain the original command data
+        // This variable will contain the original command data.
         char original_data;
     };
 	
     /*
      * This frame will only be used with the python bus.
-     * The frame will be responsible for updating the status of a command.
+     * The frame will be responsible for updating the status of a
+     * command.
      *
      * SMM wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-Management
@@ -572,9 +457,9 @@ namespace r2d2 {
         // The command id for wich the status needs to be updated.
         uint32_t cmd_id;
 		
-        // The current status of the command, for example received, 
+        // The current status of the command, for example received,
         // processed, send etc. This is specified as an integer 
-        // since swarm analytics will provide a table containing the 
+        // since swarm analytics will provide a table containing the
         // explanation for each status.
         uint16_t status;
     };
@@ -599,11 +484,28 @@ namespace r2d2 {
 
     R2D2_INTERNAL_FRAME_HELPER(frame_cursor_position_s, CURSOR_POSITION)
     R2D2_INTERNAL_FRAME_HELPER(frame_cursor_color_s, CURSOR_COLOR)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_ui_command_s,
+        UI_COMMAND,
+        R2D2_POISON_TYPE(frame_ui_command_s)
+    )
+
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
-    R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND, R2D2_POISON_TYPE(frame_ui_command_s))
-    R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
-    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)    
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
-    R2D2_INTERNAL_FRAME_HELPER(frame_command_log_s, COMMAND_LOG, R2D2_POISON_TYPE(frame_command_log_s))
-    R2D2_INTERNAL_FRAME_HELPER(frame_command_status_update_s, COMMAND_STATUS_UPDATE, R2D2_POISON_TYPE(frame_command_status_update_s))
+    R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE_STRUCT)
+    R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_command_log_s,
+        COMMAND_LOG,
+        R2D2_POISON_TYPE(frame_command_log_s)
+    )
+    
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_command_status_update_s,
+        COMMAND_STATUS_UPDATE,
+        R2D2_POISON_TYPE(frame_command_status_update_s)
+    )
 }
