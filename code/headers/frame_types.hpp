@@ -278,6 +278,30 @@ namespace r2d2 {
     };
 
     /**
+     * Only used in python
+     * List of all robot names
+     * The names of all connected robots will be in this struct, seperated by spaces
+     * These names will be used by swarm ui to indicate a destination
+     * An example: "robot1 robot2 robot3"
+    */
+    R2D2_PACK_STRUCT
+    struct frame_robot_names {
+        char names;
+    };
+
+    /**
+     * Only used in python
+     * List of all swarm names
+     * The names of all connected swarms will be in this struct, seperated by spaces
+     * These names will be used by swarm ui to indicate a destination
+     * An example: "swarm1 swarm2 swarm3"
+    */
+    R2D2_PACK_STRUCT
+    struct frame_swarm_names {
+        char names;
+    };
+
+    /**
      * Struct that represents the level of
      * the battery on the robot.
      * 
