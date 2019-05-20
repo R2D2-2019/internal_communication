@@ -538,8 +538,17 @@ namespace r2d2 {
         R2D2_POISON_TYPE(frame_ui_command_s)
     )
 
-    R2D2_INTERNAL_FRAME_HELPER(frame_robot_names, ROBOT_NAMES, R2D2_POISON_TYPE(frame_robot_names))
-    R2D2_INTERNAL_FRAME_HELPER(frame_swarm_names, SWARM_NAMES, R2D2_POISON_TYPE(frame_swarm_names))
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_robot_names, 
+        ROBOT_NAMES, 
+        R2D2_POISON_TYPE(frame_robot_names)
+    )
+    
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_swarm_names, 
+        SWARM_NAMES, 
+        R2D2_POISON_TYPE(frame_swarm_names)
+    )
 
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
