@@ -5,7 +5,7 @@
 #include <type_traits>
 
 #include "frame_types.hpp"
-#include "channel.hpp"
+#include "can/channel.hpp"
 
 namespace r2d2 {
     /**
