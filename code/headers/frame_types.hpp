@@ -30,7 +30,7 @@ namespace r2d2 {
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
-		TEMPERATURES
+		TEMPERATURES,
 
         // Don't touch
         EXTERNAL,
