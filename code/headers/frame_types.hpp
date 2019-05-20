@@ -30,6 +30,8 @@ namespace r2d2 {
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
+        ROBOT_NAMES,
+        SWARM_NAMES,
 
         // Don't touch
         EXTERNAL,
@@ -285,7 +287,7 @@ namespace r2d2 {
      * An example: "robot1 robot2 robot3"
     */
     R2D2_PACK_STRUCT
-    struct frame_robot_names {
+    struct frame_robot_names_s {
         char names;
     };
 
@@ -297,7 +299,7 @@ namespace r2d2 {
      * An example: "swarm1 swarm2 swarm3"
     */
     R2D2_PACK_STRUCT
-    struct frame_swarm_names {
+    struct frame_swarm_names_s {
         char names;
     };
 
@@ -514,6 +516,9 @@ namespace r2d2 {
         UI_COMMAND,
         R2D2_POISON_TYPE(frame_ui_command_s)
     )
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_robot_names, ROBOT_NAMES)
+    R2D2_INTERNAL_FRAME_HELPER(frame_swarm_names, SWARM_NAMES)
 
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
