@@ -22,8 +22,8 @@ namespace r2d2 {
         DISPLAY_8x8_CURSOR_CHARACTER,
         CURSOR_POSITION,
         CURSOR_COLOR,
+        UI_COMMAND,        
         BATTERY_LEVEL,
-        UI_COMMAND,
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
         COORDINATE_STRUCT,
@@ -116,7 +116,7 @@ namespace r2d2 {
 
 
     /**
-     * Packet containing the state of 
+     * Packet containing the state of
      * a button.
      */
     R2D2_PACK_STRUCT
@@ -208,7 +208,7 @@ namespace r2d2 {
     R2D2_PACK_STRUCT
     struct frame_display_8x8_character_via_cursor_s {
         // Targets which cursor to write to. This should be one
-        // your module claimed. The characters will be drawn 
+        // your module claimed. The characters will be drawn
         // from the cursor position as starting location.
         uint8_t cursor_id;
 
@@ -265,21 +265,21 @@ namespace r2d2 {
      */
     R2D2_PYTHON_FRAME
     struct frame_ui_command_s {
-        // name of the frame or json command which we want to 
+        // name of the frame or json command which we want to
         // send for evaluation to SMM
         char command;
 
         // parameters for the frame from frame_name
         char params;
 
-        // destination is used to tell what robot or swarm to 
+        // destination is used to tell what robot or swarm to
         // send the command to
         char destination;
     };
 
     /**
-     * Struct that represents the level of 
-     * the battery on the robot. 
+     * Struct that represents the level of
+     * the battery on the robot.
      * 
      * Power wiki: 
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Power
@@ -291,7 +291,7 @@ namespace r2d2 {
         // representation. That means that a value of
         // 12.1V will be 12100. This larger value is 
         // used to alleviate the need for floating point numbers.
-        // A scale of x1000 is used, because thas is the maximum 
+        // A scale of x1000 is used, because thas is the maximum
         // precision the sensor can read.
         uint32_t voltage;        
         
@@ -309,7 +309,7 @@ namespace r2d2 {
      */
     R2D2_PACK_STRUCT
     struct frame_manual_control_s {
-        // A value between -100% & 100% 
+        // A value between -100% & 100%
         int8_t speed;
 
         // A value between -90 & 90 (degrees)
@@ -328,7 +328,7 @@ namespace r2d2 {
      */
     R2D2_PACK_STRUCT
     struct frame_movement_control_s {
-        // A value between -100% & 100% 
+        // A value between -100% & 100%
         int8_t speed;
 
         // A value between -90 & 90 (degrees)
@@ -347,46 +347,58 @@ namespace r2d2 {
 
     R2D2_PACK_STRUCT
     struct frame_coordinate_s {
-        // This variable represents the height relative to the average sea level.
+        // This variable represents the height relative
+        // to the average sea level.
         int16_t altitude;
         
-        // This variable represents the thousandths seconds of the longitude coordinate.
+        // This variable represents the thousandths
+        // seconds of the longitude coordinate.
         uint16_t long_thousandth_sec;
 		   
-        // This variable represents the thousandths seconds of the latitude coordinate.
+        // This variable represents the thousandths
+        // seconds of the latitude coordinate.
         uint16_t lat_thousandth_sec;
             
-        // This variable represents the degrees of the latitude coordinate.
+        // This variable represents the degrees of
+        // the latitude coordinate.
         uint8_t lat_deg;
         
-        // This variable represents the minutes of the latitude coordinate.
+        // This variable represents the minutes of
+        // the latitude coordinate.
         uint8_t lat_min;
         
-        // This variable represents the seconds of the latitude coordinate.
+        // This variable represents the seconds of
+        // the latitude coordinate.
         uint8_t lat_sec;
         
-        // This variable represents the degrees of the longitude coordinate.
+        // This variable represents the degrees of
+        // the longitude coordinate.
         uint8_t long_deg;
         
-        // This variable represents the minutes of the longitude coordinate.
+        // This variable represents the minutes of
+        // the longitude coordinate.
         uint8_t long_min;
         
-        // This variable represents the seconds of the longitude coordinate.
+        // This variable represents the seconds of
+        // the longitude coordinate.
         uint8_t long_sec;
         
-        // This variable represents the nothern or southern hemisphere the coordinate is located on.
-        // North is true, South is false.
+        // This variable represents the nothern or
+        // southern hemisphere the coordinate is located
+        // on. North is true, South is false.
         bool north_south_hemisphere;
         
-        // This variable represents the eastern or western hemisphere the coordinate is located on.
-        // East is true, West is false.
+        // This variable represents the eastern or 
+        // western hemisphere the coordinate is located
+        // on. East is true, West is false.
         bool east_west_hemisphere;
     };
     
     /*
-     * Our A-star algorithm outputs a list of 2D vector so the path_id 
-     * indentifies which list it's from, the step id is basically 
-     * the list index. x and y are the 2D vector's attributes.
+     * Our A-star algorithm outputs a list of 2D vector so
+     * the path_id indentifies which list it's from, the 
+     * step id is basically the list index. x and y are the
+     * 2D vector's attributes.
      * 
      * Navigation wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
@@ -399,39 +411,43 @@ namespace r2d2 {
         // y coordinate (in 2d x/y space)
         uint32_t y;
 
-        // sequence integer that indentifies what step in the path we're at.
+        // sequence integer that indentifies what step in
+        // the path we're at.
         uint16_t step_id;
 
-        // unique indentifier for a path so we don't mix up multiple paths.
+        // unique indentifier for a path so we don't mix
+        // up multiple paths.
         uint8_t path_id;
     };
 	
     /*
      * This frame will only be used with the python bus.
-     * The frame will be responsible for sending log data from 
-     * SMM to the swarm analytics module
+     * The frame will be responsible for sending log data from
+     * SMM to the swarm analytics module.
      *
      * SMM wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-Management
      */
     R2D2_PYTHON_FRAME
     struct frame_command_log_s {
-        // The current status of the command [for example received, 
-        // processed, send etc.] This is specified as an integer since 
-        // swarm analytics will provide a table containing the 
+        // The current status of the command [for example received,
+        // processed, send etc.] This is specified as an integer 
+        // since swarm analytics will provide a table containing the
         // explanation for each status.
         uint16_t status;
 		
-        // This variable will contain the original recieved command type
+        // This variable will contain the original recieved command
+        // type.
         char original_command;
 
-        // This variable will contain the original command data
+        // This variable will contain the original command data.
         char original_data;
     };
 	
     /*
      * This frame will only be used with the python bus.
-     * The frame will be responsible for updating the status of a command.
+     * The frame will be responsible for updating the status of a
+     * command.
      *
      * SMM wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-Management
@@ -441,9 +457,9 @@ namespace r2d2 {
         // The command id for wich the status needs to be updated.
         uint32_t cmd_id;
 		
-        // The current status of the command, for example received, 
+        // The current status of the command, for example received,
         // processed, send etc. This is specified as an integer 
-        // since swarm analytics will provide a table containing the 
+        // since swarm analytics will provide a table containing the
         // explanation for each status.
         uint16_t status;
     };
@@ -468,12 +484,28 @@ namespace r2d2 {
 
     R2D2_INTERNAL_FRAME_HELPER(frame_cursor_position_s, CURSOR_POSITION)
     R2D2_INTERNAL_FRAME_HELPER(frame_cursor_color_s, CURSOR_COLOR)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_ui_command_s,
+        UI_COMMAND,
+        R2D2_POISON_TYPE(frame_ui_command_s)
+    )
+
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
-    R2D2_INTERNAL_FRAME_HELPER(frame_ui_command_s, UI_COMMAND, R2D2_POISON_TYPE(frame_ui_command_s))
-    R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
-    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)    
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
-    R2D2_INTERNAL_FRAME_HELPER(frame_command_log_s, COMMAND_LOG, R2D2_POISON_TYPE(frame_command_log_s))
-    R2D2_INTERNAL_FRAME_HELPER(frame_command_status_update_s, COMMAND_STATUS_UPDATE, R2D2_POISON_TYPE(frame_command_status_update_s))
     R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE_STRUCT)
+    R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_command_log_s,
+        COMMAND_LOG,
+        R2D2_POISON_TYPE(frame_command_log_s)
+    )
+    
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_command_status_update_s,
+        COMMAND_STATUS_UPDATE,
+        R2D2_POISON_TYPE(frame_command_status_update_s)
+    )
 }
