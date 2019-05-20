@@ -306,6 +306,8 @@ namespace r2d2 {
      * The names of all connected robots will be in this struct, seperated by spaces
      * These names will be used by swarm ui to indicate a destination
      * An example: "robot1 robot2 robot3"
+     * Swarm UI wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
     */
     R2D2_PACK_STRUCT
     struct frame_robot_names_s {
@@ -318,6 +320,8 @@ namespace r2d2 {
      * The names of all connected swarms will be in this struct, seperated by spaces
      * These names will be used by swarm ui to indicate a destination
      * An example: "swarm1 swarm2 swarm3"
+     * Swarm UI wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
     */
     R2D2_PACK_STRUCT
     struct frame_swarm_names_s {
