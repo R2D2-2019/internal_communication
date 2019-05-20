@@ -474,7 +474,7 @@ namespace r2d2 {
      * https://github.com/R2D2-2019/swarm_analytics
      */
     R2D2_PYTHON_FRAME
-    struct frame_command_id_s{
+    struct frame_command_id_s {
         // The new command ID
         uint32_t cmd_id;
     };
