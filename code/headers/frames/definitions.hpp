@@ -66,7 +66,7 @@ namespace r2d2 {
      * @tparam T
      */ 
     template<typename T>
-    constexpr bool string_member_offset_v = string_member_offset<T>::offset;
+    constexpr auto string_member_offset_v = string_member_offset<T>::offset;
 
     /**
      * This struct is specialized to indicate that the
