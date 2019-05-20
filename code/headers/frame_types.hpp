@@ -33,6 +33,7 @@ namespace r2d2 {
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
         TEMPERATURE,
+        GAS,
 
         // Don't touch
         EXTERNAL,
@@ -514,6 +515,21 @@ namespace r2d2 {
         // explanation for each status.
         uint16_t status;
     };
+
+    /* 
+    * This frame will be send from the gas detection module. It will send the gas_id(which corresponds to a specific gas) 
+    * and the gas_value will be the value of gas in parts per million.
+    * Refer to the wiki for more information:
+    * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Gas-Detection
+    */
+    R2D2_PACK_STRUCT
+    struct frame_gas_s{
+        // The gas value in parts per million.
+        uint16_t gas_value;
+        // The gas id which corresponds to a specific gas.
+        // For example: 0 is LPG, 1 is Co, 2 is smoke.
+        uint8_t gas_id;
+    };
     
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
@@ -559,6 +575,7 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE_STRUCT)
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
+    R2D2_INTERNAL_FRAME_HELPER(frame_gas_s, GAS)
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_command_log_s,
