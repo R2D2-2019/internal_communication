@@ -539,13 +539,13 @@ namespace r2d2 {
     )
 
     R2D2_INTERNAL_FRAME_HELPER(
-        frame_robot_names, 
+        frame_robot_names_s, 
         ROBOT_NAMES, 
         R2D2_POISON_TYPE(frame_robot_names)
     )
-    
+
     R2D2_INTERNAL_FRAME_HELPER(
-        frame_swarm_names, 
+        frame_swarm_names_s, 
         SWARM_NAMES, 
         R2D2_POISON_TYPE(frame_swarm_names)
     )
