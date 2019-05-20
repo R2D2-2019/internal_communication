@@ -30,6 +30,7 @@ namespace r2d2 {
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
+        COMMAND_ID
 
         // Don't touch
         EXTERNAL,
@@ -463,6 +464,21 @@ namespace r2d2 {
         // explanation for each status.
         uint16_t status;
     };
+
+
+    /**
+     * This frame will only be used with the python bus.
+     * This frame gives a new command_id to SMM which can use that to issue a command.
+     *
+     * Swarm Analytics wiki:
+     * https://github.com/R2D2-2019/swarm_analytics
+     */
+    R2D2_PYTHON_FRAME
+    struct frame_command_id_s{
+
+        // The new command ID
+        uint32_t cmd_id;
+    };
 	
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
@@ -507,5 +523,11 @@ namespace r2d2 {
         frame_command_status_update_s,
         COMMAND_STATUS_UPDATE,
         R2D2_POISON_TYPE(frame_command_status_update_s)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+            frame_command_id_s,
+            COMMAND_ID,
+            R2D2_POISON_TYPE(frame_command_id_s)
     )
 }
