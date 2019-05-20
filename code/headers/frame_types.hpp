@@ -30,6 +30,7 @@ namespace r2d2 {
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
+		TEMPERATURES
 
         // Don't touch
         EXTERNAL,
@@ -248,6 +249,20 @@ namespace r2d2 {
         uint8_t red;
         uint8_t green;
         uint8_t blue;
+    };
+	
+	/**
+	 * This frame contains two temperatures.
+	 * The temperature the sensor is pointed at and
+	 * the ambient temperature
+	 */
+	R2D2_PACK_STRUCT
+    struct frame_temperature_sensor_s {
+		// Ambient temperature
+        int16_t ambient_temperature;
+		// Object temperature
+		// Contains the temperature the sensor is pointed at
+		int16_t object_temperature;
     };
 
     /**
@@ -508,4 +523,6 @@ namespace r2d2 {
         COMMAND_STATUS_UPDATE,
         R2D2_POISON_TYPE(frame_command_status_update_s)
     )
+	
+	R2D2_INTERNAL_FRAME_HELPER(frame_temperature_sensor_s, TEMPERATURES)
 }
