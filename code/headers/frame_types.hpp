@@ -255,12 +255,16 @@ namespace r2d2 {
 	 * This frame contains two temperatures.
 	 * The temperature the sensor is pointed at and
 	 * the ambient temperature
+	 * IMPORTANT:
+	 * All the values must be devided by 10 in order
+	 * to get the correct value.
+	 * This is to prevent floating point values.
 	 */
 	R2D2_PACK_STRUCT
     struct frame_temperature_sensor_s {
-		// Ambient temperature
+		// Ambient temperature multiplied with 10
         int16_t ambient_temperature;
-		// Object temperature
+		// Object temperature multiplied with 10
 		// Contains the temperature the sensor is pointed at
 		int16_t object_temperature;
     };
