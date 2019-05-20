@@ -18,6 +18,9 @@ namespace r2d2 {
     enum class claimed_display_cursor : uint8_t {
         // Free for any person to use.
         OPEN_CURSOR,
+        ROBOS_DISTANCE_CURSOR,
+        ROBOS_TEMPERATURE_CURSOR,
+        ROBOS_POWER_CURSOR,
 
         // Don't touch
         CURSORS_COUNT
