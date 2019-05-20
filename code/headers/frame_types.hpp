@@ -30,7 +30,7 @@ namespace r2d2 {
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
-        TEMPERATURES,
+        TEMPERATURE,
 
         // Don't touch
         EXTERNAL,
@@ -528,5 +528,5 @@ namespace r2d2 {
         R2D2_POISON_TYPE(frame_command_status_update_s)
     )
     
-    R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURES)
+    R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURE)
 }
