@@ -22,7 +22,9 @@ namespace r2d2 {
         DISPLAY_8x8_CURSOR_CHARACTER,
         CURSOR_POSITION,
         CURSOR_COLOR,
-        UI_COMMAND,        
+        UI_COMMAND, 
+        ROBOT_NAMES,
+        SWARM_NAMES,       
         BATTERY_LEVEL,
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
@@ -30,8 +32,6 @@ namespace r2d2 {
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
-        ROBOT_NAMES,
-        SWARM_NAMES,
         TEMPERATURE,
 
         // Don't touch
