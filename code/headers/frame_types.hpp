@@ -30,6 +30,7 @@ namespace r2d2 {
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
+        TEMPERATURE,
 
         // Don't touch
         EXTERNAL,
@@ -110,9 +111,9 @@ namespace r2d2 {
 
     /** USER STRUCTS */
 
-		
-	/** DO NOT REMOVE */
-	/** #PythonAnchor# */
+        
+    /** DO NOT REMOVE */
+    /** #PythonAnchor# */
 
 
     /**
@@ -249,6 +250,26 @@ namespace r2d2 {
         uint8_t green;
         uint8_t blue;
     };
+    
+    /**
+     * This frame contains two temperatures.
+     * The temperature the sensor is pointed at and
+     * the ambient temperature
+     * IMPORTANT:
+     * All the values must be devided by 10 in order
+     * to get the correct value.
+     * This is to prevent floating point values.
+     */
+    R2D2_PACK_STRUCT
+    struct frame_temperature_s {
+        // This is the (unique) ID of the sensor
+        uint32_t id;
+        // Ambient temperature multiplied with 10
+        int16_t ambient_temperature;
+        // Object temperature multiplied with 10
+        // Contains the temperature the sensor is pointed at
+        int16_t object_temperature;
+    };
 
     /**
      * ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
@@ -378,7 +399,7 @@ namespace r2d2 {
         // This variable represents the thousandths
         // seconds of the longitude coordinate.
         uint16_t long_thousandth_sec;
-		   
+           
         // This variable represents the thousandths
         // seconds of the latitude coordinate.
         uint16_t lat_thousandth_sec;
@@ -443,7 +464,7 @@ namespace r2d2 {
         // up multiple paths.
         uint8_t path_id;
     };
-	
+    
     /*
      * This frame will only be used with the python bus.
      * The frame will be responsible for sending log data from
@@ -459,7 +480,7 @@ namespace r2d2 {
         // since swarm analytics will provide a table containing the
         // explanation for each status.
         uint16_t status;
-		
+        
         // This variable will contain the original recieved command
         // type.
         char original_command;
@@ -467,7 +488,7 @@ namespace r2d2 {
         // This variable will contain the original command data.
         char original_data;
     };
-	
+    
     /*
      * This frame will only be used with the python bus.
      * The frame will be responsible for updating the status of a
@@ -480,14 +501,14 @@ namespace r2d2 {
     struct frame_command_status_update_s {
         // The command id for wich the status needs to be updated.
         uint32_t cmd_id;
-		
+        
         // The current status of the command, for example received,
         // processed, send etc. This is specified as an integer 
         // since swarm analytics will provide a table containing the
         // explanation for each status.
         uint16_t status;
     };
-	
+    
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
@@ -532,4 +553,6 @@ namespace r2d2 {
         COMMAND_STATUS_UPDATE,
         R2D2_POISON_TYPE(frame_command_status_update_s)
     )
+    
+    R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURE)
 }
