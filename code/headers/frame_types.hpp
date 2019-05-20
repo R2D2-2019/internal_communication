@@ -30,12 +30,9 @@ namespace r2d2 {
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
-<<<<<<< HEAD
         ROBOT_NAMES,
         SWARM_NAMES,
-=======
         TEMPERATURE,
->>>>>>> b23c0785f806123e239123891055ed6ccdace9bb
 
         // Don't touch
         EXTERNAL,
