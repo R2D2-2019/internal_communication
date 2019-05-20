@@ -22,7 +22,9 @@ namespace r2d2 {
         DISPLAY_8x8_CURSOR_CHARACTER,
         CURSOR_POSITION,
         CURSOR_COLOR,
-        UI_COMMAND,        
+        UI_COMMAND, 
+        ROBOT_NAMES,
+        SWARM_NAMES,       
         BATTERY_LEVEL,
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
@@ -299,6 +301,34 @@ namespace r2d2 {
     };
 
     /**
+     * Only used in python
+     * List of all robot names
+     * The names of all connected robots will be in this struct, seperated by spaces
+     * These names will be used by swarm ui to indicate a destination
+     * An example: "robot1 robot2 robot3"
+     * Swarm UI wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
+    */
+    R2D2_PACK_STRUCT
+    struct frame_robot_names_s {
+        char names;
+    };
+
+    /**
+     * Only used in python
+     * List of all swarm names
+     * The names of all connected swarms will be in this struct, seperated by spaces
+     * These names will be used by swarm ui to indicate a destination
+     * An example: "swarm1 swarm2 swarm3"
+     * Swarm UI wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
+    */
+    R2D2_PACK_STRUCT
+    struct frame_swarm_names_s {
+        char names;
+    };
+
+    /**
      * Struct that represents the level of
      * the battery on the robot.
      * 
@@ -510,6 +540,18 @@ namespace r2d2 {
         frame_ui_command_s,
         UI_COMMAND,
         R2D2_POISON_TYPE(frame_ui_command_s)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_robot_names_s, 
+        ROBOT_NAMES, 
+        R2D2_POISON_TYPE(frame_robot_names)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_swarm_names_s, 
+        SWARM_NAMES, 
+        R2D2_POISON_TYPE(frame_swarm_names)
     )
 
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
