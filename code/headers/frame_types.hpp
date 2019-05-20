@@ -262,8 +262,8 @@ namespace r2d2 {
      */
     R2D2_PACK_STRUCT
     struct frame_temperature_s {
-		// This is the (unique) ID of the sensor
-		uint32_t id;
+        // This is the (unique) ID of the sensor
+        uint32_t id;
         // Ambient temperature multiplied with 10
         int16_t ambient_temperature;
         // Object temperature multiplied with 10
