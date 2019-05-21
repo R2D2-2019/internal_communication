@@ -517,13 +517,14 @@ namespace r2d2 {
     };
 
     /* 
-    * This frame will be send from the gas detection module. It will send the gas_id(which corresponds to a specific gas) 
+    * This frame will be send from the gas detection module.
+    * It will send the gas_id (which corresponds to a specific gas) 
     * and the gas_value will be the value of gas in parts per million.
     * Refer to the wiki for more information:
     * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Gas-Detection
     */
     R2D2_PACK_STRUCT
-    struct frame_gas_s{
+    struct frame_gas_s {
         // The gas value in parts per million.
         uint16_t gas_value;
         // The gas id which corresponds to a specific gas.
