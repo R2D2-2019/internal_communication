@@ -476,7 +476,7 @@ namespace r2d2 {
     R2D2_PYTHON_FRAME
     struct frame_command_id_s {
         // The new command ID
-        uint32_t cmd_id;
+        uint32_t command_id;
     };
 	
 
