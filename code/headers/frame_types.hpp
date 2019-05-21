@@ -19,7 +19,7 @@ namespace r2d2 {
         DISTANCE,
         DISPLAY_FILLED_RECTANGLE,
         DISPLAY_8X8_CHARACTER,
-        DISPLAY_8X8_CURSOR_CHARACTER,
+        DISPLAY_8X8_CHARACTER_VIA_CURSOR,
         CURSOR_POSITION,
         CURSOR_COLOR,
         UI_COMMAND, 
@@ -546,7 +546,7 @@ namespace r2d2 {
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_display_8x8_character_via_cursor_s,
-        DISPLAY_8X8_CURSOR_CHARACTER,
+        DISPLAY_8X8_CHARACTER_VIA_CURSOR,
         R2D2_OPTIMISE_STRING(frame_display_8x8_character_via_cursor_s, characters)
     )
 
