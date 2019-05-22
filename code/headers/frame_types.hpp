@@ -20,6 +20,8 @@ namespace r2d2 {
         DISPLAY_FILLED_RECTANGLE,
         DISPLAY_8X8_CHARACTER,
         DISPLAY_8X8_CHARACTER_VIA_CURSOR,
+        DISPLAY_FILLED_CIRCLE,
+        DISPLAY_HOLLOW_CIRCLE,
         CURSOR_POSITION,
         CURSOR_COLOR,
         UI_COMMAND, 
@@ -220,6 +222,57 @@ namespace r2d2 {
         // The characters to draw
         // Last element because of string optimisation
         char characters[247];
+    };
+
+    /**
+     * Struct to set a circle on a display. This fills a
+     * circle with the color specified.
+     *
+     * Currently we can't fill the bigger screens. When the
+     * extended frames are here the position and width/height
+     * will change to a uint16_t to support the bigger screens.
+     *
+     * Display wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
+     */
+    R2D2_PACK_STRUCT
+    struct frame_display_filled_circle_s {
+        // position of the circle
+        uint8_t x;
+        uint8_t y;
+
+        // dimensions of the circle
+        uint8_t radius;
+
+        // color of pixels
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
+    };
+
+    /**
+     * Struct to set a hollow circle on a display.
+     *
+     * Currently we can't fill the bigger screens. When the
+     * extended frames are here the position and width/height
+     * will change to a uint16_t to support the bigger screens.
+     *
+     * Display wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
+     */
+    R2D2_PACK_STRUCT
+    struct frame_display_hollow_circle_s {
+        // position of the circle
+        uint8_t x;
+        uint8_t y;
+
+        // dimensions of the circle
+        uint8_t radius;
+
+        // color of pixels
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
     };
 
     /**
@@ -550,6 +603,9 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_circle_s, DISPLAY_FILLED_CIRCLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_hollow_circle_s, DISPLAY_HOLLOW_CIRCLE)
+
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_display_8x8_character_s,
