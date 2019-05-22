@@ -640,23 +640,6 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_gas_s, GAS)
 
     R2D2_INTERNAL_FRAME_HELPER(
-      frame_request_map_obstacles_s,
-      REQUEST_MAP_OBSTACLES,
-      R2D2_POISON_TYPE(frame_request_map_obstacles_s)
-    )
-
-
-    R2D2_INTERNAL_FRAME_HELPER(
-      frame_map_info_s,
-      MAP_INFO,
-      R2D2_POISON_TYPE(frame_map_info_s)
-    )
-    R2D2_INTERNAL_FRAME_HELPER(frame_map_obstacle_s,
-       MAP_OBSTACLE,
-       R2D2_POISON_TYPE(frame_map_obstacle_s)
-     )
-
-    R2D2_INTERNAL_FRAME_HELPER(
         frame_command_log_s,
         COMMAND_LOG,
         R2D2_POISON_TYPE(frame_command_log_s)
@@ -675,4 +658,22 @@ namespace r2d2 {
     )
 
     R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURE)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_request_map_obstacles_s,
+        REQUEST_MAP_OBSTACLES,
+        R2D2_POISON_TYPE(frame_request_map_obstacles_s)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_map_info_s,
+        MAP_INFO,
+        R2D2_POISON_TYPE(frame_map_info_s)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_map_obstacle_s,
+        MAP_OBSTACLE,
+        R2D2_POISON_TYPE(frame_map_obstacle_s)
+    )
 }
