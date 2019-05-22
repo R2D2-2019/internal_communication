@@ -274,6 +274,8 @@ The name of the struct should simply refer to it's contents, not what it is used
 You've probably noticed the `R2D2_PACK_STRUCT` above the struct. This is a macro definition that instructs the compiler to make the struct as small as possible (no padding bytes). This is important, is it makes communication on the CAN bus more efficient.
 Struct members should be ordered from large to small. That means `uint32_t` goes before `uint16_t` for example. 
 
+If you have a frame that is meant **purely** for Python, replace `R2D2_PACK_STRUCT` with `R2D2_PYTHON_FRAME`. 
+
 The third one is a macro definition at the bottom of the file. This macro definition connects the enumeration value to the struct type:
 ```cpp
 R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
@@ -331,12 +333,32 @@ In short, your PR should contain:
  - The enumeration value for your frame
  - The struct containing its definition
  - The macro connection the enumeration value to the struct
+ - If you have a frame that is **purely** for use within Python, please read the next chapter about Python frames.
  
 You should add these values **beside** the other values/definitions. So the enum value should be inserted into the already existing enumeration. Don't redefine existing structures.
  
  The leads will need to approve and merge the PR.
  Once merged, the build system will be updated and everyone can pull in the new frame type.
 
+##### Python frames
+A frame that is meant for use in Python only has a  few differences in how it is defined compared to a C++ frame:
+ - Instead of `R2D2_PACK_STRUCT`, `R2D2_PYTHON_FRAME` is placed above the struct definition.
+ - In the `INTERNAL_FRAME_HELPER`, the struct is **poisoned**. 
+ 
+You can poison a struct as follows:
+```cpp
+ R2D2_INTERNAL_FRAME_HELPER(
+       frame_request_map_obstacles_s,
+       REQUEST_MAP_OBSTACLES,
+       R2D2_POISON_TYPE(frame_request_map_obstacles_s)
+   )
+```
+
+Please note the `R2D2_POISON_TYPE` tag that is placed as a third argument to the helper macro.
+Poisoning means that you're disallowing the compiler from using that token.
+That means; the struct that is poisoned is **not** usable in other C++ code.
+
+Since Python frames are not usable in the C++ code, we poison these types to prevent any incorrect usages at compile time.
 
 ## CAN
 ### Why a CAN bus?
