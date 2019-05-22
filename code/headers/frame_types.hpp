@@ -259,7 +259,7 @@ namespace r2d2 {
      * The temperature the sensor is pointed at and
      * the ambient temperature
      * IMPORTANT:
-     * All the values must be devided by 10 in order
+     * All the values must be devided by 100 in order
      * to get the correct value.
      * This is to prevent floating point values.
      */
@@ -267,9 +267,9 @@ namespace r2d2 {
     struct frame_temperature_s {
         // This is the (unique) ID of the sensor
         uint32_t id;
-        // Ambient temperature multiplied with 10
+        // Ambient temperature multiplied with 100
         int16_t ambient_temperature;
-        // Object temperature multiplied with 10
+        // Object temperature multiplied with 100
         // Contains the temperature the sensor is pointed at
         int16_t object_temperature;
     };
