@@ -22,7 +22,9 @@ namespace r2d2 {
         DISPLAY_8x8_CURSOR_CHARACTER,
         CURSOR_POSITION,
         CURSOR_COLOR,
-        UI_COMMAND,        
+        UI_COMMAND, 
+        ROBOT_NAMES,
+        SWARM_NAMES,       
         BATTERY_LEVEL,
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
@@ -31,7 +33,9 @@ namespace r2d2 {
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
         COMMAND_ID,
-
+        TEMPERATURE,
+        GAS,
+      
         // Don't touch
         EXTERNAL,
         ALL,
@@ -111,9 +115,9 @@ namespace r2d2 {
 
     /** USER STRUCTS */
 
-		
-	/** DO NOT REMOVE */
-	/** #PythonAnchor# */
+        
+    /** DO NOT REMOVE */
+    /** #PythonAnchor# */
 
 
     /**
@@ -250,6 +254,26 @@ namespace r2d2 {
         uint8_t green;
         uint8_t blue;
     };
+    
+    /**
+     * This frame contains two temperatures.
+     * The temperature the sensor is pointed at and
+     * the ambient temperature
+     * IMPORTANT:
+     * All the values must be devided by 100 in order
+     * to get the correct value.
+     * This is to prevent floating point values.
+     */
+    R2D2_PACK_STRUCT
+    struct frame_temperature_s {
+        // This is the (unique) ID of the sensor
+        uint32_t id;
+        // Ambient temperature multiplied with 100
+        int16_t ambient_temperature;
+        // Object temperature multiplied with 100
+        // Contains the temperature the sensor is pointed at
+        int16_t object_temperature;
+    };
 
     /**
      * ONLY USABLE IN PYTHON TO PYTHON COMMUNICATION
@@ -276,6 +300,34 @@ namespace r2d2 {
         // destination is used to tell what robot or swarm to
         // send the command to
         char destination;
+    };
+
+    /**
+     * Only used in python
+     * List of all robot names
+     * The names of all connected robots will be in this struct, seperated by spaces
+     * These names will be used by swarm ui to indicate a destination
+     * An example: "robot1 robot2 robot3"
+     * Swarm UI wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
+    */
+    R2D2_PACK_STRUCT
+    struct frame_robot_names_s {
+        char names;
+    };
+
+    /**
+     * Only used in python
+     * List of all swarm names
+     * The names of all connected swarms will be in this struct, seperated by spaces
+     * These names will be used by swarm ui to indicate a destination
+     * An example: "swarm1 swarm2 swarm3"
+     * Swarm UI wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
+    */
+    R2D2_PACK_STRUCT
+    struct frame_swarm_names_s {
+        char names;
     };
 
     /**
@@ -355,7 +407,7 @@ namespace r2d2 {
         // This variable represents the thousandths
         // seconds of the longitude coordinate.
         uint16_t long_thousandth_sec;
-		   
+           
         // This variable represents the thousandths
         // seconds of the latitude coordinate.
         uint16_t lat_thousandth_sec;
@@ -420,7 +472,7 @@ namespace r2d2 {
         // up multiple paths.
         uint8_t path_id;
     };
-	
+    
     /*
      * This frame will only be used with the python bus.
      * The frame will be responsible for sending log data from
@@ -436,7 +488,7 @@ namespace r2d2 {
         // since swarm analytics will provide a table containing the
         // explanation for each status.
         uint16_t status;
-		
+        
         // This variable will contain the original recieved command
         // type.
         char original_command;
@@ -444,7 +496,7 @@ namespace r2d2 {
         // This variable will contain the original command data.
         char original_data;
     };
-	
+    
     /*
      * This frame will only be used with the python bus.
      * The frame will be responsible for updating the status of a
@@ -457,14 +509,13 @@ namespace r2d2 {
     struct frame_command_status_update_s {
         // The command id for wich the status needs to be updated.
         uint32_t cmd_id;
-		
+        
         // The current status of the command, for example received,
         // processed, send etc. This is specified as an integer 
         // since swarm analytics will provide a table containing the
         // explanation for each status.
         uint16_t status;
     };
-
 
     /**
      * This frame will only be used with the python bus.
@@ -478,8 +529,23 @@ namespace r2d2 {
         // The new command ID
         uint32_t command_id;
     };
-	
 
+    /* 
+    * This frame will be send from the gas detection module.
+    * It will send the gas_id (which corresponds to a specific gas) 
+    * and the gas_value will be the value of gas in parts per million.
+    * Refer to the wiki for more information:
+    * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Gas-Detection
+    */
+    R2D2_PACK_STRUCT
+    struct frame_gas_s {
+        // The gas value in parts per million.
+        uint16_t gas_value;
+        // The gas id which corresponds to a specific gas.
+        // For example: 0 is LPG, 1 is Co, 2 is smoke.
+        uint8_t gas_id;
+    };
+    
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
@@ -506,11 +572,24 @@ namespace r2d2 {
         R2D2_POISON_TYPE(frame_ui_command_s)
     )
 
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_robot_names_s, 
+        ROBOT_NAMES, 
+        R2D2_POISON_TYPE(frame_robot_names)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_swarm_names_s, 
+        SWARM_NAMES, 
+        R2D2_POISON_TYPE(frame_swarm_names)
+    )
+
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE_STRUCT)
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
+    R2D2_INTERNAL_FRAME_HELPER(frame_gas_s, GAS)
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_command_log_s,
@@ -529,4 +608,6 @@ namespace r2d2 {
             COMMAND_ID,
             R2D2_POISON_TYPE(frame_command_id_s)
     )
+    
+    R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURE)
 }
