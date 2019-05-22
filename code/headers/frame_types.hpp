@@ -32,9 +32,10 @@ namespace r2d2 {
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
+        COMMAND_ID,
         TEMPERATURE,
         GAS,
-
+      
         // Don't touch
         EXTERNAL,
         ALL,
@@ -259,7 +260,7 @@ namespace r2d2 {
      * The temperature the sensor is pointed at and
      * the ambient temperature
      * IMPORTANT:
-     * All the values must be devided by 10 in order
+     * All the values must be devided by 100 in order
      * to get the correct value.
      * This is to prevent floating point values.
      */
@@ -267,9 +268,9 @@ namespace r2d2 {
     struct frame_temperature_s {
         // This is the (unique) ID of the sensor
         uint32_t id;
-        // Ambient temperature multiplied with 10
+        // Ambient temperature multiplied with 100
         int16_t ambient_temperature;
-        // Object temperature multiplied with 10
+        // Object temperature multiplied with 100
         // Contains the temperature the sensor is pointed at
         int16_t object_temperature;
     };
@@ -516,6 +517,19 @@ namespace r2d2 {
         uint16_t status;
     };
 
+    /**
+     * This frame will only be used with the python bus.
+     * This frame gives a new command_id to SMM which can use that to issue a command.
+     *
+     * Swarm Analytics wiki:
+     * https://github.com/R2D2-2019/swarm_analytics
+     */
+    R2D2_PYTHON_FRAME
+    struct frame_command_id_s {
+        // The new command ID
+        uint32_t command_id;
+    };
+
     /* 
     * This frame will be send from the gas detection module.
     * It will send the gas_id (which corresponds to a specific gas) 
@@ -532,7 +546,6 @@ namespace r2d2 {
         uint8_t gas_id;
     };
     
-
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
@@ -588,6 +601,12 @@ namespace r2d2 {
         frame_command_status_update_s,
         COMMAND_STATUS_UPDATE,
         R2D2_POISON_TYPE(frame_command_status_update_s)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+            frame_command_id_s,
+            COMMAND_ID,
+            R2D2_POISON_TYPE(frame_command_id_s)
     )
     
     R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURE)
