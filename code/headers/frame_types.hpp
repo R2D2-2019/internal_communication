@@ -18,19 +18,28 @@ namespace r2d2 {
         ACTIVITY_LED_STATE,
         DISTANCE,
         DISPLAY_FILLED_RECTANGLE,
-        DISPLAY_8x8_CHARACTER,
-        DISPLAY_8x8_CURSOR_CHARACTER,
+        DISPLAY_8X8_CHARACTER,
+        DISPLAY_8X8_CHARACTER_VIA_CURSOR,
         CURSOR_POSITION,
         CURSOR_COLOR,
-        UI_COMMAND,        
+        UI_COMMAND,
+        ROBOT_NAMES,
+        SWARM_NAMES,
         BATTERY_LEVEL,
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
         ROBOS_INSTRUCTION,
         COORDINATE_STRUCT,
+        COORDINATE,
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
+        COMMAND_ID,
+        TEMPERATURE,
+        GAS,
+        REQUEST_MAP_OBSTACLES,
+        MAP_INFO,
+        MAP_OBSTACLE,
 
         // Don't touch
         EXTERNAL,
@@ -109,9 +118,9 @@ namespace r2d2 {
 
     /** USER STRUCTS */
 
-		
-	/** DO NOT REMOVE */
-	/** #PythonAnchor# */
+
+    /** DO NOT REMOVE */
+    /** #PythonAnchor# */
 
 
     /**
@@ -134,7 +143,7 @@ namespace r2d2 {
 
     /**
      * Distance in milimeter
-     * 
+     *
      * Distance sensor wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Measuring-distance
      */
@@ -224,7 +233,7 @@ namespace r2d2 {
     R2D2_PACK_STRUCT
     struct frame_cursor_position_s {
         // Targets which cursor to write to. This should be one
-        // your module claimed. 
+        // your module claimed.
         uint8_t cursor_id;
 
         // new location for the cursor
@@ -247,6 +256,26 @@ namespace r2d2 {
         uint8_t red;
         uint8_t green;
         uint8_t blue;
+    };
+
+    /**
+     * This frame contains two temperatures.
+     * The temperature the sensor is pointed at and
+     * the ambient temperature
+     * IMPORTANT:
+     * All the values must be devided by 100 in order
+     * to get the correct value.
+     * This is to prevent floating point values.
+     */
+    R2D2_PACK_STRUCT
+    struct frame_temperature_s {
+        // This is the (unique) ID of the sensor
+        uint32_t id;
+        // Ambient temperature multiplied with 100
+        int16_t ambient_temperature;
+        // Object temperature multiplied with 100
+        // Contains the temperature the sensor is pointed at
+        int16_t object_temperature;
     };
 
     /**
@@ -277,23 +306,51 @@ namespace r2d2 {
     };
 
     /**
+     * Only used in python
+     * List of all robot names
+     * The names of all connected robots will be in this struct, seperated by spaces
+     * These names will be used by swarm ui to indicate a destination
+     * An example: "robot1 robot2 robot3"
+     * Swarm UI wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
+    */
+    R2D2_PACK_STRUCT
+    struct frame_robot_names_s {
+        char names;
+    };
+
+    /**
+     * Only used in python
+     * List of all swarm names
+     * The names of all connected swarms will be in this struct, seperated by spaces
+     * These names will be used by swarm ui to indicate a destination
+     * An example: "swarm1 swarm2 swarm3"
+     * Swarm UI wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-UI
+    */
+    R2D2_PACK_STRUCT
+    struct frame_swarm_names_s {
+        char names;
+    };
+
+    /**
      * Struct that represents the level of
      * the battery on the robot.
-     * 
-     * Power wiki: 
+     *
+     * Power wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Power
-     */ 
+     */
     R2D2_PACK_STRUCT
     struct frame_battery_level_s {
         // Battery voltage.
         // The voltage is multiplied by 1000 in this
         // representation. That means that a value of
-        // 12.1V will be 12100. This larger value is 
+        // 12.1V will be 12100. This larger value is
         // used to alleviate the need for floating point numbers.
         // A scale of x1000 is used, because thas is the maximum
         // precision the sensor can read.
-        uint32_t voltage;        
-        
+        uint32_t voltage;
+
         // Battery percentage. Between 0 - 100
         uint8_t percentage;
     };
@@ -301,10 +358,10 @@ namespace r2d2 {
     /**
      * Struct that represent the state
      * of how the robot SHOULD move according the controller.
-     * 
+     *
      * Manual_control wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
-     * 
+     *
      */
     R2D2_PACK_STRUCT
     struct frame_manual_control_s {
@@ -321,7 +378,7 @@ namespace r2d2 {
     /**
      * Struct that represent the state
      * of how the robot WILL move.
-     * 
+     *
      * Moving Platform wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Moving-Platform
      */
@@ -360,7 +417,7 @@ namespace r2d2 {
      * the list index. x and y are the 2D vector's attributes.
 
      * Struct that represents a coordinate on the planet.
-     * 
+     *
      * Location_detector wiki:
      * https://github.com/R2D2-2019/location_detector
      */
@@ -370,56 +427,56 @@ namespace r2d2 {
         // This variable represents the height relative
         // to the average sea level.
         int16_t altitude;
-        
+
         // This variable represents the thousandths
         // seconds of the longitude coordinate.
         uint16_t long_thousandth_sec;
-		   
+
         // This variable represents the thousandths
         // seconds of the latitude coordinate.
         uint16_t lat_thousandth_sec;
-            
+
         // This variable represents the degrees of
         // the latitude coordinate.
         uint8_t lat_deg;
-        
+
         // This variable represents the minutes of
         // the latitude coordinate.
         uint8_t lat_min;
-        
+
         // This variable represents the seconds of
         // the latitude coordinate.
         uint8_t lat_sec;
-        
+
         // This variable represents the degrees of
         // the longitude coordinate.
         uint8_t long_deg;
-        
+
         // This variable represents the minutes of
         // the longitude coordinate.
         uint8_t long_min;
-        
+
         // This variable represents the seconds of
         // the longitude coordinate.
         uint8_t long_sec;
-        
+
         // This variable represents the nothern or
         // southern hemisphere the coordinate is located
         // on. North is true, South is false.
         bool north_south_hemisphere;
-        
-        // This variable represents the eastern or 
+
+        // This variable represents the eastern or
         // western hemisphere the coordinate is located
         // on. East is true, West is false.
         bool east_west_hemisphere;
     };
-    
+
     /*
      * Our A-star algorithm outputs a list of 2D vector so
-     * the path_id indentifies which list it's from, the 
+     * the path_id indentifies which list it's from, the
      * step id is basically the list index. x and y are the
      * 2D vector's attributes.
-     * 
+     *
      * Navigation wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
      */
@@ -439,7 +496,7 @@ namespace r2d2 {
         // up multiple paths.
         uint8_t path_id;
     };
-	
+
     /*
      * This frame will only be used with the python bus.
      * The frame will be responsible for sending log data from
@@ -451,11 +508,11 @@ namespace r2d2 {
     R2D2_PYTHON_FRAME
     struct frame_command_log_s {
         // The current status of the command [for example received,
-        // processed, send etc.] This is specified as an integer 
+        // processed, send etc.] This is specified as an integer
         // since swarm analytics will provide a table containing the
         // explanation for each status.
         uint16_t status;
-		
+
         // This variable will contain the original recieved command
         // type.
         char original_command;
@@ -463,7 +520,7 @@ namespace r2d2 {
         // This variable will contain the original command data.
         char original_data;
     };
-	
+
     /*
      * This frame will only be used with the python bus.
      * The frame will be responsible for updating the status of a
@@ -476,17 +533,88 @@ namespace r2d2 {
     struct frame_command_status_update_s {
         // The command id for wich the status needs to be updated.
         uint32_t cmd_id;
-		
+
         // The current status of the command, for example received,
-        // processed, send etc. This is specified as an integer 
+        // processed, send etc. This is specified as an integer
         // since swarm analytics will provide a table containing the
         // explanation for each status.
         uint16_t status;
     };
 
-    // frame_external_s has to be here, because the static_assert requires
-    // all other size exceptions to be defined.
-    R2D2_INTERNAL_FRAME_HELPER(frame_external_s, EXTERNAL)
+    /**
+     * This frame will only be used with the python bus.
+     * This frame gives a new command_id to SMM which can use that to issue a command.
+     *
+     * Swarm Analytics wiki:
+     * https://github.com/R2D2-2019/swarm_analytics
+     */
+    R2D2_PYTHON_FRAME
+    struct frame_command_id_s {
+        // The new command ID
+        uint32_t command_id;
+    };
+
+    /*
+    * This frame will be send from the gas detection module.
+    * It will send the gas_id (which corresponds to a specific gas)
+    * and the gas_value will be the value of gas in parts per million.
+    * Refer to the wiki for more information:
+    * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Gas-Detection
+    */
+    R2D2_PACK_STRUCT
+    struct frame_gas_s {
+        // The gas value in parts per million.
+        uint16_t gas_value;
+        // The gas id which corresponds to a specific gas.
+        // For example: 0 is LPG, 1 is Co, 2 is smoke.
+        uint8_t gas_id;
+    };
+
+    /*
+    * This frame will be sent from the navigation module.
+    * Refer to the wiki for more information:
+    * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
+    */
+    R2D2_PYTHON_FRAME
+    struct frame_request_map_obstacles_s {
+        // Will be used to assign a map to a specific path
+        uint8_t path_id;
+    };
+
+    /*
+    * This frame will be sent from Swarm Analytics.
+    * Refer to the wiki for more information:
+    * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-Analytics
+    */
+    R2D2_PYTHON_FRAME
+    struct frame_map_info_s {
+        // Will be used to detect the amount of obstacles that have been found.
+        uint16_t obstacle_count;
+        // The width of a map.
+        uint16_t width;
+        // The height of a map.
+        uint16_t height;
+        // Will be used to correspond to a request.
+        uint8_t path_id;
+        // Will be used to indentify map for all the coming obstacles.
+        uint8_t map_id;
+    };
+
+    /*
+    * This frame will be sent from Swarm Analytics.
+    * Refer to the wiki for more information:
+    * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Swarm-Analytics
+    */
+    R2D2_PYTHON_FRAME
+    struct frame_map_obstacle_s {
+        // The coordinate of the X-axis.
+        uint16_t x;
+        // The coordinate of the Y-axis.
+        uint16_t y;
+        // The classification to a specific map.
+        uint8_t map_id;
+    };
+
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
@@ -495,13 +623,13 @@ namespace r2d2 {
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_display_8x8_character_s,
-        DISPLAY_8x8_CHARACTER,
+        DISPLAY_8X8_CHARACTER,
         R2D2_OPTIMISE_STRING(frame_display_8x8_character_s, characters)
     )
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_display_8x8_character_via_cursor_s,
-        DISPLAY_8x8_CURSOR_CHARACTER,
+        DISPLAY_8X8_CHARACTER_VIA_CURSOR,
         R2D2_OPTIMISE_STRING(frame_display_8x8_character_via_cursor_s, characters)
     )
 
@@ -514,6 +642,21 @@ namespace r2d2 {
         R2D2_POISON_TYPE(frame_ui_command_s)
     )
 
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_robot_names_s,
+        ROBOT_NAMES,
+        R2D2_POISON_TYPE(frame_robot_names)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_swarm_names_s,
+        SWARM_NAMES,
+        R2D2_POISON_TYPE(frame_swarm_names)
+    )
+
+    // frame_external_s has to be here, because the static_assert requires
+    // all other size exceptions to be defined.
+    R2D2_INTERNAL_FRAME_HELPER(frame_external_s, EXTERNAL)
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
@@ -521,17 +664,46 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_command_log_s, COMMAND_LOG, R2D2_POISON_TYPE(frame_command_log_s))
     R2D2_INTERNAL_FRAME_HELPER(frame_command_status_update_s, COMMAND_STATUS_UPDATE, R2D2_POISON_TYPE(frame_command_status_update_s))
     R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE_STRUCT)
+    R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE)
+
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
+    R2D2_INTERNAL_FRAME_HELPER(frame_gas_s, GAS)
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_command_log_s,
         COMMAND_LOG,
         R2D2_POISON_TYPE(frame_command_log_s)
     )
-    
+
     R2D2_INTERNAL_FRAME_HELPER(
         frame_command_status_update_s,
         COMMAND_STATUS_UPDATE,
         R2D2_POISON_TYPE(frame_command_status_update_s)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+            frame_command_id_s,
+            COMMAND_ID,
+            R2D2_POISON_TYPE(frame_command_id_s)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURE)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_request_map_obstacles_s,
+        REQUEST_MAP_OBSTACLES,
+        R2D2_POISON_TYPE(frame_request_map_obstacles_s)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_map_info_s,
+        MAP_INFO,
+        R2D2_POISON_TYPE(frame_map_info_s)
+    )
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_map_obstacle_s,
+        MAP_OBSTACLE,
+        R2D2_POISON_TYPE(frame_map_obstacle_s)
     )
 }
