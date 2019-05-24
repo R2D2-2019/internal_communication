@@ -180,7 +180,7 @@ namespace r2d2 {
         uint8_t blue;
     };
 
-    /**
+    /** @cond CLI COMMAND @endcond
      * Struct to set a single character on a display. This shows
      * a colored character at given location. The character
      * can be any character from the un-extended
@@ -376,7 +376,7 @@ namespace r2d2 {
         bool brake;
     };
 
-    /**
+    /** @cond CLI COMMAND @endcond
      * Struct that represent the state
      * of how the robot WILL move.
      *
