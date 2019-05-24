@@ -274,11 +274,57 @@ The name of the struct should simply refer to it's contents, not what it is used
 You've probably noticed the `R2D2_PACK_STRUCT` above the struct. This is a macro definition that instructs the compiler to make the struct as small as possible (no padding bytes). This is important, is it makes communication on the CAN bus more efficient.
 Struct members should be ordered from large to small. That means `uint32_t` goes before `uint16_t` for example. 
 
+If you have a frame that is meant **purely** for Python, replace `R2D2_PACK_STRUCT` with `R2D2_PYTHON_FRAME`. 
+
 The third one is a macro definition at the bottom of the file. This macro definition connects the enumeration value to the struct type:
 ```cpp
 R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
 R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
 ```
+
+To prevent clutter of all the structs and enum values, we added a file specifically for all the `enum class`'s. This file can be found here: [frame_enums.hpp](https://github.com/R2D2-2019/internal_communication/blob/master/code/headers/frame_enums.hpp).
+
+#### Optimising your frame
+When you have an array in a `struct`, you can make them more efficient. To do so we can apply one of the available optimisations to the frame. Currently we have two optimisations that can be applied:
+
+* char arrays (`char[]`) that are used to send strings
+* all the other arrays (e.g. `uint32_t[]`)
+
+The array you want to optimise **ALWAYS** has to be at the end of the `struct`. If the optimalisation breaks the rule of ordering sizes from large to small contact: @LRstudent or @itzandroidtab and mention this in the comments / PR.
+
+##### String optimisation
+When you want to have an char array to send strings you can add the `R2D2_OPTIMISE_STRING` macro to the `R2D2_INTERNAL_FRAME_HELPER`. You have to put two things in the `R2D2_OPTIMISE_STRING` macro.
+
+The first parameter is the name of the `struct` and the second parameter is the name of the variable of the array.
+
+Example of the string optimisation:
+```cpp
+R2D2_INTERNAL_FRAME_HELPER(
+    frame_display_8x8_character_s,
+    DISPLAY_8x8_CHARACTER,
+    R2D2_OPTIMISE_STRING(frame_display_8x8_character_s, characters)
+)
+```
+**Important notice!!** When using the string optimisation you have to null-terminate the string. Reading after the null-terminator is Undefined Behaviour (UB). 
+
+##### Generic array optimisation
+When you have an array in your frame we can apply the `R2D2_OPTIMISE_ARRAY` macro in the `R2D2_INTERNAL_FRAME_HELPER` macro. We have to put 3 parameters in this macro.
+
+The first parameter is the name of the `struct` again. The second parameter is the name of the variable where the length is stored, the third variable is the name of the array again.
+
+Please note the following:
+ - You are required to have member variable of type `uint8_t` that keeps track of the amount of elements in the array.
+ - The array *has* to be the last member in the `struct`.
+
+Example of the array optimisation
+```cpp
+R2D2_INTERNAL_FRAME_HELPER(
+    frame_raw_data_s, 
+    RAW_DATA, 
+    R2D2_OPTIMISE_ARRAY(frame_raw_data_s, length, data)
+)
+```
+**Important notice!!** Reading data after the data[length] is Undefined behaviour. 
 
 #### I want to create frame type for my module, how do I add one?
 You should create a Pull Request containing the frame definition you want to add.
@@ -287,12 +333,32 @@ In short, your PR should contain:
  - The enumeration value for your frame
  - The struct containing its definition
  - The macro connection the enumeration value to the struct
+ - If you have a frame that is **purely** for use within Python, please read the next chapter about Python frames.
  
 You should add these values **beside** the other values/definitions. So the enum value should be inserted into the already existing enumeration. Don't redefine existing structures.
  
  The leads will need to approve and merge the PR.
  Once merged, the build system will be updated and everyone can pull in the new frame type.
 
+##### Python frames
+A frame that is meant for use in Python only has a  few differences in how it is defined compared to a C++ frame:
+ - Instead of `R2D2_PACK_STRUCT`, `R2D2_PYTHON_FRAME` is placed above the struct definition.
+ - In the `INTERNAL_FRAME_HELPER`, the struct is **poisoned**. 
+ 
+You can poison a struct as follows:
+```cpp
+ R2D2_INTERNAL_FRAME_HELPER(
+       frame_request_map_obstacles_s,
+       REQUEST_MAP_OBSTACLES,
+       R2D2_POISON_TYPE(frame_request_map_obstacles_s)
+   )
+```
+
+Please note the `R2D2_POISON_TYPE` tag that is placed as a third argument to the helper macro.
+Poisoning means that you're disallowing the compiler from using that token.
+That means; the struct that is poisoned is **not** usable in other C++ code.
+
+Since Python frames are not usable in the C++ code, we poison these types to prevent any incorrect usages at compile time.
 
 ## CAN
 ### Why a CAN bus?
