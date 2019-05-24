@@ -126,6 +126,12 @@ namespace r2d2::can_bus {
 
             if (tx_queue.full()) {
                 space_in_tx_queue = false;
+                
+                // Enabling the interrupt on the CAN mailbox with the TX id
+                // will cause a interrupt when the CAN controller is ready.
+                // At that point will the frame be removed from the tx_queue
+                // and put on the bus.
+                port<Bus>->CAN_IER = (0x01 << ids::tx);                
             }
 
             // Wait for space, space is created in the interrupt
@@ -256,6 +262,7 @@ namespace r2d2::can_bus {
                     frame.frame_type = type;
                     frame.sequence_id = i;
                     frame.sequence_total = total + rem - 1;
+                    frame.mode = 0; 
 
                     // set uid for current transfer
                     frame.sequence_uid = curr_uid;
@@ -275,6 +282,7 @@ namespace r2d2::can_bus {
                     frame.frame_type = type;
                     frame.sequence_id = total;
                     frame.sequence_total = total; // -1 and rem cancel each other out
+                    frame.mode = 0; 
 
                     // set uid for current transfer
                     frame.sequence_uid = curr_uid;
