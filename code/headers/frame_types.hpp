@@ -35,6 +35,7 @@ namespace r2d2 {
         COMMAND_ID,
         TEMPERATURE,
         GAS,
+        RTTTL_STRING,
       
         // Don't touch
         EXTERNAL,
@@ -545,6 +546,17 @@ namespace r2d2 {
         // For example: 0 is LPG, 1 is Co, 2 is smoke.
         uint8_t gas_id;
     };
+
+    /*
+    * This is a frame that will be send to the sound module. 
+    * It contains a simple rtttl string 
+    * this was not my idea either 
+    */
+    R2D2_PACK_STRUCT
+    struct frame_rtttl_string_s {
+        //the rtttl string to be send 
+        char rtttl_string[248];
+    };
     
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
@@ -610,4 +622,6 @@ namespace r2d2 {
     )
     
     R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURE)
+    
+    R2D2_INTERNAL_FRAME_HELPER(frame_rtttl_string_s, RTTTL_STRING)
 }
