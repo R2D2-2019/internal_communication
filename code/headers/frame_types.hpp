@@ -605,7 +605,6 @@ namespace r2d2 {
     R2D2_PACK_STRUCT
     struct frame_end_effector_type_s {
         //the type of end effector 
-        enum end_effector_type { CLAW, NONE };
         end_effector_type type;
     };
 
