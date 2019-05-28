@@ -30,6 +30,7 @@ namespace r2d2 {
         SWARM_NAMES,
         BATTERY_LEVEL,
         MANUAL_CONTROL,
+        MICROPHONE,
         MOVEMENT_CONTROL,
         COORDINATE,
         PATH_STEP,
@@ -552,6 +553,17 @@ namespace r2d2 {
         uint8_t path_id;
     };
 
+    /**
+     * This frame contains the raw value of the microphone
+     * The use of such a small stuck is to keep the overhead as as small as
+     * posible
+     */
+    R2D2_PACK_STRUCT
+    struct frame_microphone_s {
+        // This is raw microphone value
+        int16_t raw_sound;
+    };
+
     /*
      * This frame will only be used with the python bus.
      * The frame will be responsible for sending log data from
@@ -716,6 +728,7 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_microphone_s, MICROPHONE)
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
     R2D2_INTERNAL_FRAME_HELPER(frame_gas_s, GAS)
 
