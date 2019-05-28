@@ -31,7 +31,7 @@ namespace r2d2 {
         BATTERY_LEVEL,
         MANUAL_CONTROL,
         MOVEMENT_CONTROL,
-        COORDINATE_STRUCT,
+        COORDINATE,
         PATH_STEP,
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
@@ -715,7 +715,7 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
-    R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE_STRUCT)
+    R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
     R2D2_INTERNAL_FRAME_HELPER(frame_gas_s, GAS)
 
