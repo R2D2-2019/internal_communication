@@ -38,6 +38,7 @@ namespace r2d2 {
         REQUEST_MAP_OBSTACLES,
         MAP_INFO,
         MAP_OBSTACLE,
+        END_EFFECTOR_TYPE,
         END_EFFECTOR_CLAW,
 
         // Don't touch
@@ -596,6 +597,19 @@ namespace r2d2 {
     };
 
     /**
+     * This frame is used to request the type of the end effector
+     * 
+     * End effector wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/End-Effectors#2-Interface
+     */
+    R2D2_PACK_STRUCT
+    struct frame_end_effector_type_s {
+        //the type of end effector 
+        enum end_effector_type { CLAW, NONE };
+        end_effector_type type;
+    };
+
+    /**
      * The end effector claw can be closed and opened with this frame.
      * 
      * End effector wiki:
@@ -689,6 +703,8 @@ namespace r2d2 {
         MAP_OBSTACLE,
         R2D2_POISON_TYPE(frame_map_obstacle_s)
     )
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_type_s, END_EFFECTOR_TYPE)
 
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_claw_s, END_EFFECTOR_CLAW)
 }
