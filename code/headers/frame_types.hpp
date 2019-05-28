@@ -17,10 +17,12 @@ namespace r2d2 {
         BUTTON_STATE,
         ACTIVITY_LED_STATE,
         DISTANCE,
-        DISPLAY_FILLED_RECTANGLE,
+        DISPLAY_RECTANGLE,
+        DISPLAY_RECTANGLE_VIA_CURSOR,
         DISPLAY_8X8_CHARACTER,
         DISPLAY_8X8_CHARACTER_VIA_CURSOR,
         DISPLAY_CIRCLE,
+        DISPLAY_CIRCLE_VIA_CURSOR,
         CURSOR_POSITION,
         CURSOR_COLOR,
         UI_COMMAND,
@@ -157,15 +159,11 @@ namespace r2d2 {
      * Struct to set a rectangle on a display. This fills a
      * rectangle with the color specified.
      *
-     * Currently we can't fill the bigger screens. When the
-     * extended frames are here the position and width/height
-     * will change to a uint16_t to support the bigger screens.
-     *
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
     R2D2_PACK_STRUCT
-    struct frame_display_filled_rectangle_s {
+    struct frame_display_rectangle_s {
         // position of rectangle
         uint8_t x;
         uint8_t y;
@@ -173,6 +171,34 @@ namespace r2d2 {
         // dimensions of the rectangle
         uint8_t width;
         uint8_t height;
+        // if true the rectangle will be filled, if false the rectangle will be hollow.
+        bool filled;
+
+        // color of pixels
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
+    };
+
+    /**
+     * Struct to set a rectangle on a display. This fills a
+     * rectangle with the color specified.
+     *
+     * Display wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
+     */
+    R2D2_PACK_STRUCT
+    struct frame_display_rectangle_via_cursor_s {
+        // Targets which cursor to write to. This should be one
+        // your module claimed. The rectangle will be drawn
+        // from the cursor position as starting location.
+        uint8_t cursor_id;
+
+        // dimensions of the rectangle
+        uint8_t width;
+        uint8_t height;
+        // if true the rectangle will be filled, if false the rectangle will be hollow.
+        bool filled;
 
         // color of pixels
         uint8_t red;
@@ -230,10 +256,6 @@ namespace r2d2 {
      * Struct to set a circle on a display. This fills a
      * circle with the color specified.
      *
-     * Currently we can't fill the bigger screens. When the
-     * extended frames are here the position and width/height
-     * will change to a uint16_t to support the bigger screens.
-     *
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
@@ -254,6 +276,30 @@ namespace r2d2 {
         uint8_t blue;
     };
 
+    /**
+     * Struct to set a circle on a display. This fills a
+     * circle with the color specified.
+     *
+     * Display wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
+     */
+    R2D2_PACK_STRUCT
+    struct frame_display_circle_via_cursor_s {
+        // Targets which cursor to write to. This should be one
+        // your module claimed. The circle will be drawn
+        // from the cursor position as starting location.
+        uint8_t cursor_id;
+
+        // dimensions of the circle
+        uint8_t radius;
+        // if true the circle will be filled, if false the circle will be hollow.
+        bool filled;
+
+        // color of pixels
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
+    };
 
     /**
      * This frame will move the targeted cursor to the
@@ -627,8 +673,10 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
-    R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_rectangle_s, DISPLAY_RECTANGLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_rectangle_via_cursor_s, DISPLAY_RECTANGLE_VIA_CURSOR)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_circle_s, DISPLAY_CIRCLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_circle_via_cursor_s, DISPLAY_CIRCLE_VIA_CURSOR)
 
 
     R2D2_INTERNAL_FRAME_HELPER(
