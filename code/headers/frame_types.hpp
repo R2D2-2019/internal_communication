@@ -551,13 +551,13 @@ namespace r2d2 {
     };
 
     /*
-    * This is a frame that will be send to the sound module. 
-    * It contains a simple rtttl string 
+    * @brief This is a frame that will be send to the sound module. 
+    * @details It contains a simple rtttl string 
     * this was not my idea either 
     */
     R2D2_PACK_STRUCT
     struct frame_rtttl_string_s {
-        //the rtttl string to be send 
+        // the rtttl string to be send 
         char rtttl_string[248];
     };
     /* 
