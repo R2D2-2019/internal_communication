@@ -670,7 +670,11 @@ namespace r2d2 {
 
     R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURE)
     
-    R2D2_INTERNAL_FRAME_HELPER(frame_rtttl_string_s, RTTTL_STRING)
+    R2D2_INTERNAL_FRAME_HELPER(
+            frame_rtttl_string_s, 
+            RTTTL_STRING,
+            R2D2_OPTIMISE_STRING(frame_rtttl_string_s, rtttl_string)
+        )
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_request_map_obstacles_s,
