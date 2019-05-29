@@ -34,4 +34,12 @@ namespace r2d2 {
         // Don't touch
         CURSORS_COUNT
     };    
+
+    /**
+     * This enum is for the different end effector types
+     */
+    enum class end_effector_type : uint8_t { 
+        CLAW, 
+        NONE 
+    };
 }
