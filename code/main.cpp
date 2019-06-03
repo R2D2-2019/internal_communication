@@ -13,8 +13,8 @@ int main() {
     r2d2::comm_c comm1;
     r2d2::comm_c comm2;
 
-    comm1.listen_for_frames({frame_type::ALL});
-    comm2.listen_for_frames({frame_type::DISPLAY_RECTANGLE});
+    comm1.configure(module::TEST, {frame_type::ALL});
+    comm2.configure(module::TEST, {frame_type::DISPLAY_RECTANGLE});
 
     frame_display_rectangle_s state;
     state.x = 0xAA;

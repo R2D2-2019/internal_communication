@@ -2,6 +2,7 @@
 
 #include "frames/macros.hpp"
 #include "frames/definitions.hpp"
+#include "modules.hpp"
 #include "frame_enums.hpp"
 
 namespace r2d2 {
@@ -46,6 +47,7 @@ namespace r2d2 {
 
         // Don't touch
         EXTERNAL,
+        IDENTITY,
         ALL,
         COUNT
     };
@@ -120,6 +122,18 @@ namespace r2d2 {
     };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_external_s, EXTERNAL)
+
+    /**
+     * This frame is used to request and 
+     * respond to identity requests on the system.
+     * The internal communication module handles
+     * module identification internally.
+     */ 
+    struct frame_identity_s {
+        module type;
+    };
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_identity_s, IDENTITY)
 
     /** USER STRUCTS */
 
