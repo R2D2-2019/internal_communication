@@ -22,13 +22,7 @@ namespace r2d2 {
          * @tparam T
          * @return
          */
-        template<
-            typename T,
-            typename = std::enable_if_t<
-                is_suitable_frame_v <T> && !is_extended_frame_v <T>
-            >
-        >
-
+        template<typename T> requires (is_suitable_frame_v<T>)
         T as_type() const {
             return *(
                 reinterpret_cast<const T *>(*data)
@@ -99,7 +93,7 @@ namespace r2d2 {
          * 
          * @tparam T
          */ 
-        template<typename T>
+        template<typename T> requires (is_suitable_frame_v<T>)
         constexpr size_t get_optimized_size(const T &data) const {
             if constexpr (supports_array_optimisation_v<T>) {
                 // We assume the length of the array is given by
@@ -149,12 +143,7 @@ namespace r2d2 {
          * @param data
          * @param prio
          */
-        template<
-            typename T,
-            typename = std::enable_if_t<
-                is_suitable_frame_v<T>
-            >
-        >
+        template<typename T> requires (is_suitable_frame_v<T>)
         void send(const T &data, const priority prio = priority::NORMAL) {
             // get the size of the data to send
             size_t size = get_optimized_size(data);
@@ -175,13 +164,7 @@ namespace r2d2 {
          * @param data
          * @param prio
          */
-        template<
-            typename T,
-            typename = std::enable_if_t<
-                is_suitable_frame_v <T>
-            >
-        >
-
+        template<typename T> requires (is_suitable_frame_v<T>)
         void send_external(const external_id_s &id, const T &data, const priority prio = priority::NORMAL) {
             // No {} needed, since all fields are filled.
             // Adding it will cause a call to memset
