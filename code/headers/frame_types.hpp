@@ -486,11 +486,11 @@ namespace r2d2 {
         int16_t altitude;
 
         // This variable represents the tenthousandths
-        // seconds of the longitude coordinate.
+        // minutes of the longitude coordinate.
         uint16_t long_tenthousandth_min;
 
         // This variable represents the tenthousandths
-        // seconds of the latitude coordinate.
+        // minutes of the latitude coordinate.
         uint16_t lat_tenthousandth_min;
 
         // This variable represents the degrees of
