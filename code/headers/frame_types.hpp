@@ -485,13 +485,13 @@ namespace r2d2 {
         // to the average sea level.
         int16_t altitude;
 
-        // This variable represents the thousandths
-        // seconds of the longitude coordinate.
-        uint16_t long_thousandth_sec;
+        // This variable represents the tenthousandths
+        // minutes of the longitude coordinate.
+        uint16_t long_tenthousandth_min;
 
-        // This variable represents the thousandths
-        // seconds of the latitude coordinate.
-        uint16_t lat_thousandth_sec;
+        // This variable represents the tenthousandths
+        // minutes of the latitude coordinate.
+        uint16_t lat_tenthousandth_min;
 
         // This variable represents the degrees of
         // the latitude coordinate.
@@ -501,10 +501,6 @@ namespace r2d2 {
         // the latitude coordinate.
         uint8_t lat_min;
 
-        // This variable represents the seconds of
-        // the latitude coordinate.
-        uint8_t lat_sec;
-
         // This variable represents the degrees of
         // the longitude coordinate.
         uint8_t long_deg;
@@ -512,10 +508,6 @@ namespace r2d2 {
         // This variable represents the minutes of
         // the longitude coordinate.
         uint8_t long_min;
-
-        // This variable represents the seconds of
-        // the longitude coordinate.
-        uint8_t long_sec;
 
         // This variable represents the nothern or
         // southern hemisphere the coordinate is located
@@ -674,19 +666,19 @@ namespace r2d2 {
 
     /**
      * This frame is used to request the type of the end effector
-     * 
+     *
      * End effector wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/End-Effectors#2-Interface
      */
     R2D2_PACK_STRUCT
     struct frame_end_effector_type_s {
-        //the type of end effector 
+        //the type of end effector
         end_effector_type type;
     };
 
     /**
      * The end effector claw can be closed and opened with this frame.
-     * 
+     *
      * End effector wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/End-Effectors#2-Interface
      */
