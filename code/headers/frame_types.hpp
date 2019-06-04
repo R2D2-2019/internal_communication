@@ -629,8 +629,9 @@ namespace r2d2 {
     };
 
     /*
-    * @brief This is a frame that will be send to the sound module. 
-    * @details It contains a simple rtttl string 
+    * This is a frame that will be send to the sound module. 
+    * It contains a simple rtttl string 
+    * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Sound-playback
     */
     R2D2_PACK_STRUCT
     struct frame_rtttl_string_s {
