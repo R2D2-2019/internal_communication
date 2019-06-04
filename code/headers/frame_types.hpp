@@ -485,29 +485,29 @@ namespace r2d2 {
         // to the average sea level.
         int16_t altitude;
 
-        // This variable represents the thousandths
+        // This variable represents the tenthousandths
         // seconds of the longitude coordinate.
-        uint16_t long_thousandth_sec;
+        uint16_t long_tenthousandth_min;
 
-        // This variable represents the thousandths
+        // This variable represents the tenthousandths
         // seconds of the latitude coordinate.
-        uint16_t lat_thousandth_sec;
+        uint16_t lat_tenthousandth_min;
 
         // This variable represents the degrees of
         // the latitude coordinate.
         uint8_t lat_deg;
 
-        // This variable represents the seconds of
+        // This variable represents the minutes of
         // the latitude coordinate.
-        uint8_t lat_sec;
+        uint8_t lat_min;
 
         // This variable represents the degrees of
         // the longitude coordinate.
         uint8_t long_deg;
 
-        // This variable represents the seconds of
+        // This variable represents the minutes of
         // the longitude coordinate.
-        uint8_t long_sec;
+        uint8_t long_min;
 
         // This variable represents the nothern or
         // southern hemisphere the coordinate is located
