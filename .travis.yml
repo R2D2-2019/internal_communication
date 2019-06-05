@@ -58,7 +58,7 @@ jobs:
 
     - script:
       # install gcc/g++-7
-      - sudo apt -qq update
+      - sudo apt-get -qq update
       - sudo apt-get -qq install g++-7 -y
 
       # Change symlinks of gcc to gcc-7
