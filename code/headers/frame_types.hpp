@@ -38,6 +38,7 @@ namespace r2d2 {
         COMMAND_ID,
         TEMPERATURE,
         GAS,
+        RTTTL_STRING,
         REQUEST_MAP_OBSTACLES,
         MAP_INFO,
         MAP_OBSTACLE,
@@ -620,6 +621,17 @@ namespace r2d2 {
     };
 
     /*
+    * This is a frame that will be send to the sound module. 
+    * It contains a simple rtttl string 
+    * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Sound-playback
+    */
+    R2D2_PACK_STRUCT
+    struct frame_rtttl_string_s {
+        // the rtttl string to be send 
+        char rtttl_string[248];
+    };
+    
+    /* 
     * This frame will be sent from the navigation module.
     * Refer to the wiki for more information:
     * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
@@ -756,6 +768,12 @@ namespace r2d2 {
     )
 
     R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURE)
+    
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_rtttl_string_s, 
+        RTTTL_STRING,
+        R2D2_OPTIMISE_STRING(frame_rtttl_string_s, rtttl_string)
+    )
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_request_map_obstacles_s,

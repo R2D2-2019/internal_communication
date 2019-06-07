@@ -10,19 +10,6 @@ branches:
     - master
     - release
 
-addons:
-  apt_packages:
-    - lib32bz2-1.0
-    - lib32ncurses5
-    - lib32z1 
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise 
-    packages:
-      - gcc-7
-      - g++-7
-
 cache:
   # cache the files for 3 hours
   timeout: 10800
@@ -31,30 +18,57 @@ cache:
     # cache the arm-none-eabi location
     - $HOME/arm-none-eabi
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise 
+
 install:
   # clone git repo to the $HOME folder
-  - git clone --recursive -j8  https://github.com/R2D2-2019/R2D2-build.git $HOME/r2d2
-  
-  # make installer executable
-  - chmod +x $HOME/r2d2/programs/travis-ci/install_arm-eabi-gcc.sh
+  - git clone https://github.com/R2D2-2019/R2D2-build.git $HOME/r2d2 --depth=10
 
-  # run installer
-  - $HOME/r2d2/programs/travis-ci/install_arm-eabi-gcc.sh
-
-  # add arm-eabi-gcc to path
-  - export PATH=$PATH:$HOME/arm-none-eabi/bin/ 
-
-  # Change symlinks of gcc to gcc-7
-  - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-7 /usr/bin/gcc 
-  - sudo unlink /usr/bin/g++ && sudo ln -s /usr/bin/g++-7 /usr/bin/g++  
-
-  # link to /bin/ location
-  - sudo ln -s /usr/bin/gcc /bin/gcc
-  - sudo ln -s /usr/bin/g++ /bin/g++  
+  # update the submodules with a depth of 50 to limit the size a bit
+  - cd $HOME/r2d2
+  - git submodule update --init --depth=50
 
 jobs:
   include:
+    - stage: Tests
+      script:
+        # make installer executable
+        - chmod +x $HOME/r2d2/programs/travis-ci/install_arm-eabi-gcc.sh
+
+        # run installer
+        - $HOME/r2d2/programs/travis-ci/install_arm-eabi-gcc.sh
+
+        # add arm-eabi-gcc to path
+        - export PATH=$PATH:$HOME/arm-none-eabi/bin/ 
+        
+        # copy the currently building repo into a build_module
+        - cp -r $TRAVIS_BUILD_DIR $HOME/r2d2/modules/build_module
+
+        # go into the modules folder of the build system
+        - cd $HOME/r2d2/modules/build_module/code
+
+        # build the module
+        - make build
+        - make clean
+      name: "Arduino build"
+
     - script:
+      # install gcc/g++-7
+      - sudo apt-get -qq update
+      - sudo apt-get -qq install g++-7 -y
+
+      # Change symlinks of gcc to gcc-7
+      - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-7 /usr/bin/gcc 
+      - sudo unlink /usr/bin/g++ && sudo ln -s /usr/bin/g++-7 /usr/bin/g++  
+
+      # link to /bin/ location
+      - sudo ln -s /usr/bin/gcc /bin/gcc
+      - sudo ln -s /usr/bin/g++ /bin/g++  
+
       # copy the currently building repo into a build_module
       - cp -r $TRAVIS_BUILD_DIR $HOME/r2d2/modules/build_module
 
@@ -64,15 +78,5 @@ jobs:
       # build the module
       - make build 
       - make run
-      - make clean
-
-    - script:
-      # copy the currently building repo into a build_module
-      - cp -r $TRAVIS_BUILD_DIR $HOME/r2d2/modules/build_module
-
-      # go into the modules folder of the build system
-      - cd $HOME/r2d2/modules/build_module/code
-
-      # build the module
-      - make build
-      - make clean
+      - make clean        
+      name: "Native tests"
