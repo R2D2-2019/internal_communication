@@ -77,11 +77,21 @@ namespace r2d2 {
         std::vector<frame_s> &get_send_frames() {
             return send_frames;
         }
+        /**
+         * Get the first frame from internal buffer
+         * 
+         * @return
+         */
         frame_s get_data() override{
             auto return_frame = send_frames.front();
             send_frames.erase(send_frames.begin());
             return return_frame;
         }
+        /**
+         * Check if there are frames in internal buffer
+         * 
+         * @return
+         */
         bool has_data() const override {
             return !send_frames.empty();
         }
