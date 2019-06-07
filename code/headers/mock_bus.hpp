@@ -41,7 +41,6 @@ namespace r2d2 {
             frame_s frame{};
             frame.type = type;
             frame.request = true;
-
             send_frames.push_back(frame);
         }
 
@@ -77,6 +76,14 @@ namespace r2d2 {
          */
         std::vector<frame_s> &get_send_frames() {
             return send_frames;
+        }
+        frame_s get_data() override{
+            auto return_frame = send_frames.front();
+            send_frames.erase(send_frames.begin());
+            return return_frame;
+        }
+        bool has_data() const override {
+            return !send_frames.empty();
         }
     };
 }

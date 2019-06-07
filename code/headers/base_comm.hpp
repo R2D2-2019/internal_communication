@@ -235,7 +235,7 @@ namespace r2d2 {
          *
          * @return
          */
-        bool has_data() const {
+        virtual bool has_data() const {
             return !rx_buffer.empty();
         }
 
@@ -245,7 +245,7 @@ namespace r2d2 {
         * @tparam T
         * @return
         */
-        frame_s get_data() {
+        virtual frame_s get_data() {
             return rx_buffer.copy_and_pop_front();
         }
 
