@@ -30,6 +30,10 @@ namespace r2d2 {
         SWARM_NAMES,
         BATTERY_LEVEL,
         MANUAL_CONTROL,
+        MANUAL_CONTROL_CONTROLLER_STATES,
+        MANUAL_CONTROL_BUTTON_STATE,
+        MANUAL_CONTROL_SLIDER_STATE,
+        MANUAL_CONTROL_JOYSTICK_STATE,
         MOVEMENT_CONTROL,
         COORDINATE,
         PATH_STEP,
@@ -454,6 +458,108 @@ namespace r2d2 {
         bool brake;
     };
 
+
+
+    /**
+     * Struct to let modules know on the start of the communication what the entire state of the controller is.
+     *
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     */
+    R2D2_PACK_STRUCT
+    struct frame_manual_control_controller_states_s {
+        // Unique ID of the controller
+        uint8_t controller_id;
+
+        // Primary buttons
+        bool button_a;
+        bool button_b;
+        bool button_x;
+        bool button_y;
+
+        // Dpad buttons
+        bool dpad_up;
+        bool dpad_down;
+        bool dpad_left;
+        bool dpad_right;
+
+        // Menu buttons
+        bool menu_left;
+        bool menu_right;
+
+        // Bumpers
+        bool bumper_left
+        bool bumper_right;
+
+        // Sliders
+        uint8_t slider_left;
+        uint8_t slider_right;
+
+        // Joysticks
+        int8_t joystick_left_x;
+        int8_t joystick_left_y;
+
+        int8_t joystick_right_y;
+        int8_t joystick_right_y;
+    };
+
+    /**
+     * Struct to let modules know the state of a button changed, and what it is now.
+     *
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     */
+    R2D2_PACK_STRUCT
+    struct frame_manual_control_button_state_s {
+        // Unique ID of the controller
+        uint8_t controller_id;
+
+        // Button ID
+        uint8_t button_id;
+
+        // Value of the above mentioned button
+        bool value;
+    };
+
+    /**
+     * Struct to let modules know the state of a slider changed, and what it is now.
+     *
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     */
+    R2D2_PACK_STRUCT
+    struct frame_manual_control_slider_state_s {
+        // Unique ID of the controller
+        uint8_t controller_id;
+
+        // Button ID
+        uint8_t slider_id;
+
+        // Value of the above mentioned slider
+        uint8_t value;
+    };
+
+    /**
+     * Struct to let modules know the state of a joystick changed, and what it is now.
+     *
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     */
+    R2D2_PACK_STRUCT
+    struct frame_manual_control_joystick_state_s {
+        //Unique ID of the controller
+        uint8_t controller_id;
+
+        // Joystick ID
+        uint8_t joystick_id;
+
+        // Value of the joystick X axis
+        int8_t value_x;
+
+        // Value of the joystick Y Axis
+        int8_t value_y;
+    };
+
     /**
      * Struct that represent the state
      * of how the robot WILL move.
@@ -744,6 +850,10 @@ namespace r2d2 {
 
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_controller_states_s, MANUAL_CONTROL_CONTROLLER_STATES)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_button_state_s, MANUAL_CONTROL_BUTTON_STATE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_slider_state_s, MANUAL_CONTROL_SLIDER_STATE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_joystick_state_s, MANUAL_CONTROL_JOYSTICK_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
