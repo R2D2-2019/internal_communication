@@ -488,7 +488,7 @@ namespace r2d2 {
         bool menu_right;
 
         // Bumpers
-        bool bumper_left
+        bool bumper_left;
         bool bumper_right;
 
         // Sliders
