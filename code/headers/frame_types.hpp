@@ -499,7 +499,7 @@ namespace r2d2 {
         int8_t joystick_left_x;
         int8_t joystick_left_y;
 
-        int8_t joystick_right_y;
+        int8_t joystick_right_x;
         int8_t joystick_right_y;
     };
 
