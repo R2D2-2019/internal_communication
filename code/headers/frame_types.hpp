@@ -39,9 +39,12 @@ namespace r2d2 {
         COMMAND_ID,
         TEMPERATURE,
         GAS,
+        RTTTL_STRING,
         REQUEST_MAP_OBSTACLES,
         MAP_INFO,
         MAP_OBSTACLE,
+        END_EFFECTOR_TYPE,
+        END_EFFECTOR_CLAW,
 
         // Don't touch
         EXTERNAL,
@@ -484,13 +487,13 @@ namespace r2d2 {
         // to the average sea level.
         int16_t altitude;
 
-        // This variable represents the thousandths
-        // seconds of the longitude coordinate.
-        uint16_t long_thousandth_sec;
+        // This variable represents the tenthousandths
+        // minutes of the longitude coordinate.
+        uint16_t long_tenthousandth_min;
 
-        // This variable represents the thousandths
-        // seconds of the latitude coordinate.
-        uint16_t lat_thousandth_sec;
+        // This variable represents the tenthousandths
+        // minutes of the latitude coordinate.
+        uint16_t lat_tenthousandth_min;
 
         // This variable represents the degrees of
         // the latitude coordinate.
@@ -500,10 +503,6 @@ namespace r2d2 {
         // the latitude coordinate.
         uint8_t lat_min;
 
-        // This variable represents the seconds of
-        // the latitude coordinate.
-        uint8_t lat_sec;
-
         // This variable represents the degrees of
         // the longitude coordinate.
         uint8_t long_deg;
@@ -511,10 +510,6 @@ namespace r2d2 {
         // This variable represents the minutes of
         // the longitude coordinate.
         uint8_t long_min;
-
-        // This variable represents the seconds of
-        // the longitude coordinate.
-        uint8_t long_sec;
 
         // This variable represents the nothern or
         // southern hemisphere the coordinate is located
@@ -639,6 +634,17 @@ namespace r2d2 {
     };
 
     /*
+    * This is a frame that will be send to the sound module. 
+    * It contains a simple rtttl string 
+    * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Sound-playback
+    */
+    R2D2_PACK_STRUCT
+    struct frame_rtttl_string_s {
+        // the rtttl string to be send 
+        char rtttl_string[248];
+    };
+    
+    /* 
     * This frame will be sent from the navigation module.
     * Refer to the wiki for more information:
     * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
@@ -681,6 +687,30 @@ namespace r2d2 {
         uint16_t y;
         // The classification to a specific map.
         uint8_t map_id;
+    };
+
+    /**
+     * This frame is used to request the type of the end effector
+     *
+     * End effector wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/End-Effectors#2-Interface
+     */
+    R2D2_PACK_STRUCT
+    struct frame_end_effector_type_s {
+        //the type of end effector
+        end_effector_type type;
+    };
+
+    /**
+     * The end effector claw can be closed and opened with this frame.
+     *
+     * End effector wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/End-Effectors#2-Interface
+     */
+    R2D2_PACK_STRUCT
+    struct frame_end_effector_claw_s {
+        // close or open state for the claw
+        bool close;
     };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
@@ -758,6 +788,12 @@ namespace r2d2 {
     )
 
     R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURE)
+    
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_rtttl_string_s, 
+        RTTTL_STRING,
+        R2D2_OPTIMISE_STRING(frame_rtttl_string_s, rtttl_string)
+    )
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_request_map_obstacles_s,
@@ -776,4 +812,8 @@ namespace r2d2 {
         MAP_OBSTACLE,
         R2D2_POISON_TYPE(frame_map_obstacle_s)
     )
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_type_s, END_EFFECTOR_TYPE)
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_claw_s, END_EFFECTOR_CLAW)
 }

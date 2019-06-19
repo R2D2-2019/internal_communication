@@ -14,21 +14,12 @@ namespace r2d2 {
     /**
      * Central definition that is used to
      * determine whether the type T is suitable as
-     * a packet type.
+     * a frame type.
      *
      * @tparam T
      */
     template<typename T>
-    constexpr bool is_suitable_frame_v = std::is_pod_v<T>;
-
-    /**
-     * Is the given packet type
-     * extended (spans multiple network layer packets)?
-     *
-     * @tparam T
-     */
-    template<typename T>
-    constexpr bool is_extended_frame_v = sizeof(T) > 8;
+    constexpr bool is_suitable_frame_v = std::is_pod_v<T> && sizeof(T) < (32 * 8);
 
     /**
      * This struct is specialized to indicate that the
@@ -36,7 +27,7 @@ namespace r2d2 {
      * 
      * @tparam T
      */ 
-    template<typename T>
+    template<typename T> requires (is_suitable_frame_v<T>)
     struct supports_string_optimisation : std::false_type {};
 
     /**
@@ -45,7 +36,7 @@ namespace r2d2 {
      * 
      * @tparam T
      */ 
-    template<typename T>
+    template<typename T> requires (is_suitable_frame_v<T>)
     struct string_member_offset {
         constexpr static uint16_t offset = 0;
     };
@@ -56,7 +47,7 @@ namespace r2d2 {
      *
      * @tparam T
      */  
-    template<typename T>
+    template<typename T> requires (is_suitable_frame_v<T>)
     constexpr bool supports_string_optimisation_v = supports_string_optimisation<T>::value;
 
     /**
@@ -65,7 +56,7 @@ namespace r2d2 {
      * 
      * @tparam T
      */ 
-    template<typename T>
+    template<typename T> requires (is_suitable_frame_v<T>)
     constexpr auto string_member_offset_v = string_member_offset<T>::offset;
 
     /**
@@ -74,7 +65,7 @@ namespace r2d2 {
      * 
      * @tparam T
      */ 
-    template<typename T>
+    template<typename T> requires (is_suitable_frame_v<T>)
     struct supports_array_optimisation : std::false_type {};
 
     /**
@@ -83,7 +74,7 @@ namespace r2d2 {
      * 
      * @tparam T
      */ 
-    template<typename T>
+    template<typename T> requires (is_suitable_frame_v<T>)
     struct array_member_offset {
         constexpr static uint8_t array_offset = 0;
         constexpr static uint8_t length = 0;
@@ -95,6 +86,6 @@ namespace r2d2 {
      *
      * @tparam T
      */  
-    template<typename T>
+    template<typename T> requires (is_suitable_frame_v<T>)
     constexpr bool supports_array_optimisation_v = supports_array_optimisation<T>::value;
 }
