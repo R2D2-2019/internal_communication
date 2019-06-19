@@ -17,9 +17,12 @@ namespace r2d2 {
         BUTTON_STATE,
         ACTIVITY_LED_STATE,
         DISTANCE,
-        DISPLAY_FILLED_RECTANGLE,
+        DISPLAY_RECTANGLE,
+        DISPLAY_RECTANGLE_VIA_CURSOR,
         DISPLAY_8X8_CHARACTER,
         DISPLAY_8X8_CHARACTER_VIA_CURSOR,
+        DISPLAY_CIRCLE,
+        DISPLAY_CIRCLE_VIA_CURSOR,
         CURSOR_POSITION,
         CURSOR_COLOR,
         UI_COMMAND,
@@ -35,9 +38,12 @@ namespace r2d2 {
         COMMAND_ID,
         TEMPERATURE,
         GAS,
+        RTTTL_STRING,
         REQUEST_MAP_OBSTACLES,
         MAP_INFO,
         MAP_OBSTACLE,
+        END_EFFECTOR_TYPE,
+        END_EFFECTOR_CLAW,
 
         // Don't touch
         EXTERNAL,
@@ -157,15 +163,11 @@ namespace r2d2 {
 
      * rectangle with the color specified.
      *
-     * Currently we can't fill the bigger screens. When the
-     * extended frames are here the position and width/height
-     * will change to a uint16_t to support the bigger screens.
-     *
      * Display wiki:
      * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
      */
     R2D2_PACK_STRUCT
-    struct frame_display_filled_rectangle_s {
+    struct frame_display_rectangle_s {
         // position of rectangle
         uint8_t x;
         uint8_t y;
@@ -173,6 +175,34 @@ namespace r2d2 {
         // dimensions of the rectangle
         uint8_t width;
         uint8_t height;
+        // if true the rectangle will be filled, if false the rectangle will be hollow.
+        bool filled;
+
+        // color of pixels
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
+    };
+
+    /**
+     * Struct to set a rectangle on a display. This fills a
+     * rectangle with the color specified.
+     *
+     * Display wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
+     */
+    R2D2_PACK_STRUCT
+    struct frame_display_rectangle_via_cursor_s {
+        // Targets which cursor to write to. This should be one
+        // your module claimed. The rectangle will be drawn
+        // from the cursor position as starting location.
+        uint8_t cursor_id;
+
+        // dimensions of the rectangle
+        uint8_t width;
+        uint8_t height;
+        // if true the rectangle will be filled, if false the rectangle will be hollow.
+        bool filled;
 
         // color of pixels
         uint8_t red;
@@ -224,6 +254,55 @@ namespace r2d2 {
         // The characters to draw
         // Last element because of string optimisation
         char characters[247];
+    };
+
+    /**
+     * Struct to set a circle on a display. This fills a
+     * circle with the color specified.
+     *
+     * Display wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
+     */
+    R2D2_PACK_STRUCT
+    struct frame_display_circle_s {
+        // position of the circle
+        uint8_t x;
+        uint8_t y;
+
+        // dimensions of the circle
+        uint8_t radius;
+        // if true the circle will be filled, if false the circle will be hollow.
+        bool filled;
+
+        // color of pixels
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
+    };
+
+    /**
+     * Struct to set a circle on a display. This fills a
+     * circle with the color specified.
+     *
+     * Display wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Display
+     */
+    R2D2_PACK_STRUCT
+    struct frame_display_circle_via_cursor_s {
+        // Targets which cursor to write to. This should be one
+        // your module claimed. The circle will be drawn
+        // from the cursor position as starting location.
+        uint8_t cursor_id;
+
+        // dimensions of the circle
+        uint8_t radius;
+        // if true the circle will be filled, if false the circle will be hollow.
+        bool filled;
+
+        // color of pixels
+        uint8_t red;
+        uint8_t green;
+        uint8_t blue;
     };
 
     /**
@@ -408,13 +487,13 @@ namespace r2d2 {
         // to the average sea level.
         int16_t altitude;
 
-        // This variable represents the thousandths
-        // seconds of the longitude coordinate.
-        uint16_t long_thousandth_sec;
+        // This variable represents the tenthousandths
+        // minutes of the longitude coordinate.
+        uint16_t long_tenthousandth_min;
 
-        // This variable represents the thousandths
-        // seconds of the latitude coordinate.
-        uint16_t lat_thousandth_sec;
+        // This variable represents the tenthousandths
+        // minutes of the latitude coordinate.
+        uint16_t lat_tenthousandth_min;
 
         // This variable represents the degrees of
         // the latitude coordinate.
@@ -424,10 +503,6 @@ namespace r2d2 {
         // the latitude coordinate.
         uint8_t lat_min;
 
-        // This variable represents the seconds of
-        // the latitude coordinate.
-        uint8_t lat_sec;
-
         // This variable represents the degrees of
         // the longitude coordinate.
         uint8_t long_deg;
@@ -435,10 +510,6 @@ namespace r2d2 {
         // This variable represents the minutes of
         // the longitude coordinate.
         uint8_t long_min;
-
-        // This variable represents the seconds of
-        // the longitude coordinate.
-        uint8_t long_sec;
 
         // This variable represents the nothern or
         // southern hemisphere the coordinate is located
@@ -551,6 +622,17 @@ namespace r2d2 {
     };
 
     /*
+    * This is a frame that will be send to the sound module. 
+    * It contains a simple rtttl string 
+    * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Sound-playback
+    */
+    R2D2_PACK_STRUCT
+    struct frame_rtttl_string_s {
+        // the rtttl string to be send 
+        char rtttl_string[248];
+    };
+    
+    /* 
     * This frame will be sent from the navigation module.
     * Refer to the wiki for more information:
     * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Navigation
@@ -595,10 +677,38 @@ namespace r2d2 {
         uint8_t map_id;
     };
 
+    /**
+     * This frame is used to request the type of the end effector
+     *
+     * End effector wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/End-Effectors#2-Interface
+     */
+    R2D2_PACK_STRUCT
+    struct frame_end_effector_type_s {
+        //the type of end effector
+        end_effector_type type;
+    };
+
+    /**
+     * The end effector claw can be closed and opened with this frame.
+     *
+     * End effector wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/End-Effectors#2-Interface
+     */
+    R2D2_PACK_STRUCT
+    struct frame_end_effector_claw_s {
+        // close or open state for the claw
+        bool close;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
-    R2D2_INTERNAL_FRAME_HELPER(frame_display_filled_rectangle_s, DISPLAY_FILLED_RECTANGLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_rectangle_s, DISPLAY_RECTANGLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_rectangle_via_cursor_s, DISPLAY_RECTANGLE_VIA_CURSOR)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_circle_s, DISPLAY_CIRCLE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_display_circle_via_cursor_s, DISPLAY_CIRCLE_VIA_CURSOR)
+
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_display_8x8_character_s,
@@ -659,6 +769,12 @@ namespace r2d2 {
     )
 
     R2D2_INTERNAL_FRAME_HELPER(frame_temperature_s, TEMPERATURE)
+    
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_rtttl_string_s, 
+        RTTTL_STRING,
+        R2D2_OPTIMISE_STRING(frame_rtttl_string_s, rtttl_string)
+    )
 
     R2D2_INTERNAL_FRAME_HELPER(
         frame_request_map_obstacles_s,
@@ -677,4 +793,8 @@ namespace r2d2 {
         MAP_OBSTACLE,
         R2D2_POISON_TYPE(frame_map_obstacle_s)
     )
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_type_s, END_EFFECTOR_TYPE)
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_claw_s, END_EFFECTOR_CLAW)
 }

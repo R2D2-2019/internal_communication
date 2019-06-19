@@ -14,9 +14,9 @@ int main() {
     r2d2::comm_c comm2;
 
     comm1.listen_for_frames({frame_type::ALL});
-    comm2.listen_for_frames({frame_type::DISPLAY_FILLED_RECTANGLE});
+    comm2.listen_for_frames({frame_type::DISPLAY_RECTANGLE});
 
-    frame_display_filled_rectangle_s state;
+    frame_display_rectangle_s state;
     state.x = 0xAA;
     state.y = 0xBA;
     state.width = 10;
@@ -41,7 +41,7 @@ int main() {
             }
 
             const auto data = t.as_frame_type<
-                frame_type::DISPLAY_FILLED_RECTANGLE>();
+                frame_type::DISPLAY_RECTANGLE>();
 
             hwlib::cout << "\tCom2 Got frame: " << hwlib::hex << int(data.x) << hwlib::dec << '\n';
         }
@@ -55,7 +55,7 @@ int main() {
             }
 
             const auto data = t.as_frame_type<
-                frame_type::DISPLAY_FILLED_RECTANGLE>();
+                frame_type::DISPLAY_RECTANGLE>();
 
             hwlib::cout << "\tCom1 Got frame: " << hwlib::hex << int(data.x) << hwlib::dec << '\n';
         }
