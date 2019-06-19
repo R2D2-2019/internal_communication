@@ -558,11 +558,8 @@ namespace r2d2 {
      */
     R2D2_PACK_STRUCT
     struct frame_microphone_s {
-    	// one sample is a 16 bit signed value
-    	int16_t sample;
-
 	// length of the array (for optimalisation)
-    	const uint8_t length = 4;
+    	uint8_t length;
 
         // array of samples
         int16_t microphone_data[length];
