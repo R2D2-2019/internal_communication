@@ -375,14 +375,14 @@ namespace r2d2 {
     struct frame_ui_command_s {
         // name of the frame or json command which we want to
         // send for evaluation to SMM
-        char command[255];
+        char command[240];
 
         // parameters for the frame from frame_name
-        char params[255];
+        char params[240];
 
         // destination is used to tell what robot or swarm to
         // send the command to
-        char destination[255];
+        char destination[240];
     };
 
     /**
