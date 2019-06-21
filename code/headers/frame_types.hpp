@@ -30,6 +30,7 @@ namespace r2d2 {
         SWARM_NAMES,
         BATTERY_LEVEL,
         MANUAL_CONTROL,
+        MICROPHONE,
         MOVEMENT_CONTROL,
         COORDINATE,
         PATH_STEP,
@@ -547,6 +548,18 @@ namespace r2d2 {
         uint8_t path_id;
     };
 
+    /**
+     * This frame contains an optimised array with raw microphone data
+     */
+    R2D2_PACK_STRUCT
+    struct frame_microphone_s {
+	// length of the array (for optimalisation)
+    	uint8_t length;
+
+        // array of samples
+        int16_t microphone_data[64];
+    };
+
     /*
      * This frame will only be used with the python bus.
      * The frame will be responsible for sending log data from
@@ -746,6 +759,13 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+    	frame_microphone_s,
+	MICROPHONE,
+	R2D2_OPTIMISE_ARRAY(frame_microphone_s, length, microphone_data)
+    )
+
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
     R2D2_INTERNAL_FRAME_HELPER(frame_gas_s, GAS)
 
