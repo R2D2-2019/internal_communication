@@ -557,7 +557,7 @@ namespace r2d2 {
     	uint8_t length;
 
         // array of samples
-        int16_t microphone_data[length];
+        int16_t microphone_data[64];
     };
 
     /*
