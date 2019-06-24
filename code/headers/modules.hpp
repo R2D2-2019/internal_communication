@@ -15,6 +15,34 @@ namespace r2d2 {
         CONTROLLER,
         LED,
 
-        POWER
+        //modules attached to can bus
+        CAMERA_VISION,
+        EXTERNAL_COMMUNICATION,
+        DISPLAY,
+        END_EFFECTORS,
+        FIRE_EXTINGUISHER,
+        GAS_DETECTION,
+        HAZARD_DETECTION,
+        HEALTH_MONITOR,
+        LOCATION_DETECTOR,
+        MICROPHONE,
+        MOVING_PLATFORM,
+        ROBOT_ARM,
+        POWER,
+        SOUND_PLAYBACK,
+        WEBCAM,
+        TOF_CAMERA,
+        VEIN_DETECTION,
+        VOICE_INTERACTION,
+        LED_STRIP,
+        MANUAL_CONTROLL,
+        THERMAL_VISION,
+
+        SENSOR_HUMIDITY,
+        SENSOR_LOAD,
+        SENSOR_FLAME,
+        SENSOR_GYROSCOPE,
+        SENSOR_DISTANCE,
+        SENSOR_TEMPERATURE
     };
 }
