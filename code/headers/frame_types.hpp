@@ -45,6 +45,7 @@ namespace r2d2 {
         MAP_OBSTACLE,
         END_EFFECTOR_TYPE,
         END_EFFECTOR_CLAW,
+        SONAR_DISTANCE,
 
         // Don't touch
         EXTERNAL,
@@ -712,6 +713,18 @@ namespace r2d2 {
         // close or open state for the claw
         bool close;
     };
+    /**
+     * The distance can be seen with this frame.
+     *
+     * End effector wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Distance-sensor
+     */
+    R2D2_PACK_STRUCT
+    struct frame_sonar_distance_s {
+        // distance in centimeters from the sensor
+        // uint16_t because 8 bits are to small for complete distance measurement
+        uint16_t distance_in_cm;
+    };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
@@ -816,4 +829,6 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_type_s, END_EFFECTOR_TYPE)
 
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_claw_s, END_EFFECTOR_CLAW)
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_sonar_distance_s, SONAR_DISTANCE)
 }
