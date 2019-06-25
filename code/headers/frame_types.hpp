@@ -45,6 +45,7 @@ namespace r2d2 {
         MAP_OBSTACLE,
         END_EFFECTOR_TYPE,
         END_EFFECTOR_CLAW,
+        FLAME_DETECTION,
 
         // Don't touch
         EXTERNAL,
@@ -713,6 +714,15 @@ namespace r2d2 {
         bool close;
     };
 
+    /**
+     *
+     */
+    R2D2_PACK_STRUCT
+    struct frame_flame_detection_s {
+    	bool flame_detected;
+    	int flame_angle;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
@@ -816,4 +826,6 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_type_s, END_EFFECTOR_TYPE)
 
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_claw_s, END_EFFECTOR_CLAW)
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_flame_detection_s, FLAME_DETECTION)
 }
