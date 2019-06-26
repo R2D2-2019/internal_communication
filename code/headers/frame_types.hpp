@@ -805,9 +805,9 @@ namespace r2d2 {
 
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
-    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_button_s, MANUAL_CONTROL_BUTTON_STATE)
-    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_slider_s, MANUAL_CONTROL_SLIDER_STATE)
-    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_joystick_s, MANUAL_CONTROL_JOYSTICK_STATE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_button_s, MANUAL_CONTROL_BUTTON)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_slider_s, MANUAL_CONTROL_SLIDER)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_joystick_s, MANUAL_CONTROL_JOYSTICK)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_path_step_s, PATH_STEP)
