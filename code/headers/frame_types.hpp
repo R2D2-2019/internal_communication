@@ -720,6 +720,7 @@ namespace r2d2 {
     R2D2_PACK_STRUCT
     struct frame_flame_detection_s {
     	bool flame_detected;
+    	bool big_fire;
     	int flame_angle;
     };
 
