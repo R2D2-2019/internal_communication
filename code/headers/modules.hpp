@@ -35,7 +35,7 @@ namespace r2d2 {
         VEIN_DETECTION,
         VOICE_INTERACTION,
         LED_STRIP,
-        MANUAL_CONTROLL,
+        MANUAL_CONTROL,
         THERMAL_VISION,
 
         SENSOR_HUMIDITY,
