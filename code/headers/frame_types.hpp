@@ -715,7 +715,10 @@ namespace r2d2 {
     };
 
     /**
+     * This frame is used to get if a fire is detected and at what angle
      *
+     * Flame detection wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Flame-sensor
      */
     R2D2_PACK_STRUCT
     struct frame_flame_detection_s {
