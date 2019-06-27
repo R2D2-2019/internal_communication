@@ -42,6 +42,7 @@ namespace r2d2 {
         COMMAND_ID,
         TEMPERATURE,
         GAS,
+        QRCODE_DATA,
         RTTTL_STRING,
         REQUEST_MAP_OBSTACLES,
         MAP_INFO,
@@ -788,6 +789,22 @@ namespace r2d2 {
     	int flame_angle;
     };
 
+    /**
+     * This frame is used to send data about detected QR codes over the bus.
+     * 
+     * Vision wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Vision
+     */
+    R2D2_PYTHON_FRAME
+    struct frame_qrcode_data_s {
+        char message;
+        uint16_t width;
+        uint16_t height;
+        uint16_t x_offset;
+        uint16_t y_offset;
+        uint16_t distance_in_mm;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
@@ -896,4 +913,10 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_claw_s, END_EFFECTOR_CLAW)
 
     R2D2_INTERNAL_FRAME_HELPER(frame_flame_detection_s, FLAME_DETECTION)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_qrcode_data_s,
+        QRCODE_DATA,
+        R2D2_POISON_TYPE(frame_qrcode_data_s)
+    )
 }
