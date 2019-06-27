@@ -802,7 +802,7 @@ namespace r2d2 {
         uint16_t x_offset;
         uint16_t y_offset;
         uint16_t distance_in_mm;
-        char message[240];
+        char message;
 
     }
 
