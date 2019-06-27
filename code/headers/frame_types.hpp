@@ -797,12 +797,12 @@ namespace r2d2 {
      */
     R2D2_PYTHON_FRAME
     struct frame_qrcode_data_s {
+        char message;
         uint16_t width;
         uint16_t height;
         uint16_t x_offset;
         uint16_t y_offset;
         uint16_t distance_in_mm;
-        char message;
 
     }
 
