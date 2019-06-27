@@ -30,6 +30,9 @@ namespace r2d2 {
         SWARM_NAMES,
         BATTERY_LEVEL,
         MANUAL_CONTROL,
+        MANUAL_CONTROL_BUTTON,
+        MANUAL_CONTROL_SLIDER,
+        MANUAL_CONTROL_JOYSTICK,
         MICROPHONE,
         MOVEMENT_CONTROL,
         COORDINATE,
@@ -456,6 +459,64 @@ namespace r2d2 {
         bool brake;
     };
 
+
+    /**
+     * Struct to let modules know the state of a button changed, and what it is now.
+     *
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     */
+    R2D2_PACK_STRUCT
+    struct frame_manual_control_button_s {
+        // Unique ID of the controller
+        uint8_t controller_id;
+
+        // Button ID
+        uint8_t button_id;
+
+        // Value of the above mentioned button
+        bool value;
+    };
+
+    /**
+     * Struct to let modules know the state of a slider changed, and what it is now.
+     *
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     */
+    R2D2_PACK_STRUCT
+    struct frame_manual_control_slider_s {
+        // Unique ID of the controller
+        uint8_t controller_id;
+
+        // Button ID
+        uint8_t slider_id;
+
+        // Value of the above mentioned slider
+        uint8_t value;
+    };
+
+    /**
+     * Struct to let modules know the state of a joystick changed, and what it is now.
+     *
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     */
+    R2D2_PACK_STRUCT
+    struct frame_manual_control_joystick_s {
+        //Unique ID of the controller
+        uint8_t controller_id;
+
+        // Joystick ID
+        uint8_t joystick_id;
+
+        // Value of the joystick X axis
+        int8_t value_x;
+
+        // Value of the joystick Y Axis
+        int8_t value_y;
+    };
+
     /**
      * Struct that represent the state
      * of how the robot WILL move.
@@ -771,6 +832,9 @@ namespace r2d2 {
 
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_button_s, MANUAL_CONTROL_BUTTON)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_slider_s, MANUAL_CONTROL_SLIDER)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_joystick_s, MANUAL_CONTROL_JOYSTICK)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE)
 
