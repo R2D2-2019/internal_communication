@@ -803,8 +803,7 @@ namespace r2d2 {
         uint16_t x_offset;
         uint16_t y_offset;
         uint16_t distance_in_mm;
-
-    }
+    };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
