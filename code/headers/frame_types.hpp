@@ -807,10 +807,10 @@ namespace r2d2 {
     };
 
     /**
-     * This frame is used to send data about detected QR codes over the bus.
+     * This frame is used to send data about the distance from the sensor.
      * 
-     * Vision wiki:
-     * https://github.com/R2D2-2019/R2D2-2019/wiki/Vision
+     * Distance sensor wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Distance-sensor
      */
     R2D2_PACK_STRUCT
     struct frame_distance_sensor_s {
