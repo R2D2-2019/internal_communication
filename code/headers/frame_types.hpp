@@ -800,8 +800,8 @@ namespace r2d2 {
         char message;
         uint16_t width;
         uint16_t height;
-        uint16_t x_offset;
-        uint16_t y_offset;
+        int16_t x_offset;
+        int16_t y_offset;
         uint16_t distance_in_mm;
     };
 
