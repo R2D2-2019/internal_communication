@@ -45,6 +45,8 @@ namespace r2d2 {
         MAP_OBSTACLE,
         END_EFFECTOR_TYPE,
         END_EFFECTOR_CLAW,
+        ROBOT_ARM,
+
 
         // Don't touch
         EXTERNAL,
@@ -713,6 +715,16 @@ namespace r2d2 {
         bool close;
     };
 
+    /**
+     *  
+     */
+    R2D2_PACK_STRUCT
+    struct frame_robot_arm_s{
+        uint16_t x;
+        uint16_t y;
+        uint16_t z;
+        uint16_t speed;
+    };
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
@@ -816,4 +828,9 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_type_s, END_EFFECTOR_TYPE)
 
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_claw_s, END_EFFECTOR_CLAW)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_robot_arm_s, 
+        ROBOT_ARM
+    )
 }
