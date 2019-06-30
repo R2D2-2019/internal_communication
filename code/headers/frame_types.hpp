@@ -52,7 +52,6 @@ namespace r2d2 {
         ROBOT_ARM,
         FLAME_DETECTION,
 
-
         // Don't touch
         EXTERNAL,
         ALL,
@@ -779,7 +778,6 @@ namespace r2d2 {
     };
 
     /**
-
      *  The Robot arm frame can move the robot arm to a certain cartasian point(xyz) with a amount of speed in (ms/min)
      * 
      *  robot arm wiki: https://github.com/R2D2-2019/R2D2-2019/wiki/Robot-Arm
@@ -792,6 +790,7 @@ namespace r2d2 {
         uint16_t speed;
     };
 
+    /**
      * This frame is used to get if a fire is detected and at what angle
      *
      * Flame detection wiki:
@@ -819,7 +818,6 @@ namespace r2d2 {
         int16_t y_offset;
         uint16_t distance_in_mm;
     };
-
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
@@ -927,7 +925,6 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_type_s, END_EFFECTOR_TYPE)
 
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_claw_s, END_EFFECTOR_CLAW)
-
 
     R2D2_INTERNAL_FRAME_HELPER(frame_robot_arm_s, ROBOT_ARM)
 
