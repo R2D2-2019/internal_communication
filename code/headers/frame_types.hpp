@@ -716,7 +716,9 @@ namespace r2d2 {
     };
 
     /**
-     *  
+     *  The Robot arm can move to a certain cartasian point(xyz) with a amount of speed in (ms/min)
+     * 
+     *  robot arm wiki: https://github.com/R2D2-2019/R2D2-2019/wiki/Robot-Arm
      */
     R2D2_PACK_STRUCT
     struct frame_robot_arm_s{
@@ -829,8 +831,5 @@ namespace r2d2 {
 
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_claw_s, END_EFFECTOR_CLAW)
 
-    R2D2_INTERNAL_FRAME_HELPER(
-        frame_robot_arm_s, 
-        ROBOT_ARM
-    )
+    R2D2_INTERNAL_FRAME_HELPER(frame_robot_arm_s, ROBOT_ARM)
 }
