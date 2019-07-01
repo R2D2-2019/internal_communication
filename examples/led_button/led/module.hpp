@@ -19,7 +19,7 @@ namespace r2d2::led {
             : base_module_c(comm), led(led) {
 
             // Set up listeners
-            comm.listen_for_frames({
+            comm.configure(module::LED, {
                 r2d2::frame_type::ACTIVITY_LED_STATE
             });
         }

@@ -62,6 +62,11 @@ namespace r2d2 {
         std::array<frame_id, 8> listen_for{};
 
         /**
+         * The type of this module.
+         */ 
+        module mod;
+
+        /**
          * Does this module accept all packets types?
          */
         bool accept_all = false;
@@ -164,7 +169,14 @@ namespace r2d2 {
          * @param data
          * @param prio
          */
-        template<typename T> requires (is_suitable_frame_v<T>)
+
+        template<
+            typename T,
+            typename = std::enable_if_t<
+                is_suitable_frame_v <T>
+            >
+        >
+
         void send_external(const external_id_s &id, const T &data, const priority prio = priority::NORMAL) {
             // No {} needed, since all fields are filled.
             // Adding it will cause a call to memset
@@ -199,7 +211,9 @@ namespace r2d2 {
          *
          * @param listen_for
          */
-        void listen_for_frames(std::array<frame_id, 8> listen_for /* Copy to allow move */) {
+        void configure(module mod, std::array<frame_id, 8> listen_for /* Copy to allow move */) {
+            this->mod = mod;
+
             // Sort to enable binary search
             int i = 1;
             while (i != listen_for.size()) {
@@ -227,7 +241,16 @@ namespace r2d2 {
          * @param frame
          */
         void accept_frame(const frame_s &frame) {
-            rx_buffer.push(frame);
+            // Identity frames are handled here explicitly,
+            // as we want to have access to higher level sending
+            // functionality but don't want the identity request
+            // frame to get into the rx_buffer of the specific module.
+            if (frame.request && frame.type == frame_type::IDENTITY) {
+                frame_identity_s identity = { mod };
+                send(identity);
+            } else {
+                rx_buffer.push(frame);
+            }            
         }
 
         /**
@@ -256,6 +279,13 @@ namespace r2d2 {
          */
         std::array<frame_id, 8> const &get_accepted_frame_types() const {
             return listen_for;
+        }
+
+        /**
+         * Get the type of this module.
+         */ 
+        module get_module_type() const {
+            return mod;
         }
 
         /**

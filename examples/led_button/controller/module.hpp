@@ -12,11 +12,9 @@ namespace r2d2::controller {
             : base_module_c(comm) {
 
             // Set up listeners
-            comm.listen_for_frames(
-                {
-                    r2d2::frame_type::BUTTON_STATE
-                }
-            );
+            comm.configure(module::CONTROLLER, {
+                r2d2::frame_type::BUTTON_STATE
+            });
         }
 
         /**
