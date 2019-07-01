@@ -235,6 +235,18 @@ namespace r2d2 {
         }
 
         /**
+         * Deprecated
+         * Re-added for backwards compatibility
+         * Listen for given packets
+         * This function now calls it's replacement "configure" with module::NONE
+         * 
+         * @param listen_for
+         */
+        void listen_for_frames(std::array<frame_id, 8> listen_for /* Copy to allow move */) {
+           configure(r2d2::module::NONE , listen_for);
+        }
+
+        /**
          * Accept the given frame. This will
          * insert it into the rx buffer.
          *
