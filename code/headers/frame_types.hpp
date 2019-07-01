@@ -31,6 +31,9 @@ namespace r2d2 {
         SWARM_NAMES,
         BATTERY_LEVEL,
         MANUAL_CONTROL,
+        MANUAL_CONTROL_BUTTON,
+        MANUAL_CONTROL_SLIDER,
+        MANUAL_CONTROL_JOYSTICK,
         MICROPHONE,
         MOVEMENT_CONTROL,
         COORDINATE,
@@ -40,12 +43,14 @@ namespace r2d2 {
         COMMAND_ID,
         TEMPERATURE,
         GAS,
+        QRCODE_DATA,
         RTTTL_STRING,
         REQUEST_MAP_OBSTACLES,
         MAP_INFO,
         MAP_OBSTACLE,
         END_EFFECTOR_TYPE,
         END_EFFECTOR_CLAW,
+        FLAME_DETECTION,
 
         // Don't touch
         EXTERNAL,
@@ -469,6 +474,64 @@ namespace r2d2 {
         bool brake;
     };
 
+
+    /**
+     * Struct to let modules know the state of a button changed, and what it is now.
+     *
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     */
+    R2D2_PACK_STRUCT
+    struct frame_manual_control_button_s {
+        // Unique ID of the controller
+        uint8_t controller_id;
+
+        // Button ID
+        uint8_t button_id;
+
+        // Value of the above mentioned button
+        bool value;
+    };
+
+    /**
+     * Struct to let modules know the state of a slider changed, and what it is now.
+     *
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     */
+    R2D2_PACK_STRUCT
+    struct frame_manual_control_slider_s {
+        // Unique ID of the controller
+        uint8_t controller_id;
+
+        // Button ID
+        uint8_t slider_id;
+
+        // Value of the above mentioned slider
+        uint8_t value;
+    };
+
+    /**
+     * Struct to let modules know the state of a joystick changed, and what it is now.
+     *
+     * Manual_control wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Manual-Control
+     */
+    R2D2_PACK_STRUCT
+    struct frame_manual_control_joystick_s {
+        //Unique ID of the controller
+        uint8_t controller_id;
+
+        // Joystick ID
+        uint8_t joystick_id;
+
+        // Value of the joystick X axis
+        int8_t value_x;
+
+        // Value of the joystick Y Axis
+        int8_t value_y;
+    };
+
     /**
      * Struct that represent the state
      * of how the robot WILL move.
@@ -727,6 +790,35 @@ namespace r2d2 {
         bool close;
     };
 
+    /**
+     * This frame is used to get if a fire is detected and at what angle
+     *
+     * Flame detection wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Flame-sensor
+     */
+    R2D2_PACK_STRUCT
+    struct frame_flame_detection_s {
+    	bool flame_detected;
+    	bool big_fire;
+    	int flame_angle;
+    };
+
+    /**
+     * This frame is used to send data about detected QR codes over the bus.
+     * 
+     * Vision wiki:
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Vision
+     */
+    R2D2_PYTHON_FRAME
+    struct frame_qrcode_data_s {
+        char message[200];
+        uint16_t width;
+        uint16_t height;
+        int16_t x_offset;
+        int16_t y_offset;
+        uint16_t distance_in_mm;
+    };
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
@@ -771,6 +863,9 @@ namespace r2d2 {
 
     R2D2_INTERNAL_FRAME_HELPER(frame_battery_level_s, BATTERY_LEVEL)
     R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_s, MANUAL_CONTROL)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_button_s, MANUAL_CONTROL_BUTTON)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_slider_s, MANUAL_CONTROL_SLIDER)
+    R2D2_INTERNAL_FRAME_HELPER(frame_manual_control_joystick_s, MANUAL_CONTROL_JOYSTICK)
     R2D2_INTERNAL_FRAME_HELPER(frame_movement_control_s, MOVEMENT_CONTROL)
     R2D2_INTERNAL_FRAME_HELPER(frame_coordinate_s, COORDINATE)
 
@@ -830,4 +925,12 @@ namespace r2d2 {
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_type_s, END_EFFECTOR_TYPE)
 
     R2D2_INTERNAL_FRAME_HELPER(frame_end_effector_claw_s, END_EFFECTOR_CLAW)
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_flame_detection_s, FLAME_DETECTION)
+
+    R2D2_INTERNAL_FRAME_HELPER(
+        frame_qrcode_data_s,
+        QRCODE_DATA,
+        R2D2_POISON_TYPE(frame_qrcode_data_s)
+    )
 }
