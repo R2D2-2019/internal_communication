@@ -45,6 +45,7 @@ namespace r2d2 {
         MAP_OBSTACLE,
         END_EFFECTOR_TYPE,
         END_EFFECTOR_CLAW,
+        GYROSCOPE,
 
         // Don't touch
         EXTERNAL,
@@ -631,6 +632,23 @@ namespace r2d2 {
         // The gas id which corresponds to a specific gas.
         // For example: 0 is LPG, 1 is Co, 2 is smoke.
         uint8_t gas_id;
+    };
+
+    /*
+    * This frame will be send from the gyroscope module.
+    * It will if you want the gyroscope data or the acceleration data
+    * wiki page: https://github.com/R2D2-2019/R2D2-2019/wiki/Gyroscope
+     */
+    R2D2_PACK_STRUCT
+    struct frame_gyroscope_s{
+        // bool to signal you want the gyroscope data
+        bool gyroscope;
+        // bool to signal you want the acceleration data
+        bool accel;
+        // the x, y and z variables that will be filled with the axis values from either gyroscope or the acceleration
+        int16_t x;
+        int16_t y;
+        int16_t z;
     };
 
     /*
