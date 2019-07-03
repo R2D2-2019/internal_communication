@@ -689,7 +689,7 @@ namespace r2d2 {
         end_effector_type type;
     };
 
-    /**
+    /** @cond CLI COMMAND @endcond
      * The end effector claw can be closed and opened with this frame.
      *
      * End effector wiki:
