@@ -50,7 +50,6 @@ namespace r2d2 {
         END_EFFECTOR_TYPE,
         END_EFFECTOR_CLAW,
         FLAME_DETECTION,
-        DISTANCE_SENSOR,
 
         // Don't touch
         EXTERNAL,
@@ -154,15 +153,20 @@ namespace r2d2 {
         bool state;
     };
 
-    /**
-     * Distance in milimeter
-     *
+        /**
+     * This frame is used to send data about the distance from the sensor.
+     * 
      * Distance sensor wiki:
-     * https://github.com/R2D2-2019/R2D2-2019/wiki/Measuring-distance
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Distance-sensor
      */
+
     R2D2_PACK_STRUCT
     struct frame_distance_s {
-        uint16_t mm;
+        uint8_t sensor_type;    
+        uint16_t sensor_pov;    
+        uint8_t count;          
+        uint16_t angles[55];
+        uint16_t values[55];
     };
 
     /**
@@ -806,20 +810,6 @@ namespace r2d2 {
         uint16_t distance_in_mm;
     };
 
-    /**
-     * This frame is used to send data about the distance from the sensor.
-     * 
-     * Distance sensor wiki:
-     * https://github.com/R2D2-2019/R2D2-2019/wiki/Distance-sensor
-     */
-    R2D2_PACK_STRUCT
-    struct frame_distance_sensor_s {
-        uint8_t sensor_type;    
-        uint16_t sensor_pov;    
-        uint8_t count;          
-        uint16_t angles[55];
-        uint16_t values[55];
-    };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
@@ -935,5 +925,4 @@ namespace r2d2 {
         R2D2_POISON_TYPE(frame_qrcode_data_s)
     )
 
-    R2D2_INTERNAL_FRAME_HELPER(frame_distance_sensor_s, DISTANCE_SENSOR)
 }
