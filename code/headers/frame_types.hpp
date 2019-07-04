@@ -778,7 +778,8 @@ namespace r2d2 {
     };
 
     /**
-     *  The Robot arm frame can move the robot arm to a certain cartasian point(xyz) with a amount of speed in (ms/min)
+     *  The Robot arm frame can move the robot arm to a certain cartasian point(xyz) with a amount 
+     *  of speed in (ms/min)
      * 
      *  robot arm wiki: https://github.com/R2D2-2019/R2D2-2019/wiki/Robot-Arm
      */
@@ -935,5 +936,4 @@ namespace r2d2 {
         QRCODE_DATA,
         R2D2_POISON_TYPE(frame_qrcode_data_s)
     )
-
 }
