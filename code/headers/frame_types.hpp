@@ -2,6 +2,7 @@
 
 #include "frames/macros.hpp"
 #include "frames/definitions.hpp"
+#include "modules.hpp"
 #include "frame_enums.hpp"
 
 namespace r2d2 {
@@ -53,6 +54,7 @@ namespace r2d2 {
 
         // Don't touch
         EXTERNAL,
+        IDENTITY,
         ALL,
         COUNT
     };
@@ -127,6 +129,18 @@ namespace r2d2 {
     };
 
     R2D2_INTERNAL_FRAME_HELPER(frame_external_s, EXTERNAL)
+
+    /**
+     * This frame is used to request and 
+     * respond to identity requests on the system.
+     * The internal communication module handles
+     * module identification internally.
+     */ 
+    struct frame_identity_s {
+        module type;
+    };
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_identity_s, IDENTITY)
 
     /** USER STRUCTS */
 
@@ -802,11 +816,11 @@ namespace r2d2 {
      */
     R2D2_PYTHON_FRAME
     struct frame_qrcode_data_s {
-        char message;
+        char message[200];
         uint16_t width;
         uint16_t height;
-        uint16_t x_offset;
-        uint16_t y_offset;
+        int16_t x_offset;
+        int16_t y_offset;
         uint16_t distance_in_mm;
     };
 

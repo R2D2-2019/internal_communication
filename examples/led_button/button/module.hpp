@@ -19,11 +19,9 @@ namespace r2d2::button {
             : base_module_c(comm), button(button) {
 
             // Set up listeners
-            comm.listen_for_frames(
-                {
-                    r2d2::frame_type::BUTTON_STATE
-                }
-            );
+            comm.configure(module::BUTTON, {
+                r2d2::frame_type::BUTTON_STATE
+            });
         }
 
         /**

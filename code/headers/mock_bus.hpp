@@ -54,7 +54,7 @@ namespace r2d2 {
          * @return
          */
         template<frame_type P>
-        frame_s create_frame(const frame_data_t<P> &data) {
+        frame_s create_frame(const frame_data_t<P> &data) const {
             frame_s frame{};
 
             const auto length = sizeof(frame_data_t<P>);
@@ -65,6 +65,21 @@ namespace r2d2 {
             for (size_t i = 0; i < length; i++) {
                 frame.data[i] = reinterpret_cast<const uint8_t*>(&data)[i];
             }            
+
+            return frame;
+        }
+
+        /**
+         * Helper function that creates a frame
+         * of the given type.
+         *
+         * @tparam P
+         * @return
+         */
+        template<frame_type P>
+        frame_s create_frame() const {
+            frame_s frame{};
+            frame.type = P;
 
             return frame;
         }
