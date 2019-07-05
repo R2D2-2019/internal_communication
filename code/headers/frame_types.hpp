@@ -168,15 +168,20 @@ namespace r2d2 {
         bool state;
     };
 
-    /**
-     * Distance in milimeter
-     *
+        /**
+     * This frame is used to send data about the distance from the sensor.
+     * 
      * Distance sensor wiki:
-     * https://github.com/R2D2-2019/R2D2-2019/wiki/Measuring-distance
+     * https://github.com/R2D2-2019/R2D2-2019/wiki/Distance-sensor
      */
+
     R2D2_PACK_STRUCT
     struct frame_distance_s {
-        uint16_t mm;
+        uint8_t sensor_type;    
+        uint16_t sensor_pov;    
+        uint8_t count;          
+        uint16_t angles[55];
+        uint16_t values[55];
     };
 
     /**
@@ -834,9 +839,10 @@ namespace r2d2 {
         uint16_t distance_in_mm;
     };
 
+
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
-    R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE)
+    R2D2_INTERNAL_FRAME_HELPER(frame_distance_s, DISTANCE, R2D2_OPTIMISE_ARRAY(frame_distance_s, count, values))
     R2D2_INTERNAL_FRAME_HELPER(frame_display_rectangle_s, DISPLAY_RECTANGLE)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_rectangle_via_cursor_s, DISPLAY_RECTANGLE_VIA_CURSOR)
     R2D2_INTERNAL_FRAME_HELPER(frame_display_circle_s, DISPLAY_CIRCLE)
