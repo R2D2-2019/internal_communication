@@ -485,7 +485,7 @@ namespace r2d2 {
      * Struct that represent the state
      * The health status of a plant.
      *
-     * Manual_control wiki:
+     * Plant_rescue_system wiki:
      * https://github.com/Joepieler/Plant_Rescue_System
      *
      */
