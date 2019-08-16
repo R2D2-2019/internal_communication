@@ -52,6 +52,7 @@ namespace r2d2 {
         END_EFFECTOR_CLAW,
         ROBOT_ARM,
         FLAME_DETECTION,
+	PLANT_HEALTH,
 
         // Don't touch
         EXTERNAL,
@@ -479,6 +480,22 @@ namespace r2d2 {
         // state of the brake button
         bool brake;
     };
+	
+     /**
+     * Struct that represent the state
+     * The health status of a plant.
+     *
+     * Manual_control wiki:
+     * https://github.com/Joepieler/Plant_Rescue_System
+     *
+     */
+    R2D2_PACK_STRUCT
+    struct frame_plant_health_s {
+        // A value between 0% & 100%
+        uint8_t moisture_percentage;
+    };
+	
+	
 
 
     /**
