@@ -41,6 +41,8 @@ namespace r2d2 {
         COMMAND_LOG,
         COMMAND_STATUS_UPDATE,
         COMMAND_ID,
+        SWM_COMMAND_HIGH
+        SWM_COMMAND_LOW
         TEMPERATURE,
         GAS,
         QRCODE_DATA,
@@ -52,6 +54,7 @@ namespace r2d2 {
         END_EFFECTOR_CLAW,
         ROBOT_ARM,
         FLAME_DETECTION,
+
 
         // Don't touch
         EXTERNAL,
@@ -839,6 +842,31 @@ namespace r2d2 {
         uint16_t distance_in_mm;
     };
 
+    /**
+     * This frame is used to send a high level swarm command.
+     * 
+     * Swarm Management wiki:
+     * https://gitlab.com/r2d2-2020/r2d2-2020/-/wikis/Modules/Swarm-Management
+     */
+    R2D2_PYTHON_FRAME
+    struct frame_high_swm_command_s {
+        char parameters[200];
+        uint32_t target;
+        uint8_t command_type;
+    };
+    /**
+     * This frame is used to send a low level swarm command.
+     * This should become an R2D2_PACK_STRUCT when the external comm is working.
+     * Swarm Management wiki:
+     * https://gitlab.com/r2d2-2020/r2d2-2020/-/wikis/Modules/Swarm-Management
+     */
+    R2D2_PYTHON_FRAME
+    struct frame_low_swm_command_s {
+        char parameters[200];
+        uint32_t target;
+        uint8_t command_type;
+    };
+
 
     R2D2_INTERNAL_FRAME_HELPER(frame_button_state_s, BUTTON_STATE)
     R2D2_INTERNAL_FRAME_HELPER(frame_activity_led_state_s, ACTIVITY_LED_STATE)
@@ -956,4 +984,8 @@ namespace r2d2 {
         QRCODE_DATA,
         R2D2_POISON_TYPE(frame_qrcode_data_s)
     )
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_low_swm_command_s, SWM_COMMAND_LOW)
+
+    R2D2_INTERNAL_FRAME_HELPER(frame_high_swm_command_s, SWM_COMMAND_HIGH)
 }
